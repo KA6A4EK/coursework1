@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">coursework</string>
+    <string name="enter_steps">Enter steps</string>
+    <string name="enter">Ввести</string>
+    <string name="topAppBarText">Health</string>
+    <string name="home_button">home button</string>
+    <string name="settings_button">settings button</string>
+    <string name="select_gender">Select gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="save">Save</string>
+</resources>
