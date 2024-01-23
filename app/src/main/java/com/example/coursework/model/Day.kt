@@ -3,7 +3,6 @@ package com.example.coursework.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.coursework.ui.screens.getCurrentDay
-import java.time.Duration
 
 @Entity(tableName = "Health")
 data class Day(

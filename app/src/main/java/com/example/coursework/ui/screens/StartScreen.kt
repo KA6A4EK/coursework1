@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
@@ -74,7 +73,7 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun alertDialog(number: Int, title: String = "", onDismis: (Int) -> Unit) {
+fun AlertDialog(number: Int, title: String = "", onDismiss: (Int) -> Unit) {
     var num by remember {
         mutableStateOf("$number")
     }
@@ -98,11 +97,11 @@ fun alertDialog(number: Int, title: String = "", onDismis: (Int) -> Unit) {
                 {
                     Text(text = "Cancel",
                         modifier = Modifier
-                            .clickable { onDismis(0) },
+                            .clickable { onDismiss(0) },
                         style = MaterialTheme.typography.displaySmall)
                     Text(text = "Save",
                         modifier = Modifier
-                            .clickable { onDismis(num.toIntOrNull() ?: 0) },
+                            .clickable { onDismiss(num.toIntOrNull() ?: 0) },
                         style = MaterialTheme.typography.displaySmall)
                 }
 

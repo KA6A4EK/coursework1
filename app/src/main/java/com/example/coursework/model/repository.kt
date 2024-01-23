@@ -1,8 +1,5 @@
 package com.example.coursework.model
 
-import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import com.example.coursework.ViewM.HealthUiState
 import com.example.coursework.ui.screens.getCurrentDay
 import dagger.Module
@@ -18,17 +15,7 @@ class repository @Inject constructor(
     val dao: dao,
     val trainingDao: TrainingDao
 ) {
-    suspend fun test() {
-        dao.Insert(Day(date = "17/01/2024"))
-        dao.Insert(Day(date = "16/01/2024"))
-        dao.Insert(Day(date = "15/01/2024"))
-        dao.Insert(Day(date = "14/01/2024"))
-        dao.Insert(Day(date = "13/01/2024"))
-        dao.Insert(Day(date = "11/01/2024"))
-        dao.Insert(Day(date = "09/01/2024"))
-        dao.Insert(Day(date = "01/01/2024"))
-        dao.Insert(Day(date = "01/01/2025"))
-    }
+
 
     private val uistate = MutableStateFlow(HealthUiState())
     val _uiState = uistate.asStateFlow()

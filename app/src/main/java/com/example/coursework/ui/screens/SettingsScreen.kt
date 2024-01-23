@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,7 +23,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -51,57 +49,51 @@ fun SettingsScreen(
     viewModel: HealthViewModel
 ) {
 
-    var userWeight by remember { mutableIntStateOf(viewModel.userWeight) }
-    var userHeight by remember { mutableIntStateOf(viewModel.userHeight) }
-    var gender by remember { mutableStateOf(viewModel.gender) }
-    var birthday by remember { mutableStateOf(viewModel.birthdayDate) }
-    var buttonIsCliked by remember { mutableStateOf("") }
+
+    var buttonIsClicked by remember { mutableStateOf("") }
     val dateDialogState = rememberMaterialDialogState()
-    if (buttonIsCliked != "") {
-        when (buttonIsCliked) {
-            "weight" -> SnapToBlockList(num = userWeight, listSize = 500, text = "kg") {
-                buttonIsCliked = ""
-                userWeight = it
+    if (buttonIsClicked != "") {
+        when (buttonIsClicked) {
+            "weight" -> SnapToBlockList(num = viewModel.userWeight, listSize = 500, text = "kg") {
+                buttonIsClicked = ""
                 viewModel.userWeight = it
                 viewModel.saveHealthData()
             }
 
-            "height" -> SnapToBlockList(num = userHeight, listSize = 300, text = "cm") {
-                buttonIsCliked = ""
-                userHeight = it
+            "height" -> SnapToBlockList(num = viewModel.userHeight, listSize = 300, text = "cm") {
+                buttonIsClicked = ""
                 viewModel.userHeight = it
                 viewModel.saveHealthData()
 
             }
 
-            "gender" -> genderAlertDialog(Gender = gender) {
-                buttonIsCliked = ""
-                gender = it
+            "gender" -> GenderAlertDialog(Gender = viewModel.gender) {
+                buttonIsClicked = ""
                 viewModel.gender = it
                 viewModel.saveHealthData()
             }
 
             "birthdayDate" -> {
                 dateDialogState.show()
-                pickDate(dateDialogState = dateDialogState, edit = viewModel.birthdayDate) {
+                PickDate(dateDialogState = dateDialogState, edit = viewModel.birthdayDate) {
                     viewModel.birthdayDate = if (it < Date()) {
                         SimpleDateFormat("dd/MM/yyyy").format(it).toString()
                     } else {
                         viewModel.birthdayDate
                     }
                     viewModel.saveHealthData()
-                    buttonIsCliked = ""
+                    buttonIsClicked = ""
                 }
 
             }
 
             "name" -> {
-                fillNameAlertDialog(name = viewModel.name) {
+                FillNameAlertDialog(name = viewModel.name) {
                     if (it != "") {
                         viewModel.name = it
                         viewModel.saveHealthData()
                     }
-                    buttonIsCliked = ""
+                    buttonIsClicked = ""
 
                 }
             }
@@ -118,14 +110,14 @@ fun SettingsScreen(
             modifier = Modifier
                 .padding(10.dp)
                 .clickable {
-                    buttonIsCliked = "name"
+                    buttonIsClicked = "name"
                 }
         )
         Card {
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .clickable { buttonIsCliked = "gender" }) {
+                .clickable { buttonIsClicked = "gender" }) {
                 Icon(
                     painterResource(id = R.drawable.person_24px),
                     contentDescription = "",
@@ -141,7 +133,7 @@ fun SettingsScreen(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .clickable { buttonIsCliked = "height" }) {
+                .clickable { buttonIsClicked = "height" }) {
                 Icon(
                     painterResource(id = R.drawable.height_24px),
                     contentDescription = "",
@@ -157,7 +149,7 @@ fun SettingsScreen(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .clickable { buttonIsCliked = "weight" }) {
+                .clickable { buttonIsClicked = "weight" }) {
                 Icon(
                     painterResource(id = R.drawable.weight_24px),
                     contentDescription = "",
@@ -173,7 +165,7 @@ fun SettingsScreen(
             Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth()
-                .clickable { buttonIsCliked = "birthdayDate" }) {
+                .clickable { buttonIsClicked = "birthdayDate" }) {
                 Icon(
                     painterResource(id = R.drawable.cake_24px),
                     contentDescription = "",
@@ -191,9 +183,8 @@ fun SettingsScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun genderAlertDialog(Gender: String, onDismis: (String) -> Unit) {
-
-    AlertDialog(onDismissRequest = { onDismis(Gender) }) {
+fun GenderAlertDialog(Gender: String, onDismiss: (String) -> Unit) {
+    AlertDialog(onDismissRequest = { onDismiss(Gender) }) {
         Card {
             Column(
                 Modifier
@@ -208,13 +199,13 @@ fun genderAlertDialog(Gender: String, onDismis: (String) -> Unit) {
                 )
                 Text(text = stringResource(R.string.male),
                     Modifier
-                        .clickable { onDismis("Male") }
+                        .clickable { onDismiss("Male") }
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.White)
                 Text(text = stringResource(R.string.female),
                     Modifier
-                        .clickable { onDismis("Female") }
+                        .clickable { onDismiss("Female") }
                         .fillMaxWidth(),
                     style = MaterialTheme.typography.displayMedium,
                     color = Color.White)
@@ -225,7 +216,7 @@ fun genderAlertDialog(Gender: String, onDismis: (String) -> Unit) {
 
 
 @Composable
-fun pickDate(edit: String, dateDialogState: MaterialDialogState, onClic: (Date) -> Unit) {
+fun PickDate(edit: String, dateDialogState: MaterialDialogState, onDismiss: (Date) -> Unit) {
 
     var date by remember { mutableStateOf(Date()) }
     LaunchedEffect(edit) {
@@ -235,7 +226,7 @@ fun pickDate(edit: String, dateDialogState: MaterialDialogState, onClic: (Date) 
     MaterialDialog(
         dialogState = dateDialogState,
         buttons = {
-            positiveButton(text = "Ok", onClick = { onClic(date) })
+            positiveButton(text = stringResource(R.string.ok), onClick = { onDismiss(date) })
 
         }
     ) {
@@ -250,7 +241,7 @@ fun pickDate(edit: String, dateDialogState: MaterialDialogState, onClic: (Date) 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun fillNameAlertDialog(name: String, onDismis: (String) -> Unit) {
+fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
     var name by remember {
         mutableStateOf(name)
     }
@@ -268,20 +259,22 @@ fun fillNameAlertDialog(name: String, onDismis: (String) -> Unit) {
                 )
                 OutlinedTextField(value = name, onValueChange = { name = it })
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
 
                     Text(
                         text = "Cancel",
                         modifier = Modifier
-                            .clickable { onDismis("") },
+                            .clickable { onDismiss("") },
                         style = MaterialTheme.typography.displaySmall
                     )
                     Text(
                         text = "Save",
                         modifier = Modifier
-                            .clickable { onDismis(name) },
+                            .clickable { onDismiss(name) },
                         style = MaterialTheme.typography.displaySmall
                     )
 
@@ -294,13 +287,13 @@ fun fillNameAlertDialog(name: String, onDismis: (String) -> Unit) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismis: (Int) -> Unit) {
+fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = num - 1)
 
-    val itemHeight = 50.dp // Замените на высоту вашего элемента в dp
+    val itemHeight = 50.dp
     val firstIndex = scrollState.firstVisibleItemIndex
     val firstOffset = scrollState.firstVisibleItemScrollOffset
-    AlertDialog(onDismissRequest = { onDismis(num) }) {
+    AlertDialog(onDismissRequest = { onDismiss(num) }) {
 
         Card(
             modifier = Modifier
@@ -314,10 +307,10 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismis: (Int) -> Un
                 ) {
                     items(listSize) { index ->
                         if (index == firstIndex + 1) {
-                            scrollCard(n = index, h = itemHeight, isMiddle = true)
+                            ScrollCard(n = index, h = itemHeight, isMiddle = true)
 
                         } else {
-                            scrollCard(n = index, h = itemHeight)
+                            ScrollCard(n = index, h = itemHeight)
                         }
                     }
                 }
@@ -338,13 +331,13 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismis: (Int) -> Un
                 Text(
                     text = "Cancel",
                     modifier = Modifier
-                        .clickable { onDismis(num) },
+                        .clickable { onDismiss(num) },
                     style = MaterialTheme.typography.displaySmall
                 )
                 Text(
                     text = "Save",
                     modifier = Modifier
-                        .clickable { onDismis(firstIndex + 1) },
+                        .clickable { onDismiss(firstIndex + 1) },
                     style = MaterialTheme.typography.displaySmall
                 )
             }
@@ -364,7 +357,7 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismis: (Int) -> Un
 }
 
 @Composable
-fun scrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
+fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
     Box(
         modifier = Modifier
             .size(h), contentAlignment = Alignment.Center

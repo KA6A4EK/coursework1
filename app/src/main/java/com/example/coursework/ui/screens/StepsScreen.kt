@@ -6,12 +6,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -21,6 +19,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,8 +41,8 @@ import kotlin.math.round
 fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
     val days = viewModel.days.map { Pair(it.date, it.steps) }
-    var steps by remember { mutableStateOf(0) }
-    Column() {
+    var steps by remember { mutableIntStateOf(0) }
+    Column {
         steps = lazyRowProgress(target = target, color = Color.Green, onClick = {}, days = days)
         Card(Modifier.padding(10.dp)) {
             Column(
@@ -103,7 +102,7 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
 fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 @Composable
-fun boxWithProgress(h: Int, target: Int) {
+fun BoxWithProgress(h: Int, target: Int) {
     Box (modifier = Modifier.height(220.dp), contentAlignment = Alignment.BottomStart){
         Canvas(
             modifier = Modifier
@@ -126,7 +125,7 @@ fun boxWithProgress(h: Int, target: Int) {
             )
             val paint = Paint().asFrameworkPaint().apply {
                 isAntiAlias = true
-                textSize = 13.sp.toPx()// Примерно эквивалентно 16.sp
+                textSize = 13.sp.toPx()
                 color = android.graphics.Color.WHITE
             }
 
@@ -155,7 +154,7 @@ fun lazyRowProgress(
         mutableStateOf(getCurrentDay())
     }
     Box {
-        boxWithProgress(h = 230, target)
+        BoxWithProgress(h = 230, target)
         LazyRow(
             modifier = Modifier.padding(end = 45.dp),
             reverseLayout = true

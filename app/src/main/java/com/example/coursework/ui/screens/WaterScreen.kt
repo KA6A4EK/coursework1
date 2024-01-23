@@ -31,7 +31,6 @@ fun WaterScreen(viewModel : HealthViewModel){
                 .height(300.dp)
                 .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "$water", style = MaterialTheme.typography.displayMedium, color = Color.White)
-                ///тут картинка стакана
 
             }
             

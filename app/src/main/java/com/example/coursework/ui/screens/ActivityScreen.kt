@@ -43,13 +43,13 @@ fun ActivityScreen(viewModel: HealthViewModel) {
             )
         }
         items(viewModel.trainingActivity.filter { it.date==current }){it->
-            cardActivityList(training =it )
+            CardActivityList(training =it )
         }
     }
 }
 
 @Composable
-fun cardActivityList(training: Training) {
+fun CardActivityList(training: Training) {
     Card {
         Row (Modifier.fillMaxWidth().height(100.dp).padding(10.dp), verticalAlignment = Alignment.CenterVertically,horizontalArrangement = Arrangement.SpaceBetween){
             Column {

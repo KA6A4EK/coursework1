@@ -1,8 +1,6 @@
 package com.example.coursework.ViewM
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coursework.model.Day
@@ -12,18 +10,13 @@ import com.example.coursework.ui.screens.getCurrentDay
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import java.time.LocalDate
 import javax.inject.Inject
 
 
-
-
-
 class HealthViewModel @Inject constructor(private val repos: repository,context: Context) : ViewModel() {
-    val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
+    private val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
     var name: String = sharedPrefs.getString("name", "User") ?: "User"
     var gender: String = sharedPrefs.getString("gender", "Male") ?: "Male"
     var userHeight: Int = sharedPrefs.getInt("userHeight", 170)

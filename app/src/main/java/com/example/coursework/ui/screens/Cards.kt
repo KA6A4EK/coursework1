@@ -102,11 +102,11 @@ fun CardSteps(
     viewModel: HealthViewModel
 ) {
     var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }
-    var buttonIsCliked by remember { mutableStateOf(false) }
+    var buttonIsClicked by remember { mutableStateOf(false) }
     val stepTarget = viewModel.stepsTarget
 
-    if (buttonIsCliked) {
-        alertDialog(
+    if (buttonIsClicked) {
+        AlertDialog(
             number = steps,
             title = stringResource(R.string.enter_steps)
         ) {
@@ -114,7 +114,7 @@ fun CardSteps(
                 steps = it
                 viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = it)))
             }
-            buttonIsCliked = false
+            buttonIsClicked = false
 
         }
     }
@@ -141,7 +141,7 @@ fun CardSteps(
                 }
 
                 Button(onClick = {
-                    buttonIsCliked = true
+                    buttonIsClicked = true
                 }) {
                     Text(text = stringResource(R.string.enter))
                 }
@@ -155,10 +155,10 @@ fun CardSteps(
 
 @Composable
 fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var buttonIsCliked by remember { mutableStateOf("") }
+    var buttonIsClicked by remember { mutableStateOf("") }
     val activities = listOf("Skiing", "Hiking", "Sprint", "Martial")
-    if (buttonIsCliked in activities) {
-        alertDialogForActivity(type = buttonIsCliked) {
+    if (buttonIsClicked in activities) {
+        AlertDialogForActivity(type = buttonIsClicked) {
             if (it.duration > 0) {
                 viewModel.handleViewEvent(
                     HealthViewEvent.Update(
@@ -169,7 +169,7 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
                 )
                 viewModel.handleViewEvent(HealthViewEvent.InsertTraining(it))
             }
-            buttonIsCliked = ""
+            buttonIsClicked = ""
         }
     }
 
@@ -183,10 +183,10 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconForActivities(R.drawable.downhill_skiing_24px, onClick = {
-                buttonIsCliked = "Skiing"
+                buttonIsClicked = "Skiing"
             })
-            IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsCliked = "Hiking" })
-            IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsCliked = "Sprint" })
+            IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsClicked = "Hiking" })
+            IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsClicked = "Sprint" })
 
             IconForActivities(drawable = R.drawable.list_24px) {
                 onCardClick()
@@ -201,16 +201,16 @@ fun CardEat(
     onCardClick: () -> Unit,
     viewModel: HealthViewModel
 ) {
-    var buttonIsCliked by remember { mutableStateOf(false) }
+    var buttonIsClicked by remember { mutableStateOf(false) }
     val calTarget = viewModel.eatTarget
     var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
-    if (buttonIsCliked) {
-        alertDialog(number = cal, title = "Enter calories"){
+    if (buttonIsClicked) {
+        AlertDialog(number = cal, title = "Enter calories"){
             if (it>0){
                 cal = it
                 viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
             }
-            buttonIsCliked = false
+            buttonIsClicked = false
         }
 
     }
@@ -236,7 +236,7 @@ fun CardEat(
                         color = Color.Gray
                     )
                 }
-                Button(onClick = { buttonIsCliked = true }) {
+                Button(onClick = { buttonIsClicked = true }) {
                     Text(text = stringResource(id = R.string.enter))
                 }
             }
@@ -281,14 +281,14 @@ fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
 fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
     val minWeight = round(18.5 * bodyHeight * bodyHeight / 10000)
     val maxWeight = round((25 * bodyHeight * bodyHeight / 10000).toDouble())
-    val BMI = bodyWeight / bodyHeight.toFloat() / bodyHeight.toFloat() * 10000
+    val bmi = bodyWeight / bodyHeight.toFloat() / bodyHeight.toFloat() * 10000
     Column {
         Canvas(
             modifier = Modifier
                 .padding(10.dp)
                 .width(width.dp)
         ) {
-            val w = (size.width / 2 + size.width / 2 * (BMI - 22) / 9)
+            val w = (size.width / 2 + size.width / 2 * (bmi - 22) / 9)
             val h = when {
                 w < 0 -> 0
                 w > size.width -> size.width
@@ -376,7 +376,7 @@ fun IconForActivities(drawable: Int, description: String = "", onClick: () -> Un
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun alertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
+fun AlertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
     var duration by remember { mutableStateOf("") }
     AlertDialog(onDismissRequest = { }) {
         Card {
