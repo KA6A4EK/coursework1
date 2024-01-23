@@ -9,4 +9,9 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="save">Save</string>
+    <string name="enter_birthday_date">Ввведите дату рождения</string>
+    <string name="enter_name">Enter name</string>
+    <string name="cm">cm</string>
+    <string name="enter_duration">enter duration</string>
+    <string name="water_level">water Level</string>
 </resources>

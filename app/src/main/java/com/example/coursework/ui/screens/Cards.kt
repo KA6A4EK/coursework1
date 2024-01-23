@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -25,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -42,7 +40,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewEvent
 import com.example.coursework.ViewM.HealthViewModel
@@ -67,12 +64,13 @@ fun CardWater(
                     Text(
                         text = "$water",
                         style = MaterialTheme.typography.displaySmall,
-                        color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "/${viewModel.waterTarget}",
-                        style = MaterialTheme.typography.headlineMedium
+                        text = "/${viewModel.waterTarget} мл",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Gray
+
                     )
                 }
                 Button(onClick = {
@@ -89,7 +87,7 @@ fun CardWater(
             }
             Image(
                 painter = painterResource(id = image),
-                contentDescription = "water Level",
+                contentDescription = stringResource(R.string.water_level),
                 modifier = Modifier
                     .size(80.dp)
                     .padding(5.dp)
@@ -110,12 +108,15 @@ fun CardSteps(
     if (buttonIsCliked) {
         alertDialog(
             number = steps,
-            title = stringResource(R.string.enter_steps),
-            onDismis = { new ->
-                buttonIsCliked = false
-                steps = new
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = new)))
-            })
+            title = stringResource(R.string.enter_steps)
+        ) {
+            if (it > 0) {
+                steps = it
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = it)))
+            }
+            buttonIsCliked = false
+
+        }
     }
     Card(modifier = Modifier
         .clickable { onCardClick() }
@@ -131,9 +132,12 @@ fun CardSteps(
                         text = "$steps",
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
                     )
-                    Text(text = "/$stepTarget", style = MaterialTheme.typography.headlineSmall)
+                    Text(
+                        text = "/$stepTarget ш",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Gray
+                    )
                 }
 
                 Button(onClick = {
@@ -152,42 +156,21 @@ fun CardSteps(
 @Composable
 fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var buttonIsCliked by remember { mutableStateOf("") }
-    when (buttonIsCliked) {
-        "Skiing" -> {
-            alertDialogForActivity(type = buttonIsCliked) {
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(activity = viewModel.currentDay.activity + it.duration)))
+    val activities = listOf("Skiing", "Hiking", "Sprint", "Martial")
+    if (buttonIsCliked in activities) {
+        alertDialogForActivity(type = buttonIsCliked) {
+            if (it.duration > 0) {
+                viewModel.handleViewEvent(
+                    HealthViewEvent.Update(
+                        viewModel.currentDay.copy(
+                            activity = viewModel.currentDay.activity + it.duration
+                        )
+                    )
+                )
                 viewModel.handleViewEvent(HealthViewEvent.InsertTraining(it))
-                buttonIsCliked = ""
             }
+            buttonIsCliked = ""
         }
-
-        "Hiking" -> {
-            alertDialogForActivity(type = buttonIsCliked) {
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(activity = viewModel.currentDay.activity + it.duration)))
-                viewModel.handleViewEvent(HealthViewEvent.InsertTraining(it))
-                buttonIsCliked = ""
-
-            }
-        }
-
-        "Sprint" -> {
-            alertDialogForActivity(type = buttonIsCliked) {
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(activity = viewModel.currentDay.activity + it.duration)))
-                viewModel.handleViewEvent(HealthViewEvent.InsertTraining(it))
-                buttonIsCliked = ""
-
-            }
-        }
-
-        "Martial" -> {
-            alertDialogForActivity(type = buttonIsCliked) {
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(activity = viewModel.currentDay.activity + it.duration)))
-                viewModel.handleViewEvent(HealthViewEvent.InsertTraining(it))
-                buttonIsCliked = ""
-            }
-        }
-
-        else -> {}
     }
 
     Card {
@@ -204,42 +187,12 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             })
             IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsCliked = "Hiking" })
             IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsCliked = "Sprint" })
-//            IconForActivities(
-//                R.drawable.sports_martial_arts_24px,
-//                onClick = { buttonIsCliked = "Martial" })
+
             IconForActivities(drawable = R.drawable.list_24px) {
                 onCardClick()
             }
         }
     }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun alertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
-    var duration by remember { mutableStateOf("0") }
-    AlertDialog(onDismissRequest = { }) {
-        Card {
-            Column (Modifier.padding(10.dp)){
-                Text(text = type, style = MaterialTheme.typography.displaySmall,color = Color.White)
-                OutlinedTextField(value = duration, onValueChange = { duration = it }, label = { Text(text = "enter duration", fontSize = 15.sp) })
-                Row (Modifier.fillMaxWidth().padding(10.dp), horizontalArrangement = Arrangement.End){
-                Button(onClick = {
-                    onDismiss(
-                        Training(
-                            title = type,
-                            duration = duration.toIntOrNull() ?: 0,
-                            date = getCurrentDay(),
-                        )
-                    )
-                }) {
-                    Text(text = stringResource(R.string.save))
-                }}
-            }
-        }
-
-    }
-
 }
 
 
@@ -252,11 +205,14 @@ fun CardEat(
     val calTarget = viewModel.eatTarget
     var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
     if (buttonIsCliked) {
-        alertDialog(number = cal, title = "Enter calories", onDismis = { new ->
+        alertDialog(number = cal, title = "Enter calories"){
+            if (it>0){
+                cal = it
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
+            }
             buttonIsCliked = false
-            cal = new
-            viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = new)))
-        })
+        }
+
     }
     Card(modifier = Modifier
         .clickable { onCardClick() }
@@ -272,10 +228,13 @@ fun CardEat(
                     Text(
                         text = "$cal",
                         style = MaterialTheme.typography.displaySmall,
-                        color = Color.White,
                         fontWeight = FontWeight.Bold
                     )
-                    Text(text = "/$calTarget", style = MaterialTheme.typography.headlineLarge)
+                    Text(
+                        text = "/$calTarget калорий",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Gray
+                    )
                 }
                 Button(onClick = { buttonIsCliked = true }) {
                     Text(text = stringResource(id = R.string.enter))
@@ -375,6 +334,7 @@ fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
 
 @Composable
 fun ProgressBar(percent: Float, barWidth: Int, width: Int) {
+    val percent = minOf(1f, percent)
     Box {
         Canvas(
             modifier = Modifier
@@ -411,5 +371,64 @@ fun IconForActivities(drawable: Int, description: String = "", onClick: () -> Un
                 .size(40.dp)
                 .clickable { onClick() }, Color.White
         )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun alertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
+    var duration by remember { mutableStateOf("") }
+    AlertDialog(onDismissRequest = { }) {
+        Card {
+            Column(Modifier.padding(20.dp)) {
+                Text(
+                    text = type,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = Color.White
+                )
+                OutlinedTextField(
+                    value = duration,
+                    onValueChange = { duration = it },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.enter_duration),
+                            fontSize = 15.sp
+                        )
+                    })
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Text(
+                        text = "Cancel",
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.clickable {
+                            onDismiss(
+                                Training(
+                                    title = type,
+                                    duration = 0,
+                                    date = getCurrentDay(),
+                                )
+                            )
+                        })
+                    Text(
+                        text = stringResource(R.string.save),
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.clickable {
+                            onDismiss(
+                                Training(
+                                    title = type,
+                                    duration = duration.toIntOrNull() ?: 1,
+                                    date = getCurrentDay(),
+                                )
+                            )
+                        })
+
+                }
+            }
+        }
+
     }
 }

@@ -36,6 +36,7 @@ class HealthViewModel @Inject constructor(private val repos: repository,context:
     var eatTarget: Int = sharedPrefs.getInt("eatTarget", 2500)
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last()
     var trainingActivity: List<Training> = runBlocking { async { repos.getAllActivity() }.await() }
+    var weightTarget : Int = 100
 
 
     fun saveHealthData(){

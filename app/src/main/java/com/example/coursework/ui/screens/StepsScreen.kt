@@ -1,7 +1,5 @@
 package com.example.coursework.ui.screens
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,8 +20,6 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +28,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coursework.ViewM.HealthViewModel
-import com.example.coursework.model.Day
-import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.round
@@ -45,10 +41,10 @@ import kotlin.math.round
 @Composable
 fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
-    val days = viewModel.days.map { Pair(it.date,it.steps) }
+    val days = viewModel.days.map { Pair(it.date, it.steps) }
     var steps by remember { mutableStateOf(0) }
     Column() {
-        steps= lazyRowProgress(target = target, color = Color.Green, onClick ={}, days = days)
+        steps = lazyRowProgress(target = target, color = Color.Green, onClick = {}, days = days)
         Card(Modifier.padding(10.dp)) {
             Column(
                 Modifier
@@ -68,7 +64,6 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 ProgressBar(
                     percent = steps / target.toFloat(), barWidth = 30, width = 290
                 )
-//                LinearProgressIndicator(steps/stepsTarget.toFloat(), trackColor = Color.Black, strokeCap = StrokeCap.Round,modifier =Modifier.height(30.dp))
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
                         text = "${round(steps * 0.7 / 1000 * 100) / 100} km",
@@ -81,20 +76,9 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 }
             }
         }
-
     }
 }
 
-
-fun generateLast100Days(): List<Pair<String, Int>> {
-    val today = LocalDate.now()
-    val dateFormat = DateTimeFormatter.ofPattern("dd/MM")
-    return List(100) { index ->
-        val date = today.minusDays(index.toLong())
-        val num = (100..10000).random()
-        Pair(date.format(dateFormat), num)
-    }
-}
 
 @Composable
 fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
@@ -116,56 +100,105 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
     }
 }
 
-@Composable
-fun lazyRowProgress(target: Int, color: Color, onClick: (String) -> Unit,days :List<Pair<String,Int>>): Int {
+fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
+@Composable
+fun boxWithProgress(h: Int, target: Int) {
+    Box (modifier = Modifier.height(220.dp), contentAlignment = Alignment.BottomStart){
+        Canvas(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(111.dp)
+        ) {
+
+            drawLine(
+                color = Color.Green,
+                start = Offset(0f, 0f),
+                end = Offset(size.width, 0f),
+                strokeWidth = 1.dp.toPx(),
+            )
+            drawLine(
+                color = Color.Yellow,
+                start = Offset(0f, size.height / 2f-15f ),
+                end = Offset(size.width, size.height / 2f -15f),
+                strokeWidth = 1.dp.toPx(),
+            )
+            val paint = Paint().asFrameworkPaint().apply {
+                isAntiAlias = true
+                textSize = 13.sp.toPx()// Примерно эквивалентно 16.sp
+                color = android.graphics.Color.WHITE
+            }
+
+            drawContext.canvas.nativeCanvas.drawText(
+                "$target",
+                size.width - 100, 37f,
+                paint
+            )
+            drawContext.canvas.nativeCanvas.drawText(
+                "${(target / 2)}",
+                size.width - 100, size.height / 2 +20f,
+                paint
+            )
+        }
+    }
+}
+
+@Composable
+fun lazyRowProgress(
+    target: Int,
+    color: Color,
+    onClick: (String) -> Unit,
+    days: List<Pair<String, Int>>
+): Int {
     var current by remember {
         mutableStateOf(getCurrentDay())
     }
-
-    LazyRow(
-        contentPadding = PaddingValues(8.dp),
-        reverseLayout = true
-    ) {
-        items(days, key = { it }) { date ->
-            Column(
-                Modifier
-                    .padding(7.dp)
-                    .height(150.dp)
-                    .width(35.dp)
-                    .clickable {
-                        current = date.first
-                        onClick.invoke(current)
-                    },
-                verticalArrangement = Arrangement.Bottom,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                VerticalProgressBar(
-                    percent = date.second / target.toFloat(),
-                    h = 100,
-                    color = color
-                )
-                Box(Modifier.size(45.dp), contentAlignment = Alignment.Center) {
-                    if (date.first == current) {
-                        Text(
-                            text = date.first.substring(0,5),
-                            color = Color.Black,
-                            modifier = Modifier.background(Color.Green, CircleShape),
-                            fontSize = 13.sp
-                        )
-                    } else {
-                        Text(
-                            text = date.first.substring(0, 2),
-                            color = Color.White,
-                            fontSize = 19.sp
-                        )
+    Box {
+        boxWithProgress(h = 230, target)
+        LazyRow(
+            modifier = Modifier.padding(end = 45.dp),
+            reverseLayout = true
+        ) {
+            items(days, key = { it }) { date ->
+                Column(
+                    Modifier
+                        .padding(7.dp)
+                        .height(230.dp)
+                        .width(45.dp)
+                        .clickable {
+                            current = date.first
+                            onClick.invoke(current)
+                        },
+                    verticalArrangement = Arrangement.Bottom,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    VerticalProgressBar(
+                        percent = date.second / target.toFloat(),
+                        h = 100,
+                        color = color
+                    )
+                    Box(Modifier.height(20.dp), contentAlignment = Alignment.Center) {
+                        if (date.first == current) {
+                            Text(
+                                text = date.first.substring(0, 5),
+                                color = Color.Black,
+                                modifier = Modifier.background(Color.Green, CircleShape),
+                                fontSize = 14.sp,
+                                maxLines = 1
+                            )
+                        } else {
+                            Text(
+                                text = date.first.substring(0, 2),
+                                color = Color.White,
+                                fontSize = 19.sp
+                            )
+                        }
                     }
                 }
-            }
 
+            }
         }
     }
-    return days.find { it.first==current }?.second ?: 404
-
+    return days.find { it.first == current }?.second ?: 404
 }
-fun getCurrentDay() =LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))

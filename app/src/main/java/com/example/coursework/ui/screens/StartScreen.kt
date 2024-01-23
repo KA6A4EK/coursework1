@@ -1,9 +1,12 @@
 package com.example.coursework.ui.screens
 
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
@@ -74,11 +78,10 @@ fun alertDialog(number: Int, title: String = "", onDismis: (Int) -> Unit) {
     var num by remember {
         mutableStateOf("$number")
     }
-    AlertDialog(onDismissRequest = { onDismis(num.toIntOrNull() ?: 0) }) {
+    AlertDialog(onDismissRequest = {  }) {
         Card {
             Column(
                 Modifier
-                    .height(150.dp)
                     .padding(20.dp), verticalArrangement = Arrangement.Center
             ) {
                 Text(text = title, color = Color.White, style = MaterialTheme.typography.displaySmall)
@@ -88,6 +91,21 @@ fun alertDialog(number: Int, title: String = "", onDismis: (Int) -> Unit) {
                     onValueChange = { num = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
+                Row(horizontalArrangement = Arrangement.SpaceAround,
+                    modifier = Modifier
+                        .fillMaxWidth().padding(top = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically)
+                {
+                    Text(text = "Cancel",
+                        modifier = Modifier
+                            .clickable { onDismis(0) },
+                        style = MaterialTheme.typography.displaySmall)
+                    Text(text = "Save",
+                        modifier = Modifier
+                            .clickable { onDismis(num.toIntOrNull() ?: 0) },
+                        style = MaterialTheme.typography.displaySmall)
+                }
+
             }
         }
     }
