@@ -13,15 +13,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,9 +33,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import kotlin.math.round
@@ -42,7 +49,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
     val days = viewModel.days.map { Pair(it.date, it.steps) }
     var steps by remember { mutableIntStateOf(0) }
-    Column {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         steps = lazyRowProgress(target = target, color = Color.Green, onClick = {}, days = days)
         Card(Modifier.padding(10.dp)) {
             Column(
@@ -58,7 +65,10 @@ fun StepsScreen(viewModel: HealthViewModel) {
                         style = MaterialTheme.typography.displaySmall,
                         color = Color.White
                     )
-                    Text(text = " steps", style = MaterialTheme.typography.headlineMedium)
+                    Text(
+                        text = stringResource(R.string.steps),
+                        style = MaterialTheme.typography.headlineMedium
+                    )
                 }
                 ProgressBar(
                     percent = steps / target.toFloat(), barWidth = 30, width = 290
@@ -75,6 +85,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 }
             }
         }
+
     }
 }
 
@@ -92,7 +103,7 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
                 color = color,
                 start = Offset(0f, size.height),
                 end = Offset(0f, size.height * (1 - percent)),
-                strokeWidth = 15.dp.toPx(),
+                strokeWidth = 12.dp.toPx(),
                 cap = StrokeCap.Round,
             )
         }
@@ -102,8 +113,8 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
 fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 @Composable
-fun BoxWithProgress(h: Int, target: Int) {
-    Box (modifier = Modifier.height(220.dp), contentAlignment = Alignment.BottomStart){
+fun BoxWithProgress(target: Int) {
+    Box(modifier = Modifier.height(220.dp), contentAlignment = Alignment.BottomStart) {
         Canvas(
             modifier = Modifier
                 .padding(10.dp)
@@ -119,8 +130,8 @@ fun BoxWithProgress(h: Int, target: Int) {
             )
             drawLine(
                 color = Color.Yellow,
-                start = Offset(0f, size.height / 2f-15f ),
-                end = Offset(size.width, size.height / 2f -15f),
+                start = Offset(0f, size.height / 2f - 15f),
+                end = Offset(size.width, size.height / 2f - 15f),
                 strokeWidth = 1.dp.toPx(),
             )
             val paint = Paint().asFrameworkPaint().apply {
@@ -136,7 +147,7 @@ fun BoxWithProgress(h: Int, target: Int) {
             )
             drawContext.canvas.nativeCanvas.drawText(
                 "${(target / 2)}",
-                size.width - 100, size.height / 2 +20f,
+                size.width - 100, size.height / 2 + 20f,
                 paint
             )
         }
@@ -153,9 +164,29 @@ fun lazyRowProgress(
     var current by remember {
         mutableStateOf(getCurrentDay())
     }
+    val scope = rememberCoroutineScope()
+    val scrollState = rememberLazyListState()
+    val firstIndex = scrollState.firstVisibleItemIndex
+    val firstOffset = scrollState.firstVisibleItemScrollOffset
+    LaunchedEffect(firstIndex) {
+        if (firstOffset != 0) {
+            scope.launch {
+                scrollState.animateScrollToItem(firstIndex + 1)
+            }
+            current = days[firstIndex + 1].first
+
+        } else {
+            scope.launch {
+                scrollState.animateScrollToItem(firstIndex)
+            }
+            current = days[firstIndex].first
+
+        }
+    }
     Box {
-        BoxWithProgress(h = 230, target)
+        BoxWithProgress(target)
         LazyRow(
+            state = scrollState,
             modifier = Modifier.padding(end = 45.dp),
             reverseLayout = true
         ) {
@@ -164,7 +195,13 @@ fun lazyRowProgress(
                     Modifier
                         .padding(7.dp)
                         .height(230.dp)
-                        .width(45.dp)
+                        .width(45.sp.value.dp)
+                        .background(
+                            if (date.first == current) {
+                                Color(255, 255, 1, alpha = 100)
+                            } else (MaterialTheme.colorScheme.background.copy(alpha = 0f)),
+                            CircleShape
+                        )
                         .clickable {
                             current = date.first
                             onClick.invoke(current)
@@ -184,7 +221,8 @@ fun lazyRowProgress(
                                 color = Color.Black,
                                 modifier = Modifier.background(Color.Green, CircleShape),
                                 fontSize = 14.sp,
-                                maxLines = 1
+                                maxLines = 1,
+                                fontWeight = FontWeight.Bold
                             )
                         } else {
                             Text(
@@ -199,5 +237,31 @@ fun lazyRowProgress(
             }
         }
     }
+
     return days.find { it.first == current }?.second ?: 404
+}
+
+@Composable
+fun setStepsTarget (viewModel: HealthViewModel,onDismiss : (Boolean)->Unit){
+    var buttonSetTarget by remember { mutableStateOf(false) }
+
+    Text(
+        text = stringResource(R.string.set_target),
+        modifier = Modifier.clickable { buttonSetTarget = true },
+        style = MaterialTheme.typography.headlineLarge
+    )
+    if (buttonSetTarget) {
+        val pitch = 100
+        targetSelectList(
+            num = maxOf(viewModel.stepsTarget / pitch, 1),
+            listSize = 500,
+            text = stringResource(R.string.steps_target),
+            pitch = pitch
+        ) {
+            viewModel.stepsTarget = it * pitch
+            viewModel.saveHealthData()
+            buttonSetTarget = false
+            onDismiss(false)
+        }
+    }
 }

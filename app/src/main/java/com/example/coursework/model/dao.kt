@@ -10,6 +10,7 @@ import androidx.room.RoomDatabase
 import androidx.room.Update
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
 
 @Dao

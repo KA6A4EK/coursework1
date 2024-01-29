@@ -74,10 +74,11 @@ fun CardWater(
                     )
                 }
                 Button(onClick = {
-                    water += 200
+                    viewModel.showNotification()
+                    water += viewModel.cupSize
                     viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(water = water)))
                 }) {
-                    Text(text = "+ 200 мл")
+                    Text(text = "+ ${viewModel.cupSize} мл")
                 }
             }
             val image = when (viewModel.currentDay.water) {
@@ -205,7 +206,7 @@ fun CardEat(
     val calTarget = viewModel.eatTarget
     var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
     if (buttonIsClicked) {
-        AlertDialog(number = cal, title = "Enter calories"){
+        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)){
             if (it>0){
                 cal = it
                 viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
@@ -231,7 +232,7 @@ fun CardEat(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "/$calTarget калорий",
+                        text = stringResource(R.string.calTarget, calTarget),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
                     )
@@ -364,7 +365,7 @@ fun IconForActivities(drawable: Int, description: String = "", onClick: () -> Un
     Box(
         modifier = Modifier
             .size(70.dp)
-            .background(Color(93, 151, 87, 255), CircleShape), contentAlignment = Alignment.Center
+            .background(Color(93, 151, 87, 170), CircleShape), contentAlignment = Alignment.Center
     ) {
         Icon(
             painterResource(id = drawable), contentDescription = description, modifier = Modifier
@@ -402,7 +403,7 @@ fun AlertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
                     horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
-                        text = "Cancel",
+                        text = stringResource(R.string.cancel),
                         style = MaterialTheme.typography.displaySmall,
                         modifier = Modifier.clickable {
                             onDismiss(

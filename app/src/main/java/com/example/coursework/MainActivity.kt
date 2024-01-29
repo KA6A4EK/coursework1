@@ -11,14 +11,17 @@ import com.example.coursework.ViewM.ProvideViewModel
 import com.example.coursework.model.DaggerAppComponent
 import com.example.coursework.model.DaoModule
 import com.example.coursework.ui.screens.MainScreen
+import com.example.coursework.model.NotificationModule
 import com.example.coursework.ui.theme.CourseworkTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val appComponent = DaggerAppComponent.builder()
             .daoModule(DaoModule(applicationContext))
             .provideViewModel(ProvideViewModel(this))
+            .notificationModule(NotificationModule(this))
             .build()
         setContent {
             CourseworkTheme {

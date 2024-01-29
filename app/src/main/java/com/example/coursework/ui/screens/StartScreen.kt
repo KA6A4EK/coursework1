@@ -23,9 +23,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 
 
@@ -95,11 +97,11 @@ fun AlertDialog(number: Int, title: String = "", onDismiss: (Int) -> Unit) {
                         .fillMaxWidth().padding(top = 20.dp),
                     verticalAlignment = Alignment.CenterVertically)
                 {
-                    Text(text = "Cancel",
+                    Text(text = stringResource(id = R.string.cancel),
                         modifier = Modifier
                             .clickable { onDismiss(0) },
                         style = MaterialTheme.typography.displaySmall)
-                    Text(text = "Save",
+                    Text(text = stringResource(id = R.string.save),
                         modifier = Modifier
                             .clickable { onDismiss(num.toIntOrNull() ?: 0) },
                         style = MaterialTheme.typography.displaySmall)

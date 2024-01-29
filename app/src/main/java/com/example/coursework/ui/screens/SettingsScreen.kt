@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
@@ -25,6 +26,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,6 +42,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -266,13 +269,13 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
                 ) {
 
                     Text(
-                        text = "Cancel",
+                        text = stringResource(id = R.string.cancel),
                         modifier = Modifier
                             .clickable { onDismiss("") },
                         style = MaterialTheme.typography.displaySmall
                     )
                     Text(
-                        text = "Save",
+                        text = stringResource(id = R.string.save),
                         modifier = Modifier
                             .clickable { onDismiss(name) },
                         style = MaterialTheme.typography.displaySmall
@@ -289,9 +292,9 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
 @Composable
 fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = num - 1)
-
+    val scope = rememberCoroutineScope()
     val itemHeight = 50.dp
-    val firstIndex = scrollState.firstVisibleItemIndex
+    var firstIndex = scrollState.firstVisibleItemIndex
     val firstOffset = scrollState.firstVisibleItemScrollOffset
     AlertDialog(onDismissRequest = { onDismiss(num) }) {
 
@@ -310,7 +313,14 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> U
                             ScrollCard(n = index, h = itemHeight, isMiddle = true)
 
                         } else {
-                            ScrollCard(n = index, h = itemHeight)
+                            ScrollCard(
+                                n = index,
+                                h = itemHeight,
+                                modifier = Modifier.clickable {
+                                    scope.launch {
+                                        scrollState.animateScrollToItem(index - 1)
+                                    }
+                                })
                         }
                     }
                 }
@@ -329,13 +339,13 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> U
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Cancel",
+                    text = stringResource(id = R.string.cancel),
                     modifier = Modifier
                         .clickable { onDismiss(num) },
                     style = MaterialTheme.typography.displaySmall
                 )
                 Text(
-                    text = "Save",
+                    text = stringResource(id = R.string.save),
                     modifier = Modifier
                         .clickable { onDismiss(firstIndex + 1) },
                     style = MaterialTheme.typography.displaySmall
@@ -347,20 +357,23 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> U
 
     LaunchedEffect(firstIndex) {
         if (firstOffset != 0) {
-            scrollState.animateScrollToItem(firstIndex + 1)
-
+            scope.launch {
+                scrollState.animateScrollToItem(firstIndex + 1)
+            }
         } else {
-            scrollState.animateScrollToItem(firstIndex)
-
+            scope.launch {
+                scrollState.animateScrollToItem(firstIndex)
+            }
         }
     }
 }
 
 @Composable
-fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
+fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false, modifier: Modifier = Modifier) {
     Box(
-        modifier = Modifier
-            .size(h), contentAlignment = Alignment.Center
+        modifier = modifier
+            .height(h)
+            .width(100.dp), contentAlignment = Alignment.Center
     ) {
         if (isMiddle) {
             Text(

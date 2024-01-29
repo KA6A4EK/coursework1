@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -42,11 +46,19 @@ fun MainScreen(
     val currentScreen = backStackEntry?.destination?.route ?: "start"
 
     Scaffold(
-        topBar = { TopAppbar() },
+        topBar = { TopAppbar(currentScreen, navController) },
         bottomBar = {
             BottomAppbar(
-                homeClick = { if (currentScreen!="start"){navController.navigate("start")} },
-                settingsClick = { if (currentScreen!="settings"){navController.navigate("settings")} })
+                homeClick = {
+                    if (currentScreen != "start") {
+                        navController.navigate("start")
+                    }
+                },
+                settingsClick = {
+                    if (currentScreen != "settings") {
+                        navController.navigate("settings")
+                    }
+                })
         },
     ) { paddingValues ->
         NavHost(
@@ -61,7 +73,7 @@ fun MainScreen(
                 SettingsScreen(viewModel)
             }
             composable(route = "steps_screen") {
-                StepsScreen(viewModel )
+                StepsScreen(viewModel)
             }
             composable(route = "water_screen") {
                 WaterScreen(viewModel)
@@ -69,18 +81,23 @@ fun MainScreen(
             composable(route = "eat_screen") {
                 EatScreen(viewModel)
             }
-            composable( route = "activity_list"){
+            composable(route = "activity_list") {
                 ActivityScreen(viewModel)
             }
-
-
+            composable(route = "target/{edit_target}") {
+                val curent = backStackEntry?.arguments?.getString("edit_target") ?: "start"
+                TargetScreen(viewModel, curent)
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppbar() {
+fun TopAppbar(curent: String, navController: NavHostController) {
+    var dropDownMenuExpanded by remember { mutableStateOf(false) }
+    val screens =
+        listOf("steps_screen", "activity_list", "eat_screen", "water_screen", "bmi_screen")
     TopAppBar(title = {
         Text(
             text = stringResource(R.string.topAppBarText),
@@ -89,10 +106,38 @@ fun TopAppbar() {
         )
     },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { dropDownMenuExpanded = true }) {
                 Icon(Icons.Filled.MoreVert, contentDescription = "")
             }
+            if (dropDownMenuExpanded) {
+                DropdownMenu(expanded = dropDownMenuExpanded, onDismissRequest = { /*TODO*/ }) {
+                    if (curent == "start") {
+                        Text(text = curent)
+                    } else if (screens.contains(curent)) {
+                        Text(
+                            text = stringResource(id = R.string.set_target),
+                            modifier = Modifier.clickable {
+                                dropDownMenuExpanded = false
+                                navController.navigate("target/{$curent}")
+                            },
+                            style = MaterialTheme.typography.headlineLarge
+                        )
+                        if (curent == "water_screen") {
+                            Text(
+                                text = stringResource(id = R.string.set_cup_size),
+                                modifier = Modifier.clickable {
+                                    dropDownMenuExpanded = false
+                                    navController.navigate("target/{cupSize}")
+                                },
+                                style = MaterialTheme.typography.headlineLarge
+                            )
+                        }
+                    }
+
+                }
+            }
         })
+
 }
 
 
@@ -119,3 +164,4 @@ fun BottomAppbar(homeClick: () -> Unit, settingsClick: () -> Unit) {
         }
     })
 }
+
