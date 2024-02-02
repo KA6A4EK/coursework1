@@ -8,10 +8,9 @@ import com.example.coursework.ViewM.ProvideViewModel
 import dagger.Component
 
 
-@Component(modules = [DaoModule::class, ProvideViewModel::class, RepositoryModule::class, NotificationModule::class])
+@Component(modules = [DaoModule::class, ProvideViewModel::class, RepositoryModule::class])
 interface AppComponent {
-    fun provideNotificationBuilder(): NotificationCompat.Builder
-    fun provideNotificationManager(): NotificationManagerCompat
+
     fun provideHealthViewModel(): HealthViewModel
 
     fun provideDao(): dao

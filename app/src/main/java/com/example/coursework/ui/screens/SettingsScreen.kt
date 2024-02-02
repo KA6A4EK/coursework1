@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
@@ -26,7 +25,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,7 +40,6 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
@@ -280,9 +277,7 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
                             .clickable { onDismiss(name) },
                         style = MaterialTheme.typography.displaySmall
                     )
-
                 }
-
             }
         }
     }
@@ -291,101 +286,41 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = num - 1)
-    val scope = rememberCoroutineScope()
-    val itemHeight = 50.dp
-    var firstIndex = scrollState.firstVisibleItemIndex
-    val firstOffset = scrollState.firstVisibleItemScrollOffset
     AlertDialog(onDismissRequest = { onDismiss(num) }) {
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row {
-                LazyColumn(
-                    state = scrollState, modifier = Modifier
-                        .height(190.dp)
-                        .padding(20.dp)
-                ) {
-                    items(listSize) { index ->
-                        if (index == firstIndex + 1) {
-                            ScrollCard(n = index, h = itemHeight, isMiddle = true)
-
-                        } else {
-                            ScrollCard(
-                                n = index,
-                                h = itemHeight,
-                                modifier = Modifier.clickable {
-                                    scope.launch {
-                                        scrollState.animateScrollToItem(index - 1)
-                                    }
-                                })
-                        }
-                    }
-                }
-                Column(
-                    modifier = Modifier.height(190.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = text, style = MaterialTheme.typography.headlineMedium)
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = stringResource(id = R.string.cancel),
-                    modifier = Modifier
-                        .clickable { onDismiss(num) },
-                    style = MaterialTheme.typography.displaySmall
-                )
-                Text(
-                    text = stringResource(id = R.string.save),
-                    modifier = Modifier
-                        .clickable { onDismiss(firstIndex + 1) },
-                    style = MaterialTheme.typography.displaySmall
-                )
-            }
-        }
-    }
-
-
-    LaunchedEffect(firstIndex) {
-        if (firstOffset != 0) {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex + 1)
-            }
-        } else {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex)
-            }
+        CardWithLazyColumnForSelect(num = num+1, listSize = listSize, text = text, pitch = 1) {
+            onDismiss(it)
         }
     }
 }
 
 @Composable
-fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .height(h)
-            .width(100.dp), contentAlignment = Alignment.Center
-    ) {
-        if (isMiddle) {
-            Text(
-                text = "$n",
-                style = MaterialTheme.typography.headlineLarge,
-                color = Color.White,
-                fontWeight = FontWeight.Bold
-            )
-        } else {
-            Text(text = "$n", style = MaterialTheme.typography.headlineMedium, color = Color.Gray)
+fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
+    if (n >=0) {
+        Box(
+            modifier = Modifier
+                .height(h)
+                .width(100.dp), contentAlignment = Alignment.Center
+        ) {
+            if (isMiddle) {
+                Text(
+                    text = "$n",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = Color.White,
+                    fontWeight = FontWeight.Bold
+                )
+            } else {
+                Text(
+                    text = "$n",
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = Color.Gray
+                )
+            }
         }
-
-
+    } else {
+        Box(
+            modifier = Modifier
+                .height(h)
+                .width(100.dp)
+        ) {}
     }
 }

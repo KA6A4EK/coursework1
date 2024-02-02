@@ -7,19 +7,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,140 +21,118 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
-import kotlinx.coroutines.launch
 
 @Composable
-fun TargetScreen(viewModel: HealthViewModel, curent: String) {
+fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> Unit) {
     Text(text = curent)
-}
-
-
-//var cupSize: Int = sharedPrefs.getInt("cupSize", 200)
-//var activityTarget: Int = sharedPrefs.getInt("activityTarget", 90)
-//var eatTarget: Int = sharedPrefs.getInt("eatTarget", 2500)
-//var weightTarget: Int = 100
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun targetSelectList(num: Int, listSize: Int, text: String, pitch: Int, onDismiss: (Int) -> Unit) {
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = num - 1)
-    val scope = rememberCoroutineScope()
-    val itemHeight = 50.dp
-    val firstIndex = scrollState.firstVisibleItemIndex
-    val firstOffset = scrollState.firstVisibleItemScrollOffset
-
-    androidx.compose.material3.AlertDialog(onDismissRequest = { onDismiss(num) }) {
-
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-        ) {
-            Row {
-                LazyColumn(
-                    state = scrollState, modifier = Modifier
-                        .height(190.dp)
-                        .padding(20.dp)
-                ) {
-                    items(listSize) { index ->
-                        if (index == firstIndex + 1) {
-                            ScrollCard(n = index * pitch, h = itemHeight, isMiddle = true)
-
-                        } else {
-                            ScrollCard(
-                                n = index * pitch,
-                                h = itemHeight,
-
-                                modifier = Modifier.clickable {
-                                    scope.launch {
-                                        if (index != 0) {
-                                            scrollState.animateScrollToItem(index - 1)
-                                        }
-                                    }
-                                })
-                        }
-                    }
-                }
-                Column(
-                    modifier = Modifier.height(190.dp),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(text = text, style = MaterialTheme.typography.headlineMedium)
-                }
-            }
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 20.dp),
-                verticalAlignment = Alignment.CenterVertically
+    when (curent) {
+        "{steps_screen}" -> {
+            val pitch = 100
+            CardWithLazyColumnForSelect(
+                num = viewModel.stepsTarget / pitch, listSize = 500, text = stringResource(
+                    id = R.string.steps_target
+                ), pitch = pitch
             ) {
-                Text(
-                    text = stringResource(id = R.string.cancel),
-                    modifier = Modifier
-                        .clickable { onDismiss(num) },
-                    style = MaterialTheme.typography.displaySmall
-                )
-                Text(
-                    text = stringResource(id = R.string.save),
-                    modifier = Modifier
-                        .clickable { onDismiss(firstIndex + 1) },
-                    style = MaterialTheme.typography.displaySmall
-                )
+                viewModel.stepsTarget = it
+                navigateUp()
+            }
+        }
+
+        "{activity_list}" -> {
+            val pitch = 5
+            CardWithLazyColumnForSelect(
+                num = viewModel.activityTarget / pitch,
+                listSize = 50,
+                text = stringResource(R.string.activity_target),
+                pitch = pitch
+            ) {
+                viewModel.activityTarget = it
+                navigateUp()
+
+            }
+        }
+
+        "{eat_screen}" -> {
+            val pitch = 50
+            CardWithLazyColumnForSelect(
+                num = viewModel.eatTarget / pitch, listSize = 500, text = stringResource(
+                    id = R.string.eat_target
+                ), pitch = pitch
+            ) {
+                viewModel.eatTarget = it
+                navigateUp()
+
+            }
+        }
+
+        "{water_screen}" -> {
+            val pitch = 100
+            CardWithLazyColumnForSelect(
+                num = viewModel.waterTarget / pitch, listSize = 100, text = stringResource(
+                    id = R.string.water_target
+                ), pitch = pitch
+            ) {
+                viewModel.waterTarget = it
+                navigateUp()
+
+            }
+        }
+
+        "{bmi_screen}" -> {
+            CardWithLazyColumnForSelect(
+                num = viewModel.weightTarget, listSize = 500, text = stringResource(
+                    R.string.weight_target
+                ), pitch = 1
+            ) {
+                viewModel.weightTarget = it
+                navigateUp()
+            }
+        }
+
+        "{cupSize}" -> {
+            val pitch = 10
+            CardWithLazyColumnForSelect(
+                num = viewModel.cupSize / pitch, listSize = 500, text = stringResource(
+                    id = R.string.set_cup_size
+                ), pitch = pitch
+            ) {
+                viewModel.cupSize = it
+                navigateUp()
+
             }
         }
     }
+    viewModel.saveHealthData()
 
-
-    LaunchedEffect(firstIndex) {
-        if (firstOffset != 0) {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex + 1)
-            }
-        } else {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex)
-            }
-        }
-    }
 }
 
 
 @Composable
-fun ScrollCard(num: Int, listSize: Int, text: String, pitch: Int, onDismiss: (Int) -> Unit) {
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = num - 1)
-    val scope = rememberCoroutineScope()
-    val itemHeight = 50.dp
-    val firstIndex = scrollState.firstVisibleItemIndex
-    val firstOffset = scrollState.firstVisibleItemScrollOffset
+fun CardWithLazyColumnForSelect(
+    num: Int,
+    listSize: Int,
+    text: String,
+    pitch: Int,
+    initialIndex: Int = 0,
+    onDismiss: (Int) -> Unit
+) {
+    var ret by remember { mutableStateOf(num) }
+
 
     Card(
         modifier = Modifier
             .fillMaxWidth()
     ) {
         Row {
-            LazyColumn(
-                state = scrollState, modifier = Modifier
-                    .height(190.dp)
-                    .padding(20.dp)
+            ScrolableLazyColumn(
+                num - 1 / pitch,
+                listSize,
+                pitch,
+                initialIndex = initialIndex
             ) {
-                items(listSize) { index ->
-                    if (index == firstIndex + 1) {
-                        ScrollCard(n = index * pitch, h = itemHeight, isMiddle = true)
-
-                    } else {
-                        ScrollCard(
-                            n = index * pitch,
-                            h = itemHeight,
-
-                            modifier = Modifier.clickable {
-                                scope.launch {
-                                    if (index != 0) {
-                                        scrollState.animateScrollToItem(index - 1)
-                                    }
-                                }
-                            })
-                    }
-                }
+                ret = it
             }
+
             Column(
                 modifier = Modifier.height(190.dp),
                 verticalArrangement = Arrangement.Center
@@ -178,29 +150,16 @@ fun ScrollCard(num: Int, listSize: Int, text: String, pitch: Int, onDismiss: (In
             Text(
                 text = stringResource(id = R.string.cancel),
                 modifier = Modifier
-                    .clickable { onDismiss(num) },
+                    .clickable { onDismiss(num * pitch) },
                 style = MaterialTheme.typography.displaySmall
             )
             Text(
                 text = stringResource(id = R.string.save),
                 modifier = Modifier
-                    .clickable { onDismiss(firstIndex + 1) },
+                    .clickable { onDismiss(ret) },
                 style = MaterialTheme.typography.displaySmall
             )
         }
     }
 
-
-
-    LaunchedEffect(firstIndex) {
-        if (firstOffset != 0) {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex + 1)
-            }
-        } else {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex)
-            }
-        }
-    }
 }

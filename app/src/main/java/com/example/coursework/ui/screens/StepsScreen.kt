@@ -47,10 +47,11 @@ import kotlin.math.round
 @Composable
 fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
+    val color = Color(168, 255, 65, 215)
     val days = viewModel.days.map { Pair(it.date, it.steps) }
     var steps by remember { mutableIntStateOf(0) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        steps = lazyRowProgress(target = target, color = Color.Green, onClick = {}, days = days)
+        steps = lazyRowProgress(target = target, color = color, onClick = {}, days = days)
         Card(Modifier.padding(10.dp)) {
             Column(
                 Modifier
@@ -71,7 +72,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
                     )
                 }
                 ProgressBar(
-                    percent = steps / target.toFloat(), barWidth = 30, width = 290
+                    percent = steps / target.toFloat(), barWidth = 30, width = 290,color
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
@@ -198,7 +199,7 @@ fun lazyRowProgress(
                         .width(45.sp.value.dp)
                         .background(
                             if (date.first == current) {
-                                Color(255, 255, 1, alpha = 100)
+                                Color(red = 124, green = 124, blue = 124, alpha = 100)
                             } else (MaterialTheme.colorScheme.background.copy(alpha = 0f)),
                             CircleShape
                         )
@@ -219,7 +220,7 @@ fun lazyRowProgress(
                             Text(
                                 text = date.first.substring(0, 5),
                                 color = Color.Black,
-                                modifier = Modifier.background(Color.Green, CircleShape),
+                                modifier = Modifier.background(color,CircleShape),
                                 fontSize = 14.sp,
                                 maxLines = 1,
                                 fontWeight = FontWeight.Bold
@@ -239,29 +240,4 @@ fun lazyRowProgress(
     }
 
     return days.find { it.first == current }?.second ?: 404
-}
-
-@Composable
-fun setStepsTarget (viewModel: HealthViewModel,onDismiss : (Boolean)->Unit){
-    var buttonSetTarget by remember { mutableStateOf(false) }
-
-    Text(
-        text = stringResource(R.string.set_target),
-        modifier = Modifier.clickable { buttonSetTarget = true },
-        style = MaterialTheme.typography.headlineLarge
-    )
-    if (buttonSetTarget) {
-        val pitch = 100
-        targetSelectList(
-            num = maxOf(viewModel.stepsTarget / pitch, 1),
-            listSize = 500,
-            text = stringResource(R.string.steps_target),
-            pitch = pitch
-        ) {
-            viewModel.stepsTarget = it * pitch
-            viewModel.saveHealthData()
-            buttonSetTarget = false
-            onDismiss(false)
-        }
-    }
 }

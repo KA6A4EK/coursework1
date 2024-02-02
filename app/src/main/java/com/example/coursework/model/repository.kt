@@ -1,11 +1,8 @@
 package com.example.coursework.model
 
-import com.example.coursework.ViewM.HealthUiState
 import com.example.coursework.ui.screens.getCurrentDay
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
@@ -15,10 +12,6 @@ class repository @Inject constructor(
     val dao: dao,
     val trainingDao: TrainingDao
 ) {
-
-
-    private val uistate = MutableStateFlow(HealthUiState())
-    val _uiState = uistate.asStateFlow()
 
     suspend fun Update(day: Day) {
         dao.Update(day)

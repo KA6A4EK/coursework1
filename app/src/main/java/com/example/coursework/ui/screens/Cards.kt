@@ -16,6 +16,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -53,12 +56,15 @@ fun CardWater(
     viewModel: HealthViewModel
 ) {
     var water by remember { mutableIntStateOf(viewModel.currentDay.water) }
-
     Card(modifier = Modifier
         .clickable { onCardClick() }
         .fillMaxWidth()
         .heightIn(100.dp)) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Column(modifier = Modifier.padding(10.dp)) {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
@@ -74,9 +80,14 @@ fun CardWater(
                     )
                 }
                 Button(onClick = {
-                    viewModel.showNotification()
                     water += viewModel.cupSize
-                    viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(water = water)))
+                    viewModel.handleViewEvent(
+                        HealthViewEvent.Update(
+                            viewModel.currentDay.copy(
+                                water = water
+                            )
+                        )
+                    )
                 }) {
                     Text(text = "+ ${viewModel.cupSize} мл")
                 }
@@ -95,6 +106,8 @@ fun CardWater(
             )
         }
     }
+
+
 }
 
 @Composable
@@ -148,11 +161,15 @@ fun CardSteps(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            ProgressBar(percent = steps / stepTarget.toFloat(), barWidth = 10, width = 170)
+            ProgressBar(percent = steps / stepTarget.toFloat(), barWidth = 10, width = 170,Color.Green)
         }
     }
 
 }
+
+
+
+
 
 @Composable
 fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
@@ -173,29 +190,28 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             buttonIsClicked = ""
         }
     }
+        Card {
+            Row(
+                Modifier
+                    .padding(8.dp)
+                    .fillMaxWidth()
+                    .height(100.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconForActivities(R.drawable.downhill_skiing_24px, onClick = {
+                    buttonIsClicked = "Skiing"
+                })
+                IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsClicked = "Hiking" })
+                IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsClicked = "Sprint" })
 
-    Card {
-        Row(
-            Modifier
-                .padding(8.dp)
-                .fillMaxWidth()
-                .height(100.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconForActivities(R.drawable.downhill_skiing_24px, onClick = {
-                buttonIsClicked = "Skiing"
-            })
-            IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsClicked = "Hiking" })
-            IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsClicked = "Sprint" })
-
-            IconForActivities(drawable = R.drawable.list_24px) {
-                onCardClick()
+                IconForActivities(drawable = R.drawable.list_24px) {
+                    onCardClick()
+                }
             }
         }
-    }
-}
 
+}
 
 @Composable
 fun CardEat(
@@ -206,8 +222,8 @@ fun CardEat(
     val calTarget = viewModel.eatTarget
     var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
     if (buttonIsClicked) {
-        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)){
-            if (it>0){
+        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
+            if (it > 0) {
                 cal = it
                 viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
             }
@@ -215,34 +231,34 @@ fun CardEat(
         }
 
     }
-    Card(modifier = Modifier
-        .clickable { onCardClick() }
-        .fillMaxWidth()
-        .heightIn(100.dp)) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.padding(10.dp)) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = "$cal",
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.calTarget, calTarget),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Gray
-                    )
-                }
-                Button(onClick = { buttonIsClicked = true }) {
-                    Text(text = stringResource(id = R.string.enter))
+        Card(modifier = Modifier
+            .clickable { onCardClick() }
+            .fillMaxWidth()
+            .heightIn(100.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(Modifier.padding(10.dp)) {
+                    Row(verticalAlignment = Alignment.Bottom) {
+                        Text(
+                            text = "$cal",
+                            style = MaterialTheme.typography.displaySmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = stringResource(R.string.calTarget, calTarget),
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.Gray
+                        )
+                    }
+                    Button(onClick = { buttonIsClicked = true }) {
+                        Text(text = stringResource(id = R.string.enter))
+                    }
                 }
             }
         }
-    }
 
 }
 
@@ -251,31 +267,32 @@ fun CardEat(
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
     val bodyHeight = viewModel.userHeight
     val bodyWeight = viewModel.userWeight
-    Card {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(120.dp)
-                .clickable { onClick() },
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Text(
-                    text = "$bodyHeight",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = Color.White
-                )
-                Text(
-                    text = "$bodyWeight",
-                    style = MaterialTheme.typography.displaySmall,
-                    color = Color.White
-                )
-            }
-            BMIProgress(width = 170, bodyHeight = bodyHeight, bodyWeight = bodyWeight)
+        Card {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(120.dp)
+                    .clickable { onClick() },
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(
+                        text = "$bodyHeight",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "$bodyWeight",
+                        style = MaterialTheme.typography.displaySmall,
+                        color = Color.White
+                    )
+                }
+                BMIProgress(width = 170, bodyHeight = bodyHeight, bodyWeight = bodyWeight)
 
+            }
         }
-    }
+
 }
 
 @Composable
@@ -334,7 +351,7 @@ fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
 
 
 @Composable
-fun ProgressBar(percent: Float, barWidth: Int, width: Int) {
+fun ProgressBar(percent: Float, barWidth: Int, width: Int,color: Color) {
     val percent = minOf(1f, percent)
     Box {
         Canvas(
@@ -350,7 +367,7 @@ fun ProgressBar(percent: Float, barWidth: Int, width: Int) {
                 cap = StrokeCap.Round
             )
             drawLine(
-                color = Color.Green,
+                color = color,
                 start = Offset(0f, 0f),
                 end = Offset(size.width * percent, 0f),
                 strokeWidth = (barWidth + 5).dp.toPx(),

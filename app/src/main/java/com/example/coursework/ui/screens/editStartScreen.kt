@@ -1,0 +1,82 @@
+package com.example.coursework.ui.screens
+
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.Icon
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
+import com.example.coursework.ViewM.HealthViewModel
+
+@Composable
+fun editStartScreen(viewModel: HealthViewModel) {
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Box(contentAlignment = Alignment.TopEnd) {
+            var visible by remember { mutableStateOf(viewModel.uiState.stepsVisible) }
+            CardSteps(onCardClick = { }, viewModel = viewModel)
+            editStartScreenButton(visible = visible) {
+                visible = it
+                viewModel.uiState.stepsVisible = it
+            }
+        }
+        Box(contentAlignment = Alignment.TopEnd) {
+            var visible by remember { mutableStateOf(viewModel.uiState.waterVisible) }
+            CardWater(onCardClick = { }, viewModel = viewModel)
+            editStartScreenButton(visible = visible) {
+                visible = it
+                viewModel.uiState.waterVisible = it
+            }
+        }
+        Box(contentAlignment = Alignment.TopEnd) {
+            var visible by remember { mutableStateOf(viewModel.uiState.eatVisible) }
+            CardEat(onCardClick = { }, viewModel = viewModel)
+            editStartScreenButton(visible = visible) {
+                visible= it
+                viewModel.uiState.eatVisible = it
+            }
+        }
+        Box(contentAlignment = Alignment.TopEnd) {
+            var visible by remember { mutableStateOf(viewModel.uiState.activityVisible) }
+            CardActivity(onCardClick = { }, viewModel = viewModel)
+            editStartScreenButton(visible = visible) {
+                visible= it
+                viewModel.uiState.activityVisible = it
+            }
+        }
+        Box(contentAlignment = Alignment.TopEnd) {
+            var visible by remember { mutableStateOf(viewModel.uiState.bodyCompositionVisible) }
+            CardBMI(onClick = { }, viewModel = viewModel)
+            editStartScreenButton(visible = visible) {
+                visible= it
+                viewModel.uiState.bodyCompositionVisible = it
+            }
+        }
+    }
+    viewModel.saveUiState()
+}
+
+@Composable
+fun editStartScreenButton(visible: Boolean, onClick: (Boolean) -> Unit) {
+    Icon(
+        if (visible) {
+            Icons.Default.Close
+        } else {
+            Icons.Default.Add
+        },
+        contentDescription = "",
+        modifier = Modifier.size(33.dp).clickable {
+            onClick(!visible)
+        })
+}

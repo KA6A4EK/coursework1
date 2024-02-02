@@ -39,39 +39,40 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
             .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
 
-        if (true) {
+        if (viewModel.uiState.stepsVisible) {
             CardSteps(
                 onCardClick = { navController.navigate("steps_screen") },
                 viewModel
             )
 
         }
-        if (true) {
+        if (viewModel.uiState.waterVisible) {
             CardWater(
                 onCardClick = { navController.navigate("water_screen") },
                 viewModel
             )
-
-            if (true) {
-                CardEat(
-                    onCardClick = { navController.navigate("eat_screen") },
-                    viewModel = viewModel
-                )
-            }
-            if (true) {
-                CardActivity(viewModel,
-                    onCardClick = { navController.navigate("activity_list") },
-                    )
-            }
-            if (true) {
-                CardBMI(
-                    onClick = { navController.navigate("settings") },
-                    viewModel = viewModel
-                )
-            }
+        }
+        if (viewModel.uiState.eatVisible) {
+            CardEat(
+                onCardClick = { navController.navigate("eat_screen") },
+                viewModel = viewModel
+            )
+        }
+        if (viewModel.uiState.activityVisible) {
+            CardActivity(
+                viewModel,
+                onCardClick = { navController.navigate("activity_list") },
+            )
+        }
+        if (viewModel.uiState.bodyCompositionVisible) {
+            CardBMI(
+                onClick = { navController.navigate("settings") },
+                viewModel = viewModel
+            )
         }
     }
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,32 +80,43 @@ fun AlertDialog(number: Int, title: String = "", onDismiss: (Int) -> Unit) {
     var num by remember {
         mutableStateOf("$number")
     }
-    AlertDialog(onDismissRequest = {  }) {
+    AlertDialog(onDismissRequest = { }) {
         Card {
             Column(
                 Modifier
                     .padding(20.dp), verticalArrangement = Arrangement.Center
             ) {
-                Text(text = title, color = Color.White, style = MaterialTheme.typography.displaySmall)
+                Text(
+                    text = title,
+                    color = Color.White,
+                    style = MaterialTheme.typography.displaySmall
+                )
 
                 TextField(
                     value = num,
                     onValueChange = { num = it },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal)
                 )
-                Row(horizontalArrangement = Arrangement.SpaceAround,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceAround,
                     modifier = Modifier
-                        .fillMaxWidth().padding(top = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically)
+                        .fillMaxWidth()
+                        .padding(top = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                )
                 {
-                    Text(text = stringResource(id = R.string.cancel),
+                    Text(
+                        text = stringResource(id = R.string.cancel),
                         modifier = Modifier
                             .clickable { onDismiss(0) },
-                        style = MaterialTheme.typography.displaySmall)
-                    Text(text = stringResource(id = R.string.save),
+                        style = MaterialTheme.typography.displaySmall
+                    )
+                    Text(
+                        text = stringResource(id = R.string.save),
                         modifier = Modifier
                             .clickable { onDismiss(num.toIntOrNull() ?: 0) },
-                        style = MaterialTheme.typography.displaySmall)
+                        style = MaterialTheme.typography.displaySmall
+                    )
                 }
 
             }

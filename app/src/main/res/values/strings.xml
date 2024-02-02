@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">coursework</string>
     <string name="enter_steps">Enter steps</string>
-    <string name="enter">Ввести</string>
+    <string name="enter">Enter</string>
     <string name="topAppBarText">Health</string>
     <string name="home_button">home button</string>
     <string name="settings_button">settings button</string>
@@ -9,12 +9,12 @@
     <string name="male">Male</string>
     <string name="female">Female</string>
     <string name="save">Save</string>
-    <string name="enter_birthday_date">Ввведите дату рождения</string>
+    <string name="enter_birthday_date">Enter birthday date</string>
     <string name="enter_name">Enter name</string>
     <string name="cm">cm</string>
     <string name="enter_duration">enter duration</string>
     <string name="water_level">water Level</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="channel_name">chanelName</string>
     <string name="channel_description">channel_description</string>
     <string name="chanel_id">chanel_id</string>
@@ -23,9 +23,14 @@
     <string name="water_target">water target</string>
     <string name="this_day">This day</string>
     <string name="enter_calories">Enter calories</string>
-    <string name="calTarget">/%1$s калорий</string>
+    <string name="calTarget">/%1$s calories</string>
     <string name="cancel">Cancel</string>
     <string name="steps_target">steps target</string>
     <string name="steps">" steps"</string>
     <string name="set_cup_size">Set cup size</string>
+    <string name="activity_target">activity target</string>
+    <string name="weight_target">weight target</string>
+    <string name="edit_screen">edit screen</string>
+    <string name="hours">%1$s hours</string>
+    <string name="remind_me_every">Remind me every</string>
 </resources>

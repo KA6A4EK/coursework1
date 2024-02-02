@@ -46,7 +46,7 @@ fun MainScreen(
     val currentScreen = backStackEntry?.destination?.route ?: "start"
 
     Scaffold(
-        topBar = { TopAppbar(currentScreen, navController) },
+        topBar = { TopAppbar(currentScreen, navController,viewModel) },
         bottomBar = {
             BottomAppbar(
                 homeClick = {
@@ -86,7 +86,13 @@ fun MainScreen(
             }
             composable(route = "target/{edit_target}") {
                 val curent = backStackEntry?.arguments?.getString("edit_target") ?: "start"
-                TargetScreen(viewModel, curent)
+                TargetScreen(viewModel, curent, navigateUp = { navController.navigateUp() })
+            }
+            composable(route = "edit_start"){
+                editStartScreen(viewModel = viewModel)
+            }
+            composable(route = "notifications_period"){
+                SelectNotificationsPeriod(viewModel)
             }
         }
     }
@@ -94,7 +100,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppbar(curent: String, navController: NavHostController) {
+fun TopAppbar(curent: String, navController: NavHostController, viewModel: HealthViewModel) {
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
     val screens =
         listOf("steps_screen", "activity_list", "eat_screen", "water_screen", "bmi_screen")
@@ -106,13 +112,24 @@ fun TopAppbar(curent: String, navController: NavHostController) {
         )
     },
         actions = {
-            IconButton(onClick = { dropDownMenuExpanded = true }) {
+            IconButton(onClick = { dropDownMenuExpanded = !dropDownMenuExpanded }) {
                 Icon(Icons.Filled.MoreVert, contentDescription = "")
             }
             if (dropDownMenuExpanded) {
-                DropdownMenu(expanded = dropDownMenuExpanded, onDismissRequest = { /*TODO*/ }) {
+                DropdownMenu(
+                    expanded = dropDownMenuExpanded,
+                    onDismissRequest = { dropDownMenuExpanded = false },
+                    modifier = Modifier.padding(10.dp)
+                ) {
                     if (curent == "start") {
-                        Text(text = curent)
+                        Text(text = stringResource(R.string.edit_screen), modifier = Modifier.clickable {
+                            navController.navigate("edit_start")
+                            dropDownMenuExpanded = false
+                        }, style = MaterialTheme.typography.headlineLarge)
+                        Text(text = "Notifications", modifier = Modifier.clickable {
+                            navController.navigate("notifications_period")
+                            dropDownMenuExpanded = false
+                        }, style = MaterialTheme.typography.headlineLarge)
                     } else if (screens.contains(curent)) {
                         Text(
                             text = stringResource(id = R.string.set_target),
