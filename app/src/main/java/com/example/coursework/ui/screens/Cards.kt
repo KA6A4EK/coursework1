@@ -16,9 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -28,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -51,7 +49,121 @@ import kotlin.math.round
 
 
 @Composable
-fun CardWater(
+fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
+    var buttonIsClicked by remember { mutableStateOf(false) }
+    var steps by remember { mutableStateOf(viewModel.currentDay.steps) }
+
+    if (buttonIsClicked)
+        AlertDialog(
+            number = steps,
+            title = stringResource(R.string.enter_steps)
+        ) {
+            if (it > 0) {
+                steps = it
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = it)))
+            }
+            buttonIsClicked = false
+        }
+    StartScreenCard(
+        onCardClick = { onCardClick() },
+        onButtonClick = { buttonIsClicked = true },
+        cardValue = steps,
+        target = viewModel.stepsTarget,
+        text1 = "steps",
+        text2 = "Enter"
+    ) {
+        ProgressBar(
+            percent = steps / viewModel.stepsTarget.toFloat(),
+            barWidth = 10,
+            width = 170,
+            Color.Green
+        )
+    }
+}
+
+@Composable
+fun StartScreenCard(
+    onCardClick: () -> Unit,
+    onButtonClick: () -> Unit,
+    cardValue: Int,
+    target: Int,
+    text1: String,
+    text2: String,
+    composable: @Composable () -> Unit
+) {
+    var value by remember { mutableStateOf(cardValue) }
+    LaunchedEffect(cardValue) {
+        value = cardValue
+    }
+
+    Card(modifier = Modifier
+        .clickable { onCardClick() }
+        .fillMaxWidth()
+        .heightIn(100.dp)) {
+        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Row(
+                    verticalAlignment = Alignment.Bottom
+                ) {
+                    Text(
+                        text = value.toString(),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                    )
+                    Text(
+                        text = "/$target$text1",
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Gray
+                    )
+                }
+
+                Button(onClick = {
+                    onButtonClick()
+                }) {
+                    Text(text = text2)
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            composable()
+
+        }
+    }
+
+}
+
+
+@Composable
+fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
+    var water by remember { mutableStateOf(viewModel.currentDay.water) }
+    val cupSize = viewModel.cupSize
+    StartScreenCard(
+        onCardClick = { onCardClick() },
+        onButtonClick = {
+            water += cupSize
+            viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(water = water)))
+        },
+        cardValue = water,
+        target = viewModel.waterTarget,
+        text1 = "ml",
+        text2 = "+${viewModel.cupSize}ml"
+    ) {
+        val image = when (viewModel.currentDay.water) {
+            in 0..viewModel.waterTarget / 3 -> R.drawable.water_loss_24px
+            in viewModel.waterTarget / 3 + 1..viewModel.waterTarget / 3 * 2 -> R.drawable.water_medium_24px
+            else -> R.drawable.water_full_24px
+        }
+        Image(
+            painter = painterResource(id = image),
+            contentDescription = stringResource(R.string.water_level),
+            modifier = Modifier
+                .size(80.dp)
+                .padding(5.dp)
+        )
+    }
+}
+
+@Composable
+fun CardWaterстраое(
     onCardClick: () -> Unit,
     viewModel: HealthViewModel
 ) {
@@ -73,7 +185,7 @@ fun CardWater(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "/${viewModel.waterTarget} мл",
+                        text = "/${stringResource(R.string.ml, viewModel.cupSize)}",
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
 
@@ -89,7 +201,7 @@ fun CardWater(
                         )
                     )
                 }) {
-                    Text(text = "+ ${viewModel.cupSize} мл")
+                    Text(text = "+${stringResource(R.string.ml, viewModel.cupSize)}")
                 }
             }
             val image = when (viewModel.currentDay.water) {
@@ -111,7 +223,7 @@ fun CardWater(
 }
 
 @Composable
-fun CardSteps(
+fun CardStepsстарое(
     onCardClick: () -> Unit,
     viewModel: HealthViewModel
 ) {
@@ -148,7 +260,7 @@ fun CardSteps(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = "/$stepTarget ш",
+                        text = stringResource(R.string.steps_s, stepTarget),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
                     )
@@ -161,14 +273,16 @@ fun CardSteps(
                 }
             }
             Spacer(modifier = Modifier.weight(1f))
-            ProgressBar(percent = steps / stepTarget.toFloat(), barWidth = 10, width = 170,Color.Green)
+            ProgressBar(
+                percent = steps / stepTarget.toFloat(),
+                barWidth = 10,
+                width = 170,
+                Color.Green
+            )
         }
     }
 
 }
-
-
-
 
 
 @Composable
@@ -190,31 +304,65 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             buttonIsClicked = ""
         }
     }
-        Card {
-            Row(
-                Modifier
-                    .padding(8.dp)
-                    .fillMaxWidth()
-                    .height(100.dp),
-                horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconForActivities(R.drawable.downhill_skiing_24px, onClick = {
-                    buttonIsClicked = "Skiing"
-                })
-                IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsClicked = "Hiking" })
-                IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsClicked = "Sprint" })
+    Card {
+        Row(
+            Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .height(100.dp),
+            horizontalArrangement = Arrangement.SpaceAround,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconForActivities(R.drawable.downhill_skiing_24px, onClick = {
+                buttonIsClicked = "Skiing"
+            })
+            IconForActivities(R.drawable.hiking_24px, onClick = { buttonIsClicked = "Hiking" })
+            IconForActivities(R.drawable.sprint_24px, onClick = { buttonIsClicked = "Sprint" })
 
-                IconForActivities(drawable = R.drawable.list_24px) {
-                    onCardClick()
-                }
+            IconForActivities(drawable = R.drawable.list_24px) {
+                onCardClick()
             }
         }
+    }
 
 }
 
+
 @Composable
-fun CardEat(
+fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
+    var cal by remember { mutableStateOf(viewModel.currentDay.eat) }
+    var buttonIsClicked by remember { mutableStateOf(false) }
+    if (buttonIsClicked) {
+        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
+            if (it > 0) {
+                cal = it
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
+            }
+            buttonIsClicked = false
+        }
+
+    }
+    StartScreenCard(
+        onCardClick = { onCardClick() },
+        onButtonClick = {
+            buttonIsClicked = true
+        },
+        cardValue = cal,
+        target = viewModel.eatTarget,
+        text1 = "cal",
+        text2 = "Enter"
+    ) {
+        ProgressBar(
+            percent = cal / viewModel.eatTarget.toFloat(),
+            barWidth = 10,
+            width = 170,
+            Color.Yellow
+        )
+    }
+}
+
+@Composable
+fun CardEatстарое(
     onCardClick: () -> Unit,
     viewModel: HealthViewModel
 ) {
@@ -231,67 +379,66 @@ fun CardEat(
         }
 
     }
-        Card(modifier = Modifier
-            .clickable { onCardClick() }
-            .fillMaxWidth()
-            .heightIn(100.dp)) {
-            Row(
-                Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(Modifier.padding(10.dp)) {
-                    Row(verticalAlignment = Alignment.Bottom) {
-                        Text(
-                            text = "$cal",
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = stringResource(R.string.calTarget, calTarget),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = Color.Gray
-                        )
-                    }
-                    Button(onClick = { buttonIsClicked = true }) {
-                        Text(text = stringResource(id = R.string.enter))
-                    }
+    Card(modifier = Modifier
+        .clickable { onCardClick() }
+        .fillMaxWidth()
+        .heightIn(100.dp)) {
+        Row(
+            Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(Modifier.padding(10.dp)) {
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = "$cal",
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = stringResource(R.string.calTarget, calTarget),
+                        style = MaterialTheme.typography.headlineSmall,
+                        color = Color.Gray
+                    )
+                }
+                Button(onClick = { buttonIsClicked = true }) {
+                    Text(text = stringResource(id = R.string.enter))
                 }
             }
         }
+    }
 
 }
-
 
 @Composable
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
     val bodyHeight = viewModel.userHeight
     val bodyWeight = viewModel.userWeight
-        Card {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .clickable { onClick() },
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text(
-                        text = "$bodyHeight",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = Color.White
-                    )
-                    Text(
-                        text = "$bodyWeight",
-                        style = MaterialTheme.typography.displaySmall,
-                        color = Color.White
-                    )
-                }
-                BMIProgress(width = 170, bodyHeight = bodyHeight, bodyWeight = bodyWeight)
-
+    Card {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .clickable { onClick() },
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = "$bodyHeight",
+                    style = MaterialTheme.typography.displaySmall,
+                    color = Color.White
+                )
+                Text(
+                    text = "$bodyWeight",
+                    style = MaterialTheme.typography.displaySmall,
+                    color = Color.White
+                )
             }
+            BMIProgress(width = 170, bodyHeight = bodyHeight, bodyWeight = bodyWeight)
+
         }
+    }
 
 }
 
@@ -351,7 +498,7 @@ fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
 
 
 @Composable
-fun ProgressBar(percent: Float, barWidth: Int, width: Int,color: Color) {
+fun ProgressBar(percent: Float, barWidth: Int, width: Int, color: Color) {
     val percent = minOf(1f, percent)
     Box {
         Canvas(

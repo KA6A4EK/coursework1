@@ -46,7 +46,7 @@ fun MainScreen(
     val currentScreen = backStackEntry?.destination?.route ?: "start"
 
     Scaffold(
-        topBar = { TopAppbar(currentScreen, navController,viewModel) },
+        topBar = { TopAppbar(currentScreen, navController) },
         bottomBar = {
             BottomAppbar(
                 homeClick = {
@@ -100,7 +100,7 @@ fun MainScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppbar(curent: String, navController: NavHostController, viewModel: HealthViewModel) {
+fun TopAppbar(curent: String, navController: NavHostController) {
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
     val screens =
         listOf("steps_screen", "activity_list", "eat_screen", "water_screen", "bmi_screen")

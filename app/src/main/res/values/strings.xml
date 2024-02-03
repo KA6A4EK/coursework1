@@ -33,4 +33,10 @@
     <string name="edit_screen">edit screen</string>
     <string name="hours">%1$s hours</string>
     <string name="remind_me_every">Remind me every</string>
+    <string name="ml">%1$s ml</string>
+    <string name="steps_s">/%1$s step</string>
+    <string name="km">%1$s km</string>
+    <string name="cal">%1$s Cal</string>
+    <string name="hello">Hello %1$s</string>
+    <string name="kg">kg</string>
 </resources>

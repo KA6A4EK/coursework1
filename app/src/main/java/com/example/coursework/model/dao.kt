@@ -43,7 +43,7 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 @Module
-class DaoModule(private val applicationContext: Context) {
+class DaoModule() {
     @Provides
     fun provideDao(database: AppDatabase): dao {
         return database.HealthDao
@@ -54,9 +54,9 @@ class DaoModule(private val applicationContext: Context) {
     }
 
     @Provides
-    fun provideDB(): AppDatabase {
+    fun provideDB(context: Context): AppDatabase {
         return Room.databaseBuilder(
-            applicationContext,
+            context,
             AppDatabase::class.java,
             "HealthDatabase"
         ).build()

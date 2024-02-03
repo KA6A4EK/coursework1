@@ -76,11 +76,11 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
-                        text = "${round(steps * 0.7 / 1000 * 100) / 100} km",
+                        text = stringResource(R.string.km, round(steps * 0.7 / 1000 * 100) / 100),
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
-                        text = "${round(steps * 0.04 * 100) / 100} Cal",
+                        text = stringResource(R.string.cal, round(steps * 0.04 * 100) / 100),
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }

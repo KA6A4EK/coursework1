@@ -61,7 +61,7 @@ class HealthViewModel @Inject constructor(
         }
     }
 
-    fun requestPermission():Boolean{
+    fun requestPermission(): Boolean {
         ActivityCompat.requestPermissions(
             context as Activity,
             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
@@ -77,23 +77,26 @@ class HealthViewModel @Inject constructor(
             return true
         }
     }
+
     fun provideSharedPreference() = sharedPrefs
+
     init {
         viewModelScope.launch {
             delay(100L)
             waterFromNotifications()
         }
     }
+
     fun waterFromNotifications() {
         val water = sharedPrefs.getString("countWater", "${getCurrentDay()} 0")!!.split(" ")
         sharedPrefs.edit()
             ?.putString("countWater", "${getCurrentDay()} 0")?.apply()
         if (water[0] == getCurrentDay()) {
-            currentDay.water += water[1].toInt()*cupSize
+            currentDay.water += water[1].toInt() * cupSize
             handleViewEvent(HealthViewEvent.Update(currentDay))
         } else {
             val day = days.find { it.date == water[0] }
-            handleViewEvent(HealthViewEvent.Update(day!!.copy(water = day.water + water[1].toInt()*cupSize)))
+            handleViewEvent(HealthViewEvent.Update(day!!.copy(water = day.water + water[1].toInt() * cupSize)))
         }
 
     }
@@ -115,7 +118,8 @@ class HealthViewModel @Inject constructor(
             apply()
         }
     }
-    fun getDaysToNotification()=listOf(
+
+    fun getDaysToNotification() = listOf(
         sharedPrefs.getBoolean("sunday", false),
         sharedPrefs.getBoolean("monday", false),
         sharedPrefs.getBoolean("tuesday", false),
@@ -124,6 +128,7 @@ class HealthViewModel @Inject constructor(
         sharedPrefs.getBoolean("friday", false),
         sharedPrefs.getBoolean("saturday", false),
     )
+
     fun handleViewEvent(viewEvent: HealthViewEvent) {
         when (viewEvent) {
             is HealthViewEvent.Update -> {
@@ -153,9 +158,10 @@ class HealthViewModel @Inject constructor(
 }
 
 @Module
-class ProvideViewModel(private val context: Context) {
+class ProvideViewModel() {
     @Provides
     fun provideHealthViewModel(
+        context: Context,
         repository: repository
     ): HealthViewModel {
         return HealthViewModel(

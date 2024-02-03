@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -54,13 +53,18 @@ fun SettingsScreen(
     val dateDialogState = rememberMaterialDialogState()
     if (buttonIsClicked != "") {
         when (buttonIsClicked) {
-            "weight" -> SnapToBlockList(num = viewModel.userWeight, listSize = 500, text = "kg") {
+            "weight" -> SnapToBlockList(num = viewModel.userWeight, listSize = 500, text = stringResource(
+                R.string.kg
+            )
+            ) {
                 buttonIsClicked = ""
                 viewModel.userWeight = it
                 viewModel.saveHealthData()
             }
 
-            "height" -> SnapToBlockList(num = viewModel.userHeight, listSize = 300, text = "cm") {
+            "height" -> SnapToBlockList(num = viewModel.userHeight, listSize = 300, text = stringResource(
+                id = R.string.cm
+            )) {
                 buttonIsClicked = ""
                 viewModel.userHeight = it
                 viewModel.saveHealthData()
@@ -105,7 +109,7 @@ fun SettingsScreen(
     Column {
 
         Text(
-            text = "Hello ${viewModel.name}",
+            text = stringResource(R.string.hello, viewModel.name),
             style = MaterialTheme.typography.displayMedium,
             modifier = Modifier
                 .padding(10.dp)
@@ -124,7 +128,9 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = viewModel.gender,
+                    text = if (viewModel.gender=="Male"){
+                        stringResource(id = R.string.male)}else{
+                        stringResource(id = R.string.female)},
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )

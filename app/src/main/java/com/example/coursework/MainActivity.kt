@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.ViewM.ProvideViewModel
+import com.example.coursework.model.ContextModule
 import com.example.coursework.model.DaggerAppComponent
 import com.example.coursework.model.DaoModule
 import com.example.coursework.model.Receiver
@@ -32,8 +33,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val appComponent = DaggerAppComponent.builder()
-            .daoModule(DaoModule(applicationContext))
-            .provideViewModel(ProvideViewModel(this))
+            .contextModule(ContextModule(applicationContext))
             .build()
         vm = appComponent.provideHealthViewModel()
         setContent {
@@ -66,8 +66,7 @@ class MainActivity : ComponentActivity() {
             val pendingIntent =
                 PendingIntent.getBroadcast(this, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
             val period = parceTime(sharedPrefs.getString("NotificationPeriod", "02:00")!!)
-            val interval =
-                (period.hour * 60 + period.minute) * 60 * 1000 // 90 минут в миллисекундах
+            val interval = (period.hour * 60 + period.minute) * 60 * 1000 // 90 минут в миллисекундах
             val currentTime = Calendar.getInstance()
             val localTime = LocalTime.now()
             val triggerTime: Long
@@ -80,6 +79,10 @@ class MainActivity : ComponentActivity() {
                 triggerTime = currentTime.timeInMillis
             } else if (localTime.plusMinutes((period.minute + period.hour * 60).toLong()) in startTime..endTime) {
                 Log.e(TAG, "second if")
+                Log.e(TAG, startTime.toString())
+                Log.e(TAG, endTime.toString())
+                Log.e(TAG, "second if")
+                Log.e(TAG, localTime.plusMinutes((period.minute + period.hour * 60).toLong()).toString())
 
                 // Если текущее время находится в пределах периода, устанавливаем срабатывание на 2 часа от текущего времени
                 currentTime.add(Calendar.HOUR_OF_DAY, period.hour)

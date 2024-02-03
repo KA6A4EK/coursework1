@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -328,8 +329,8 @@ fun parceTime(time: String) = LocalTime.parse(time, DateTimeFormatter.ofPattern(
 @Composable
 fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> Unit) {
     val time = edit.split(":")
-    var h by remember { mutableStateOf(time[0].toInt()) }
-    var m by remember { mutableStateOf(time[1].toInt()) }
+    var h by remember { mutableIntStateOf(time[0].toInt()) }
+    var m by remember { mutableIntStateOf(time[1].toInt()) }
     androidx.compose.material3.AlertDialog(onDismissRequest = { onDismiss("") }) {
         Card() {
             Row {

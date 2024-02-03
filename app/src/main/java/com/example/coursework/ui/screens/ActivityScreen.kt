@@ -52,7 +52,7 @@ fun ActivityScreen(viewModel: HealthViewModel) {
             TotalActivityTime(time = viewModel.trainingActivity.filter { it.date == current }
                 .sumOf { it.duration }, target = viewModel.activityTarget)
         }
-        items(viewModel.trainingActivity.filter { it.date == current }) { it ->
+        items(viewModel.trainingActivity.filter { it.date == current }) {
             CardActivityList(training = it)
         }
     }

@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -22,7 +23,7 @@ import com.example.coursework.ViewM.HealthViewModel
 @Composable
 fun editStartScreen(viewModel: HealthViewModel) {
 
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(10.dp)) {
         Box(contentAlignment = Alignment.TopEnd) {
             var visible by remember { mutableStateOf(viewModel.uiState.stepsVisible) }
             CardSteps(onCardClick = { }, viewModel = viewModel)

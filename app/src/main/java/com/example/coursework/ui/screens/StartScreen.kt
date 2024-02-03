@@ -38,18 +38,16 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
             .padding(8.dp)
             .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-
         if (viewModel.uiState.stepsVisible) {
             CardSteps(
-                onCardClick = { navController.navigate("steps_screen") },
-                viewModel
-            )
+                viewModel,
+                onCardClick = { navController.navigate("steps_screen") })
 
         }
         if (viewModel.uiState.waterVisible) {
             CardWater(
+                viewModel,
                 onCardClick = { navController.navigate("water_screen") },
-                viewModel
             )
         }
         if (viewModel.uiState.eatVisible) {
