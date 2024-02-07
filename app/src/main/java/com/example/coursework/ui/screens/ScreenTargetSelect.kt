@@ -37,7 +37,6 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
                 navigateUp()
             }
         }
-
         "{activity_list}" -> {
             val pitch = 5
             CardWithLazyColumnForSelect(
@@ -48,10 +47,8 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
             ) {
                 viewModel.activityTarget = it
                 navigateUp()
-
             }
         }
-
         "{eat_screen}" -> {
             val pitch = 50
             CardWithLazyColumnForSelect(
@@ -61,10 +58,8 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
             ) {
                 viewModel.eatTarget = it
                 navigateUp()
-
             }
         }
-
         "{water_screen}" -> {
             val pitch = 100
             CardWithLazyColumnForSelect(
@@ -74,10 +69,8 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
             ) {
                 viewModel.waterTarget = it
                 navigateUp()
-
             }
         }
-
         "{bmi_screen}" -> {
             CardWithLazyColumnForSelect(
                 num = viewModel.weightTarget, listSize = 500, text = stringResource(
@@ -88,7 +81,6 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
                 navigateUp()
             }
         }
-
         "{cupSize}" -> {
             val pitch = 10
             CardWithLazyColumnForSelect(
@@ -98,12 +90,10 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
             ) {
                 viewModel.cupSize = it
                 navigateUp()
-
             }
         }
     }
     viewModel.saveHealthData()
-
 }
 
 
@@ -117,8 +107,6 @@ fun CardWithLazyColumnForSelect(
     onDismiss: (Int) -> Unit
 ) {
     var ret by remember { mutableIntStateOf(num) }
-
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -132,7 +120,6 @@ fun CardWithLazyColumnForSelect(
             ) {
                 ret = it
             }
-
             Column(
                 modifier = Modifier.height(190.dp),
                 verticalArrangement = Arrangement.Center
@@ -161,5 +148,4 @@ fun CardWithLazyColumnForSelect(
             )
         }
     }
-
 }

@@ -1,5 +1,7 @@
 package com.example.coursework.ui.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,33 +48,12 @@ import java.time.format.DateTimeFormatter
 fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     val sharedPreferences = viewModel.provideSharedPreference()
     val days = viewModel.getDaysToNotification()
-    var startTime by remember {
-        mutableStateOf(
-            sharedPreferences.getString(
-                "startTime",
-                "09:00"
-            )!!
-        )
-    }
-    var period by remember {
-        mutableStateOf(
-            sharedPreferences.getString(
-                "NotificationPeriod",
-                "02:00"
-            )!!
-        )
-    }
+    var startTime by remember { mutableStateOf(sharedPreferences.getString("startTime", "09:00")!!) }
+    var period by remember { mutableStateOf(sharedPreferences.getString("NotificationPeriod", "02:00")!!) }
     val color1 = Color(0, 144, 255, 222)
     val color2 = Color(71, 71, 71, 150)
     var endTime by remember { mutableStateOf(sharedPreferences.getString("endTime", "21:00")!!) }
-    var showNotifications by remember {
-        mutableStateOf(
-            sharedPreferences.getBoolean(
-                "showNotifications",
-                false
-            )
-        )
-    }
+    var showNotifications by remember { mutableStateOf(sharedPreferences.getBoolean("showNotifications", false)) }
     var showAlertDialogToSelectPeriod by remember { mutableStateOf(false) }
     var sunday by remember { mutableStateOf(days[0]) }
     var monday by remember { mutableStateOf(days[1]) }
@@ -138,6 +119,7 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
         ) {
             Text(text = "Send notification", style = MaterialTheme.typography.headlineMedium)
             Checkbox(checked = showNotifications, onCheckedChange = {
+                Log.e(TAG,"$it")
                 if (viewModel.requestPermission()) {
                     showNotifications = it
                     sharedPreferences.edit().putBoolean("showNotifications", it).apply()
@@ -354,16 +336,8 @@ fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> 
                     text = stringResource(id = R.string.save),
                     modifier = Modifier
                         .clickable {
-                            onDismiss(
-                                "0$h:${
-                                    if (m < 10) {
-                                        "0$m"
-                                    } else {
-                                        "$m"
-                                    }
-                                }"
-                            )
-                        },
+                            Log.e(TAG,("0$h:${(m+100).toString().substring(1)}"))
+                            onDismiss("0$h:${(m+100).toString().substring(1)}") },
                     style = MaterialTheme.typography.displaySmall
                 )
             }
@@ -392,7 +366,8 @@ fun ScrolableLazyColumn(
             .height(190.dp)
             .padding(20.dp)
     ) {
-        items((initialIndex..listSize).toList()) { index ->
+        items((initialIndex..listSize).toList(),
+            key = {it} ) { index ->
             ScrollCard(n = index * pitch, h = itemHeight, isMiddle = index == firstIndex+1+initialIndex)
         }
     }

@@ -1,5 +1,6 @@
 package com.example.coursework.ui.screens
 
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -39,7 +40,8 @@ import com.example.coursework.ViewM.HealthViewModel
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
-    viewModel: HealthViewModel
+    viewModel: HealthViewModel,
+    context:Context
 ) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -67,32 +69,26 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = "start") {
-                StartScreen(modifier = Modifier, navController, viewModel)
-            }
+                StartScreen(modifier = Modifier, navController, viewModel) }
             composable(route = "settings") {
-                SettingsScreen(viewModel)
-            }
+                SettingsScreen(viewModel) }
             composable(route = "steps_screen") {
-                StepsScreen(viewModel)
-            }
+                StepsScreen(viewModel) }
             composable(route = "water_screen") {
-                WaterScreen(viewModel)
-            }
+                WaterScreen(viewModel) }
             composable(route = "eat_screen") {
-                EatScreen(viewModel)
-            }
+                EatScreen(viewModel) }
             composable(route = "activity_list") {
-                ActivityScreen(viewModel)
-            }
+                ActivityScreen(viewModel) }
             composable(route = "target/{edit_target}") {
                 val curent = backStackEntry?.arguments?.getString("edit_target") ?: "start"
-                TargetScreen(viewModel, curent, navigateUp = { navController.navigateUp() })
-            }
+                TargetScreen(viewModel, curent, navigateUp = { navController.navigateUp() }) }
             composable(route = "edit_start"){
-                editStartScreen(viewModel = viewModel)
-            }
+                editStartScreen(viewModel = viewModel) }
             composable(route = "notifications_period"){
-                SelectNotificationsPeriod(viewModel)
+                SelectNotificationsPeriod(viewModel) }
+            composable(route = "weight_screen"){
+                WeightScreen(viewModel)
             }
         }
     }
@@ -150,11 +146,9 @@ fun TopAppbar(curent: String, navController: NavHostController) {
                             )
                         }
                     }
-
                 }
             }
         })
-
 }
 
 
@@ -171,7 +165,7 @@ fun BottomAppbar(homeClick: () -> Unit, settingsClick: () -> Unit) {
                 Color.White
             )
             Icon(
-                painter = painterResource(id = R.drawable.settings_24px),
+                painter = painterResource(id = R.drawable.person_24px),
                 contentDescription = stringResource(R.string.settings_button),
                 modifier = Modifier
                     .clickable { settingsClick() }

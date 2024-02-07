@@ -2,12 +2,16 @@ package com.example.coursework.ViewM
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coursework.model.Day
+import com.example.coursework.model.SleepCounter
+import com.example.coursework.model.StepsCounter
 import com.example.coursework.model.Training
 import com.example.coursework.model.repository
 import com.example.coursework.ui.screens.getCurrentDay
@@ -22,7 +26,7 @@ import javax.inject.Inject
 
 class HealthViewModel @Inject constructor(
     private val repos: repository,
-    private val context: Context,
+    private val context: Context
 ) :
     ViewModel() {
     private val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
@@ -41,6 +45,10 @@ class HealthViewModel @Inject constructor(
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
     var trainingActivity: List<Training> = runBlocking { async { repos.getAllActivity() }.await() }
     var weightTarget: Int = sharedPrefs.getInt("weightTarget", 60)
+    val permissionForSteps = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED
+
+
+
 
     private val uiStateSharedPref = context.getSharedPreferences("uiState", Context.MODE_PRIVATE)
     val uiState = HealthUiState(
@@ -50,6 +58,24 @@ class HealthViewModel @Inject constructor(
         eatVisible = uiStateSharedPref.getBoolean("eatVisible", true),
         activityVisible = uiStateSharedPref.getBoolean("activityVisible", true)
     )
+     val stepsCounter = StepsCounter(context)
+    val sleepCounter =  SleepCounter(context)
+
+    val lastDaySteps  = sharedPrefs.getInt("lastDaySteps",0)
+
+
+    init {
+        viewModelScope.launch {
+            delay(150L)
+            currentDay.steps = stepsCounter.getSteps() - lastDaySteps
+            Log.e(TAG,"view model last day steps$lastDaySteps")
+            Log.e(TAG,"viewmodel get steps ${stepsCounter.getSteps()}")
+            delay(50L)
+            waterFromNotifications()
+            handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
+        }
+    }
+
 
     fun saveUiState() {
         uiStateSharedPref.edit().apply {
@@ -67,25 +93,19 @@ class HealthViewModel @Inject constructor(
             arrayOf(Manifest.permission.POST_NOTIFICATIONS),
             1
         )
-        if (ActivityCompat.checkSelfPermission(
-                context!!,
+        return if (ActivityCompat.checkSelfPermission(
+                context,
                 Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            return false
+            false
         } else {
-            return true
+            true
         }
     }
 
     fun provideSharedPreference() = sharedPrefs
 
-    init {
-        viewModelScope.launch {
-            delay(100L)
-            waterFromNotifications()
-        }
-    }
 
     fun waterFromNotifications() {
         val water = sharedPrefs.getString("countWater", "${getCurrentDay()} 0")!!.split(" ")
@@ -162,11 +182,11 @@ class ProvideViewModel() {
     @Provides
     fun provideHealthViewModel(
         context: Context,
-        repository: repository
+        repository: repository,
     ): HealthViewModel {
         return HealthViewModel(
             repository,
-            context,
+            context
         )
     }
 }

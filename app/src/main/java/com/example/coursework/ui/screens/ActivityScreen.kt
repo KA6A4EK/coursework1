@@ -94,7 +94,6 @@ fun TotalActivityTime(time: Int, target: Int) {
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(top = 15.dp, start = 20.dp)
         )
-
         Row(
             modifier = Modifier
                 .fillMaxWidth()

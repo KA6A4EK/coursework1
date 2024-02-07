@@ -1,5 +1,7 @@
 package com.example.coursework.ui.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,11 +39,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.text.isDigitsOnly
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import kotlin.math.max
 import kotlin.math.round
 
 @Composable
@@ -76,11 +80,11 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
-                        text = stringResource(R.string.km, round(steps * 0.7 / 1000 * 100) / 100),
+                        text = "${round(steps * 0.7 / 1000 * 100) / 100}${stringResource(R.string.km)}",
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
-                        text = stringResource(R.string.cal, round(steps * 0.04 * 100) / 100),
+                        text = "${round(steps * 0.04 * 100) / 100}${stringResource(R.string.cal)}",
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
@@ -92,7 +96,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
 
 
 @Composable
-fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
+fun VerticalProgressBar(columnSize:Float=1f,percent: Float, h: Int, color: Color) {
     Box {
         Canvas(
             modifier = Modifier
@@ -103,7 +107,7 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
             drawLine(
                 color = color,
                 start = Offset(0f, size.height),
-                end = Offset(0f, size.height * (1 - percent)),
+                end = Offset(0f, size.height * (1 - percent/columnSize)),
                 strokeWidth = 12.dp.toPx(),
                 cap = StrokeCap.Round,
             )
@@ -114,25 +118,27 @@ fun VerticalProgressBar(percent: Float, h: Int, color: Color) {
 fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 @Composable
-fun BoxWithProgress(target: Int) {
-    Box(modifier = Modifier.height(220.dp), contentAlignment = Alignment.BottomStart) {
+fun BoxWithProgress(target: Int,columnSize: Float) {
+    Box(modifier = Modifier.height(210.dp), contentAlignment = Alignment.BottomStart) {
         Canvas(
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxWidth()
-                .height(111.dp)
+                .height(150.dp)
         ) {
 
             drawLine(
                 color = Color.Green,
-                start = Offset(0f, 0f),
-                end = Offset(size.width, 0f),
+                start = Offset(0f, size.height *(1-1/columnSize) ),
+                end = Offset(size.width, size.height *(1-1/columnSize)),
                 strokeWidth = 1.dp.toPx(),
             )
+//            val s =size.height *(1-1/columnSize)+( size.height -  size.height *(1-1/columnSize))/2-12
+            val s = size.height*(1-1/(2*columnSize))
             drawLine(
                 color = Color.Yellow,
-                start = Offset(0f, size.height / 2f - 15f),
-                end = Offset(size.width, size.height / 2f - 15f),
+                start = Offset(0f, s),
+                end = Offset(size.width, s),
                 strokeWidth = 1.dp.toPx(),
             )
             val paint = Paint().asFrameworkPaint().apply {
@@ -143,12 +149,12 @@ fun BoxWithProgress(target: Int) {
 
             drawContext.canvas.nativeCanvas.drawText(
                 "$target",
-                size.width - 100, 37f,
+                size.width - 100, size.height *(1-1/columnSize)+33f,
                 paint
             )
             drawContext.canvas.nativeCanvas.drawText(
                 "${(target / 2)}",
-                size.width - 100, size.height / 2 + 20f,
+                size.width - 100, s + 33f,
                 paint
             )
         }
@@ -162,13 +168,12 @@ fun lazyRowProgress(
     onClick: (String) -> Unit,
     days: List<Pair<String, Int>>
 ): Int {
-    var current by remember {
-        mutableStateOf(getCurrentDay())
-    }
+    var current by remember { mutableStateOf(getCurrentDay()) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
     val firstIndex = scrollState.firstVisibleItemIndex
     val firstOffset = scrollState.firstVisibleItemScrollOffset
+//    var daysMaxValue by remember { mutableStateOf(scrollState.layoutInfo.totalItemsCount) }
     LaunchedEffect(firstIndex) {
         if (firstOffset != 0) {
             scope.launch {
@@ -184,13 +189,17 @@ fun lazyRowProgress(
 
         }
     }
+    val daysMaxValue =  scrollState.layoutInfo.visibleItemsInfo.map { it.key }.toString().replace(")", "").replace("]", "").split(", ").filter { it.isDigitsOnly() }.map { it.toInt() }.maxOrNull()?:1
+    val columnSize = max(daysMaxValue/target.toFloat(),1f)
+
     Box {
-        BoxWithProgress(target)
+        BoxWithProgress(target,columnSize)
         LazyRow(
             state = scrollState,
             modifier = Modifier.padding(end = 45.dp),
             reverseLayout = true
         ) {
+
             items(days, key = { it }) { date ->
                 Column(
                     Modifier
@@ -211,8 +220,9 @@ fun lazyRowProgress(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     VerticalProgressBar(
+                        columnSize,
                         percent = date.second / target.toFloat(),
-                        h = 100,
+                        h = 150,
                         color = color
                     )
                     Box(Modifier.height(20.dp), contentAlignment = Alignment.Center) {
@@ -238,6 +248,10 @@ fun lazyRowProgress(
             }
         }
     }
+
+    Log.e(TAG,daysMaxValue.toString())
+    Log.e(TAG,columnSize.toString())
+
 
     return days.find { it.first == current }?.second ?: 404
 }

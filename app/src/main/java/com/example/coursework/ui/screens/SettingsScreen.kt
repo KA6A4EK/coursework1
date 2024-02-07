@@ -47,8 +47,6 @@ import java.util.Date
 fun SettingsScreen(
     viewModel: HealthViewModel
 ) {
-
-
     var buttonIsClicked by remember { mutableStateOf("") }
     val dateDialogState = rememberMaterialDialogState()
     if (buttonIsClicked != "") {
@@ -101,13 +99,10 @@ fun SettingsScreen(
 
                 }
             }
-
-
             else -> {}
         }
     }
     Column {
-
         Text(
             text = stringResource(R.string.hello, viewModel.name),
             style = MaterialTheme.typography.displayMedium,
@@ -294,7 +289,7 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
 fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
     AlertDialog(onDismissRequest = { onDismiss(num) }) {
         CardWithLazyColumnForSelect(num = num+1, listSize = listSize, text = text, pitch = 1) {
-            onDismiss(it)
+            onDismiss(it-1)
         }
     }
 }

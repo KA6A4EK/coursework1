@@ -7,20 +7,23 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.ContentValues.TAG
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.coursework.R
+import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.ui.screens.getCurrentDay
+import com.example.coursework.ui.screens.parceTime
 import dagger.Module
 import dagger.Provides
+import java.time.LocalTime
 import java.util.Calendar
+import java.util.Date
 
 
 @Module
@@ -104,74 +107,56 @@ class Receiver() : BroadcastReceiver() {
     }
 }
 
-//        val message = intent?.getStringExtra("MESSAGE")
-//        if (message != null) {
-//            val sharedPrefs =
-//                context?.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
-//            sharedPrefs?.edit()?.putInt("countWater", sharedPrefs.getInt("countWater", 0))
-//        }
-//fun showNotification() {
-//    if (ActivityCompat.checkSelfPermission(
-//            context,
-//            Manifest.permission.POST_NOTIFICATIONS
-//        ) != PackageManager.PERMISSION_GRANTED
-//    ) {
-//        ActivityCompat.requestPermissions(
-//            context as Activity,
-//            arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-//            1
-//        )
-//    } else {
-//        val intent = Intent(context, Receiver::class.java).apply {
-//            putExtra("MESSAGE", "Clicked")
-//        }
-//        val pendingIntent = PendingIntent.getBroadcast(
-//            context,
-//            0,
-//            intent,
-//            PendingIntent.FLAG_UPDATE_CURRENT
-//        )
-//        notificationManager.notify(
-//            1, NotificationCompat.Builder(context, "channel_id")
-//                .setSmallIcon(R.drawable.glass_cup_24px)
-//                .setContentTitle("Время попить воды!")
-//                .setContentText("Отличный момент насладиться свежестью воды прямо сейчас!")
-//                .addAction(0, "попил", pendingIntent)
-//                .build()
-//        )
-//    }
-//}
+
+fun showNotificationAlarmManager(context: Context,viewModel: HealthViewModel){
+    val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
+    val showNotifications = sharedPrefs.getBoolean("showNotifications", false)
+    val days = viewModel.getDaysToNotification()
+
+    if (showNotifications && days[Calendar.DAY_OF_WEEK - 2]) {
+        val startTime = parceTime(sharedPrefs.getString("startTime", "09:00")!!)
+        val endTime = parceTime(sharedPrefs.getString("endTime", "21:00")!!)
+        val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmIntent = Intent(context, Receiver::class.java)
+        val pendingIntent =
+            PendingIntent.getBroadcast(context, 0, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+        val period = parceTime(sharedPrefs.getString("NotificationPeriod", "02:00")!!)
+        val interval =
+            (period.hour * 60 + period.minute) * 60 * 1000 // 90 минут в миллисекундах
+        val currentTime = Calendar.getInstance()
+        val localTime = LocalTime.now()
+        val triggerTime: Long
+
+        if (localTime < startTime) {
+            Log.e(ContentValues.TAG, "first if")
+            // Если текущее время раньше начала периода, устанавливаем срабатывание на 09:10
+            currentTime.set(Calendar.HOUR_OF_DAY, startTime.hour)
+            currentTime.set(Calendar.MINUTE, startTime.minute)
+            triggerTime = currentTime.timeInMillis
+        } else if (localTime.plusMinutes((period.minute + period.hour * 60).toLong()) in startTime..endTime) {
+            Log.e(ContentValues.TAG, "second if")
 
 
-class AlarmManagerForWaterNotification(private val context: Context) {
-    fun alarm() {
-        val intent = Intent(context, Receiver::class.java).apply {
-            putExtra("MESSAGE", "Clicked")
+            // Если текущее время находится в пределах периода, устанавливаем срабатывание на 2 часа от текущего времени
+            currentTime.add(Calendar.HOUR_OF_DAY, period.hour)
+            currentTime.add(Calendar.MINUTE, period.minute)
+            triggerTime = currentTime.timeInMillis
+
+        } else {
+            Log.e(ContentValues.TAG, "else")
+            // Если текущее время позже конца периода, устанавливаем срабатывание на следующий день в 09:10
+            currentTime.add(Calendar.DAY_OF_MONTH, 1)
+            currentTime.set(Calendar.HOUR_OF_DAY, startTime.hour)
+            currentTime.set(Calendar.MINUTE, startTime.minute)
+            triggerTime = currentTime.timeInMillis
         }
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-//        val calendar = Calendar.getInstance().apply {
-//            timeInMillis = System.currentTimeMillis()
-//        }
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 15)
-        calendar.set(Calendar.MINUTE, 10)
-        calendar.set(Calendar.SECOND, 0)
-        alarmManager.setRepeating(
+        Log.e(ContentValues.TAG, Date(triggerTime).toString())
+
+        alarmMgr.setRepeating(
             AlarmManager.RTC_WAKEUP,
-            calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent
+            triggerTime,
+            interval.toLong(),
+            pendingIntent
         )
-//        alarmManager.setRepeating(
-//            AlarmManager.RTC_WAKEUP,
-//            calendar.timeInMillis,
-//            AlarmManager.INTERVAL_HALF_HOUR,
-//            pendingIntent
-//        )
     }
 }
-

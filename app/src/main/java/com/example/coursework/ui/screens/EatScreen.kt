@@ -31,11 +31,7 @@ fun EatScreen(viewModel : HealthViewModel){
                 .height(300.dp)
                 .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(text = "$cal", style = MaterialTheme.typography.displayMedium, color = Color.White)
-
             }
-
         }
-
     }
-
 }

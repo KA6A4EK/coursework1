@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!--    <uses-feature android:name="android.hardware.sensor.accelerometer"/>-->
+    <uses-feature android:name="android.hardware.sensor.stepcounter"/>
+    <uses-feature android:name="android.hardware.sensor.stepdetector"/>
+    <uses-feature android:name="android.hardware.sensor.accelerometer"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
-    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
+    <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+<!--    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
 
     <application
         android:allowBackup="true"
@@ -16,6 +27,11 @@
         android:theme="@style/Theme.Coursework"
         tools:targetApi="31">
         <receiver android:name=".model.Receiver" />
+        <receiver android:name=".model.StepsCounterReceiver" />
+<!--        <service android:name=".model.StepCounterService" />-->
+        <service
+            android:name=".model.StepCounterService"
+            android:foregroundServiceType="dataSync"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -23,7 +39,7 @@
             android:theme="@style/Theme.Coursework">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
+                <action android:name="CUSTOM_INTENT_USER_ACTION" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

@@ -19,13 +19,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -52,7 +52,9 @@ import kotlin.math.round
 fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var buttonIsClicked by remember { mutableStateOf(false) }
     var steps by remember { mutableStateOf(viewModel.currentDay.steps) }
-
+//    LaunchedEffect (viewModel.currentDay.steps){
+//        steps = viewModel.currentDay.steps
+//    }
     if (buttonIsClicked)
         AlertDialog(
             number = steps,
@@ -64,18 +66,20 @@ fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             }
             buttonIsClicked = false
         }
+
     StartScreenCard(
+        showButtonAction = viewModel.permissionForSteps,
         onCardClick = { onCardClick() },
         onButtonClick = { buttonIsClicked = true },
         cardValue = steps,
         target = viewModel.stepsTarget,
-        text1 = "steps",
-        text2 = "Enter"
+        text1 = stringResource(R.string.step),
+        text2 = stringResource(id = R.string.enter)
     ) {
         ProgressBar(
             percent = steps / viewModel.stepsTarget.toFloat(),
             barWidth = 10,
-            width = 170,
+            width = 120,
             Color.Green
         )
     }
@@ -86,42 +90,53 @@ fun StartScreenCard(
     onCardClick: () -> Unit,
     onButtonClick: () -> Unit,
     cardValue: Int,
+    showButtonAction:Boolean = true,
     target: Int,
     text1: String,
     text2: String,
     composable: @Composable () -> Unit
 ) {
-    var value by remember { mutableStateOf(cardValue) }
-    LaunchedEffect(cardValue) {
-        value = cardValue
-    }
 
     Card(modifier = Modifier
         .clickable { onCardClick() }
         .fillMaxWidth()
-        .heightIn(100.dp)) {
+        .heightIn(100.dp), colors = CardDefaults.cardColors(
+        containerColor = if (cardValue >= target) {
+            Color(1, 255, 1, 200)
+        } else {
+            MaterialTheme.colorScheme.surfaceVariant
+        }
+    )
+    ) {
         Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             Column(modifier = Modifier.padding(8.dp)) {
                 Row(
                     verticalAlignment = Alignment.Bottom
                 ) {
                     Text(
-                        text = value.toString(),
+                        text = cardValue.toString(),
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                     )
+                    if (showButtonAction){
                     Text(
                         text = "/$target$text1",
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
-                    )
+                    )}
                 }
-
+                if (showButtonAction){
                 Button(onClick = {
                     onButtonClick()
                 }) {
                     Text(text = text2)
-                }
+                }}
+                else{
+                    Text(
+                    text = "/$target$text1",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = Color.Gray
+                )}
             }
             Spacer(modifier = Modifier.weight(1f))
             composable()
@@ -144,8 +159,8 @@ fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         },
         cardValue = water,
         target = viewModel.waterTarget,
-        text1 = "ml",
-        text2 = "+${viewModel.cupSize}ml"
+        text1 = stringResource(id = R.string.ml),
+        text2 = "+${viewModel.cupSize}${stringResource(id = R.string.ml)}"
     ) {
         val image = when (viewModel.currentDay.water) {
             in 0..viewModel.waterTarget / 3 -> R.drawable.water_loss_24px
@@ -260,7 +275,7 @@ fun CardStepsстарое(
                         fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text = stringResource(R.string.steps_s, stepTarget),
+                        text = stringResource(R.string.step, stepTarget),
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
                     )
@@ -276,7 +291,7 @@ fun CardStepsстарое(
             ProgressBar(
                 percent = steps / stepTarget.toFloat(),
                 barWidth = 10,
-                width = 170,
+                width = 100,
                 Color.Green
             )
         }
@@ -349,13 +364,13 @@ fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         },
         cardValue = cal,
         target = viewModel.eatTarget,
-        text1 = "cal",
-        text2 = "Enter"
+        text1 = stringResource(id = R.string.cal),
+        text2 = stringResource(id = R.string.enter),
     ) {
         ProgressBar(
             percent = cal / viewModel.eatTarget.toFloat(),
             barWidth = 10,
-            width = 170,
+            width = 120,
             Color.Yellow
         )
     }
@@ -414,7 +429,7 @@ fun CardEatстарое(
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
     val bodyHeight = viewModel.userHeight
     val bodyWeight = viewModel.userWeight
-    Card {
+    Card (){
         Row(
             modifier = Modifier
                 .fillMaxWidth()

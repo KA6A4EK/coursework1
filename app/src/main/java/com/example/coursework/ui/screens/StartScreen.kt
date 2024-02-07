@@ -64,7 +64,7 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
         }
         if (viewModel.uiState.bodyCompositionVisible) {
             CardBMI(
-                onClick = { navController.navigate("settings") },
+                onClick = { navController.navigate("weight_screen") },
                 viewModel = viewModel
             )
         }

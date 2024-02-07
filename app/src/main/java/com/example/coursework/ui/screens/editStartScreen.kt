@@ -22,7 +22,6 @@ import com.example.coursework.ViewM.HealthViewModel
 
 @Composable
 fun editStartScreen(viewModel: HealthViewModel) {
-
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(10.dp)) {
         Box(contentAlignment = Alignment.TopEnd) {
             var visible by remember { mutableStateOf(viewModel.uiState.stepsVisible) }
