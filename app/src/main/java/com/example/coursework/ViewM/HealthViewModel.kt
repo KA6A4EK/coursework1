@@ -2,10 +2,8 @@ package com.example.coursework.ViewM
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -68,8 +66,8 @@ class HealthViewModel @Inject constructor(
         viewModelScope.launch {
             delay(150L)
             currentDay.steps = stepsCounter.getSteps() - lastDaySteps
-            Log.e(TAG,"view model last day steps$lastDaySteps")
-            Log.e(TAG,"viewmodel get steps ${stepsCounter.getSteps()}")
+//            Log.e(TAG,"view model last day steps$lastDaySteps")
+//            Log.e(TAG,"viewmodel get steps ${stepsCounter.getSteps()}")
             delay(50L)
             waterFromNotifications()
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))

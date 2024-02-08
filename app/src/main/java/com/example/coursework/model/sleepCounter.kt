@@ -1,12 +1,10 @@
 package com.example.coursework.model
 
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.util.Log
 
 class SleepCounter(context: Context) : SensorEventListener {
     var sleepTime : Long = 0
@@ -25,7 +23,7 @@ class SleepCounter(context: Context) : SensorEventListener {
 
                     if (isInMotion(x, y, z)) {
                         sleepTime = maxOf(sleepTime, currentTime-  lastMovementTime)
-                        Log.e(TAG,"sleepTime${sleepTime}")
+//                        Log.e(TAG,"sleepTime${sleepTime}")
                     }
                 }
 

@@ -1,7 +1,5 @@
 package com.example.coursework
 
-import android.Manifest
-import android.app.Activity
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,12 +17,14 @@ import com.example.coursework.model.showNotificationAlarmManager
 import com.example.coursework.ui.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
 
-class MainActivity : ComponentActivity()
+class MainActivity : ComponentActivity()//, SensorEventListener
 {
 
     lateinit var vm: HealthViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         val appComponent = DaggerAppComponent.builder()
             .contextModule(ContextModule(this))
             .build()
@@ -41,42 +41,40 @@ class MainActivity : ComponentActivity()
                 }
             }
         }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                "android.permission.ACTIVITY_RECOGNITION"
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf("android.permission.ACTIVITY_RECOGNITION"),
+                3
+            )
+        } else {
+//            scheduleService(this,1,1)
+
+        }
 
     }
-
-
-
 
 
     override fun onStop() {
         super.onStop()
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACTIVITY_RECOGNITION
-            ) != PackageManager.PERMISSION_GRANTED
+                "android.permission.ACTIVITY_RECOGNITION"
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                this as Activity,
-                arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
-                1
-            )
-        }
-        else{
             saveStepsInDatabase(this)
         }
         if (ActivityCompat.checkSelfPermission(
                 this,
-                Manifest.permission.POST_NOTIFICATIONS
-            ) != PackageManager.PERMISSION_GRANTED
+                "android.permission.POST_NOTIFICATIONS"
+        ) != PackageManager.PERMISSION_GRANTED
         ) {
-            ActivityCompat.requestPermissions(
-                this as Activity,
-                arrayOf(Manifest.permission.POST_NOTIFICATIONS),
-                1
-            )
+
+            showNotificationAlarmManager(this, vm)
         }
-        else{
-            showNotificationAlarmManager(this,vm)}
     }
 }
-
