@@ -42,6 +42,7 @@ class StepsCounter(context: Context) : SensorEventListener {
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
         if (sensorEvent?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             step = sensorEvent.values[0].toInt()
+            Log.e(TAG,"onSensorChanged $step")
         }
     }
 
@@ -50,7 +51,6 @@ class StepsCounter(context: Context) : SensorEventListener {
 
 
 class StepCounterService : Service(), SensorEventListener {
-
     private lateinit var sensorManager: SensorManager
     private lateinit var stepSensor: Sensor
     private lateinit var sharedPreferences: SharedPreferences
@@ -64,18 +64,16 @@ class StepCounterService : Service(), SensorEventListener {
         super.onCreate()
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!!
-        createNotificationChannel()
         sharedPreferences = getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
-
         Log.e(TAG, "onCreate")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        startForeground(NOTIFICATION_ID, createNotification().build())
+        createNotificationChannel()
+        startForeground(NOTIFICATION_ID,createNotification().build())
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
         Log.e(TAG, "onStartCommand")
         return START_STICKY
-
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -97,16 +95,7 @@ class StepCounterService : Service(), SensorEventListener {
                 .build().provideHealthRepository()
             val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }
 
-            runBlocking {
-                repository.Update(
-                    currentDay!!.copy(
-                        steps = stepCount!! - sharedPreferences.getInt(
-                            "lastDaySteps",
-                            0
-                        )
-                    )
-                )
-            }
+            runBlocking { repository.Update(currentDay!!.copy(steps = stepCount!! - sharedPreferences.getInt("lastDaySteps", 0))) }
             sharedPreferences.edit().putInt("lastDaySteps", stepCount!!).apply()
             Log.e(TAG, "onSensorChanged $stepCount")
         }
@@ -149,7 +138,7 @@ fun saveStepsInDatabase(context: Context) {
     val currentTime = Calendar.getInstance()
     val interval = 1000 * 60 * 60
     currentTime.set(Calendar.HOUR_OF_DAY, 23)
-//    currentTime.add(Calendar.SECOND, 5)
+    currentTime.add(Calendar.SECOND, 5)
     currentTime.set(Calendar.MINUTE, 55)
 
 // Установка повтора на каждый день
@@ -163,3 +152,110 @@ fun saveStepsInDatabase(context: Context) {
 }
 
 
+fun saveStepsInDatabase1(context: Context) {
+    Log.e(TAG, "saveStepsInDatabase")
+    val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    val alarmIntent = Intent(context, StepCounterService1::class.java)
+    val pendingIntent =
+        PendingIntent.getService(context, 123, alarmIntent, PendingIntent.FLAG_IMMUTABLE)
+    val currentTime = Calendar.getInstance()
+    currentTime.set(Calendar.MINUTE,55)
+    currentTime.set(Calendar.SECOND,0)
+
+
+// Установка повтора на каждый час
+    alarmManager.setRepeating(
+        AlarmManager.RTC_WAKEUP,
+        currentTime.timeInMillis,
+        AlarmManager.INTERVAL_HOUR,
+        pendingIntent
+    )
+    Log.e(TAG, "${currentTime.time}")
+}
+
+class StepCounterService1 : Service(), SensorEventListener {
+
+    private lateinit var sensorManager: SensorManager
+    private lateinit var stepSensor: Sensor
+    private lateinit var sharedPreferences: SharedPreferences
+
+    companion object {
+        const val CHANNEL_ID = "StepCounterChannel2"
+        const val NOTIFICATION_ID = 113
+    }
+
+    override fun onCreate() {
+        super.onCreate()
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!!
+        createNotificationChannel()
+
+        sharedPreferences = getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
+
+        Log.e(TAG, "onCreate")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        startForeground(NOTIFICATION_ID, createNotification().build())
+        sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        Log.e(TAG, "onStartCommand")
+        return START_STICKY
+
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        return null
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        sensorManager.unregisterListener(this)
+        Log.e(TAG, "onDestroy")
+
+    }
+
+    override fun onSensorChanged(event: SensorEvent?) {
+        if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
+            val stepCount = event?.values?.get(0)?.toInt()!!
+            val repository = DaggerAppComponent.builder()
+                .contextModule(ContextModule(this))
+                .build().provideHealthRepository()
+            val hour = Calendar.HOUR
+            val lastHourSteps = sharedPreferences.getInt("lastHourSteps",stepCount)
+            val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }!!
+            val stepsAtTheDay =  currentDay.stepsAtTheDay.split(", ").toMutableList()
+            Log.e(TAG,"stepsAtTheDay")
+            stepsAtTheDay[hour] = (stepCount - lastHourSteps).toString()
+            runBlocking { repository.Update(currentDay.copy(stepsAtTheDay =stepsAtTheDay.toList().toString().replace("[","").replace("]",""))) }
+            sharedPreferences.edit().putInt("lastHourSteps", stepCount!!).apply()
+            Log.e(TAG, "lastHourSteps $stepCount")
+        }
+        stopSelf()
+    }
+
+    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+    }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Step Counter Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun createNotification(): NotificationCompat.Builder {
+        val intent = Intent(this, Receiver::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 10, intent, PendingIntent.FLAG_IMMUTABLE)
+        return NotificationCompat.Builder(this, CHANNEL_ID)
+            .setContentTitle("Step Counter Service")
+            .setContentText("Foreground service collecting step data")
+            .setSmallIcon(R.drawable.sprint_24px)
+            .setContentIntent(pendingIntent)
+
+    }
+}

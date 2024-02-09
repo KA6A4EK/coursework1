@@ -38,6 +38,7 @@ class repository @Inject constructor(
             if (days.find { it.date == getCurrentDay() } == null) {
                 val day = Day()
                 Insert(day)
+
                 return (days + day).sortedBy { format.parse(it.date) }.reversed()
             }
         }

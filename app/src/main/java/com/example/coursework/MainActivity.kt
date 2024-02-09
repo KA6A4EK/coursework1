@@ -14,6 +14,7 @@ import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.model.ContextModule
 import com.example.coursework.model.DaggerAppComponent
 import com.example.coursework.model.saveStepsInDatabase
+import com.example.coursework.model.saveStepsInDatabase1
 import com.example.coursework.model.showNotificationAlarmManager
 import com.example.coursework.ui.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
@@ -23,6 +24,7 @@ class MainActivity : ComponentActivity() {
     lateinit var vm: HealthViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        this.deleteDatabase("HealthDatabase")
         val appComponent = DaggerAppComponent.builder()
             .contextModule(ContextModule(this))
             .build()
@@ -39,6 +41,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION), 1)
+
+        }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.POST_NOTIFICATIONS), 1)
+        }
     }
 
     override fun onStop() {
@@ -49,6 +66,7 @@ class MainActivity : ComponentActivity() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             saveStepsInDatabase(this)
+            saveStepsInDatabase1(this)
         }
         if (ActivityCompat.checkSelfPermission(
                 this,

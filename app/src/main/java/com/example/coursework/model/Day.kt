@@ -12,7 +12,9 @@ data class Day(
     var water: Int = 0,
     val eat: Int = 0,
     var activity : Int =0,
-    val bmi :Int = 0
+    val bmi :Int = 0,
+    val x :Int =1,
+    var stepsAtTheDay : String = "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
 )
 
 @Entity(tableName = "Training_Activity")

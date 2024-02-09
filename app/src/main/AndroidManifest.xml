@@ -4,8 +4,10 @@
     <uses-feature android:name="android.hardware.sensor.stepcounter"/>
     <uses-feature android:name="android.hardware.sensor.stepdetector"/>
     <uses-feature android:name="android.hardware.sensor.accelerometer"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_HEALTH" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="com.android.alarm.permission.SET_ALARM"/>
 
 
 
@@ -20,8 +22,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Coursework">
         <receiver android:name=".model.Receiver" />
-        <service android:name=".model.StepCounterService"
-            android:foregroundServiceType="health" />
+        <service android:name=".model.StepCounterService" android:foregroundServiceType="health" />
+        <service android:name=".model.StepCounterService1" android:foregroundServiceType="health" />
         <activity
             android:name=".MainActivity"
             android:exported="true"

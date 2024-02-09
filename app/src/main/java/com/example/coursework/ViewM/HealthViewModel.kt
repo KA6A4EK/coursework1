@@ -45,9 +45,10 @@ class HealthViewModel @Inject constructor(
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
     var trainingActivity: List<Training> = runBlocking { async { repos.getAllActivity() }.await() }
     var weightTarget: Int = sharedPrefs.getInt("weightTarget", 60)
-    val permissionForSteps = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED
-
-
+    val permissionForSteps = ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACTIVITY_RECOGNITION
+    ) != PackageManager.PERMISSION_GRANTED
 
 
     private val uiStateSharedPref = context.getSharedPreferences("uiState", Context.MODE_PRIVATE)
@@ -58,19 +59,31 @@ class HealthViewModel @Inject constructor(
         eatVisible = uiStateSharedPref.getBoolean("eatVisible", true),
         activityVisible = uiStateSharedPref.getBoolean("activityVisible", true)
     )
-     val stepsCounter = StepsCounter(context)
-    val sleepCounter =  SleepCounter(context)
-
+    val stepsCounter = StepsCounter(context)
+    val sleepCounter = SleepCounter(context)
 
 
     init {
         viewModelScope.launch {
-            val lastDaySteps  = sharedPrefs.getInt("lastDaySteps",0)
-            delay(50L)
+//            sharedPrefs.edit().clear().apply()
+            delay(100L)
+
+            if (!sharedPrefs.contains("lastDaySteps")){
+                sharedPrefs.edit().putInt("lastDaySteps",stepsCounter.getSteps()).apply()
+                Log.e(TAG,"lastDaySteps added")
+            }
+            if (!sharedPrefs.contains("lastHourSteps")){
+                sharedPrefs.edit().putInt("lastHourSteps",stepsCounter.getSteps()).apply()
+                Log.e(TAG,"lastHourSteps added")
+
+            }
+            val lastDaySteps = sharedPrefs.getInt("lastDaySteps", 404)
+
             currentDay.steps = stepsCounter.getSteps() - lastDaySteps
-            Log.e(TAG,"view model last day steps$lastDaySteps")
-            Log.e(TAG,"viewmodel get steps ${stepsCounter.getSteps()}")
-            delay(50L)
+            Log.e(TAG, "view model last day steps$lastDaySteps")
+            Log.e(TAG, "viewmodel get steps ${stepsCounter.getSteps()}")
+            Log.e(TAG, "viewmodel get last hour steps ${ sharedPrefs.getInt("lastHourSteps",132)}")
+            delay(100L)
             waterFromNotifications()
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
         }
@@ -109,16 +122,20 @@ class HealthViewModel @Inject constructor(
 
     fun waterFromNotifications() {
         val water = sharedPrefs.getString("countWater", "${getCurrentDay()} 0")!!.split(" ")
-        sharedPrefs.edit()
-            ?.putString("countWater", "${getCurrentDay()} 0")?.apply()
+        sharedPrefs.edit()?.putString("countWater", "${getCurrentDay()} 0")?.apply()
+        if (days.isNotEmpty()){
         if (water[0] == getCurrentDay()) {
             currentDay.water += water[1].toInt() * cupSize
             handleViewEvent(HealthViewEvent.Update(currentDay))
-        } else {
+        } else  {
             val day = days.find { it.date == water[0] }
-            handleViewEvent(HealthViewEvent.Update(day!!.copy(water = day.water + water[1].toInt() * cupSize)))
-        }
+            if (day!=null) {
 
+
+
+                handleViewEvent(HealthViewEvent.Update(day.copy(water = day.water + water[1].toInt() * cupSize)))
+            }
+        }}
     }
 
 

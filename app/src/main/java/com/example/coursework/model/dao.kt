@@ -10,7 +10,6 @@ import androidx.room.RoomDatabase
 import androidx.room.Update
 import dagger.Module
 import dagger.Provides
-import javax.inject.Singleton
 
 
 @Dao
@@ -59,7 +58,10 @@ class DaoModule() {
             context,
             AppDatabase::class.java,
             "HealthDatabase"
-        ).build()
+        )
+//            .fallbackToDestructiveMigration()
+
+            .build()
     }
 }
 

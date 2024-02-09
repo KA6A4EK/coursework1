@@ -24,7 +24,8 @@ fun EatScreen(viewModel : HealthViewModel){
     val days = viewModel.days.map { Pair(it.date,it.eat) }
 
     Column (horizontalAlignment = Alignment.CenterHorizontally){
-        cal = lazyRowProgress(target = viewModel.eatTarget, color = Color.Yellow, onClick = {}, days =days)
+//        cal = lazyRowProgress(target = viewModel.eatTarget, color = Color.Yellow, onClick = {}, days =days)
+        cal = days.find{it.first==  lazyRowProgress(target = viewModel.eatTarget, color = Color.Yellow, onClick = {}, days =days)}!!.second
 
         Card (Modifier.padding(10.dp)){
             Column(modifier = Modifier

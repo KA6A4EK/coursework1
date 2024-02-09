@@ -19,24 +19,34 @@ import androidx.compose.ui.unit.dp
 import com.example.coursework.ViewM.HealthViewModel
 
 @Composable
-fun WaterScreen(viewModel : HealthViewModel){
+fun WaterScreen(viewModel: HealthViewModel) {
     var water by remember { mutableIntStateOf(0) }
-    val days = viewModel.days.map { Pair(it.date,it.water) }
+    val days = viewModel.days.map { Pair(it.date, it.water) }
     val color = Color(0, 166, 255, 255)
 
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
-        water = lazyRowProgress(target = viewModel.waterTarget, color = color, onClick = {}, days =days)
-            
-        Card (Modifier.padding(10.dp)){
-            Column(modifier = Modifier
-                .height(300.dp)
-                .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = "$water", style = MaterialTheme.typography.displayMedium, color = Color.White)
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+//        water = lazyRowProgress(target = viewModel.waterTarget, color = color, onClick = {}, days =days)
+        water = days.find {
+            it.first == lazyRowProgress(
+                target = viewModel.waterTarget,
+                color = color,
+                onClick = {},
+                days = days
+            )
+        }!!.second
 
+        Card(Modifier.padding(10.dp)) {
+            Column(
+                modifier = Modifier
+                    .height(300.dp)
+                    .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "$water",
+                    style = MaterialTheme.typography.displayMedium,
+                    color = Color.White
+                )
             }
-            
         }
-
     }
-
 }

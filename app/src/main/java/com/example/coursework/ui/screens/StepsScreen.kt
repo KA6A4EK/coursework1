@@ -1,7 +1,5 @@
 package com.example.coursework.ui.screens
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -52,10 +49,11 @@ import kotlin.math.round
 fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
     val color = Color(168, 255, 65, 215)
-    val days = viewModel.days.map { Pair(it.date, it.steps) }
-    var steps by remember { mutableIntStateOf(0) }
+    var current by remember { mutableStateOf(getCurrentDay()) }
+    var currentDay by remember { mutableStateOf(viewModel.days.find { it.date== getCurrentDay() }!!) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        steps = lazyRowProgress(target = target, color = color, onClick = {}, days = days)
+        current = lazyRowProgress(target = target, color = color, onClick = {}, days =  viewModel.days.map { Pair(it.date, it.steps) })
+        currentDay  = viewModel.days.find { it.date==current }!!
         Card(Modifier.padding(10.dp)) {
             Column(
                 Modifier
@@ -66,7 +64,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
             ) {
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
-                        text = "$steps",
+                        text = "${currentDay.steps}",
                         style = MaterialTheme.typography.displaySmall,
                         color = Color.White
                     )
@@ -76,39 +74,48 @@ fun StepsScreen(viewModel: HealthViewModel) {
                     )
                 }
                 ProgressBar(
-                    percent = steps / target.toFloat(), barWidth = 30, width = 290,color
+                    percent = currentDay.steps / target.toFloat(), barWidth = 30, width = 290, color
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
-                        text = "${round(steps * 0.7 / 1000 * 100) / 100}${stringResource(R.string.km)}",
+                        text = "${round(currentDay.steps * 0.7 / 1000 * 100) / 100}${stringResource(R.string.km)}",
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
-                        text = "${round(steps * 0.04 * 100) / 100}${stringResource(R.string.cal)}",
+                        text = "${round(currentDay.steps * 0.04 * 100) / 100}${stringResource(R.string.cal)}",
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
             }
         }
 
+        CardWithStepsAtEveryHour(currentDay.stepsAtTheDay)
     }
 }
 
 
 @Composable
-fun VerticalProgressBar(columnSize:Float=1f,percent: Float, h: Int, color: Color) {
+fun VerticalProgressBar(
+    columnSize: Float = 1f,
+    padding: Int = 10,
+    width: Int = 12,
+    percent: Float,
+    h: Int,
+    modifier: Modifier = Modifier,
+    color: Color
+) {
     Box {
         Canvas(
-            modifier = Modifier
-                .padding(10.dp)
+            modifier = modifier
+                .padding(padding.dp)
                 .height(h.dp)
 
         ) {
             drawLine(
                 color = color,
                 start = Offset(0f, size.height),
-                end = Offset(0f, size.height * (1 - percent/columnSize)),
-                strokeWidth = 12.dp.toPx(),
+                end = Offset(0f, size.height * (1 - percent / columnSize)),
+                strokeWidth = width.dp.toPx(),
                 cap = StrokeCap.Round,
             )
         }
@@ -118,7 +125,7 @@ fun VerticalProgressBar(columnSize:Float=1f,percent: Float, h: Int, color: Color
 fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
 
 @Composable
-fun BoxWithProgress(target: Int,columnSize: Float) {
+fun BoxWithProgress(target: Int, columnSize: Float) {
     Box(modifier = Modifier.height(210.dp), contentAlignment = Alignment.BottomStart) {
         Canvas(
             modifier = Modifier
@@ -129,12 +136,11 @@ fun BoxWithProgress(target: Int,columnSize: Float) {
 
             drawLine(
                 color = Color.Green,
-                start = Offset(0f, size.height *(1-1/columnSize) ),
-                end = Offset(size.width, size.height *(1-1/columnSize)),
+                start = Offset(0f, size.height * (1 - 1 / columnSize)),
+                end = Offset(size.width, size.height * (1 - 1 / columnSize)),
                 strokeWidth = 1.dp.toPx(),
             )
-//            val s =size.height *(1-1/columnSize)+( size.height -  size.height *(1-1/columnSize))/2-12
-            val s = size.height*(1-1/(2*columnSize))
+            val s = size.height * (1 - 1 / (2 * columnSize))
             drawLine(
                 color = Color.Yellow,
                 start = Offset(0f, s),
@@ -149,7 +155,7 @@ fun BoxWithProgress(target: Int,columnSize: Float) {
 
             drawContext.canvas.nativeCanvas.drawText(
                 "$target",
-                size.width - 100, size.height *(1-1/columnSize)+33f,
+                size.width - 100, size.height * (1 - 1 / columnSize) + 33f,
                 paint
             )
             drawContext.canvas.nativeCanvas.drawText(
@@ -167,13 +173,12 @@ fun lazyRowProgress(
     color: Color,
     onClick: (String) -> Unit,
     days: List<Pair<String, Int>>
-): Int {
+): String {
     var current by remember { mutableStateOf(getCurrentDay()) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
     val firstIndex = scrollState.firstVisibleItemIndex
     val firstOffset = scrollState.firstVisibleItemScrollOffset
-//    var daysMaxValue by remember { mutableStateOf(scrollState.layoutInfo.totalItemsCount) }
     LaunchedEffect(firstIndex) {
         if (firstOffset != 0) {
             scope.launch {
@@ -189,11 +194,14 @@ fun lazyRowProgress(
 
         }
     }
-    val daysMaxValue =  scrollState.layoutInfo.visibleItemsInfo.map { it.key }.toString().replace(")", "").replace("]", "").split(", ").filter { it.isDigitsOnly() }.map { it.toInt() }.maxOrNull()?:1
-    val columnSize = max(daysMaxValue/target.toFloat(),1f)
+    val daysMaxValue =
+        scrollState.layoutInfo.visibleItemsInfo.map { it.key }.toString().replace(")", "")
+            .replace("]", "").split(", ").filter { it.isDigitsOnly() }.map { it.toInt() }
+            .maxOrNull() ?: 1
+    val columnSize = max(daysMaxValue / target.toFloat(), 1f)
 
     Box {
-        BoxWithProgress(target,columnSize)
+        BoxWithProgress(target, columnSize)
         LazyRow(
             state = scrollState,
             modifier = Modifier.padding(end = 45.dp),
@@ -230,7 +238,7 @@ fun lazyRowProgress(
                             Text(
                                 text = date.first.substring(0, 5),
                                 color = Color.Black,
-                                modifier = Modifier.background(color,CircleShape),
+                                modifier = Modifier.background(color, CircleShape),
                                 fontSize = 14.sp,
                                 maxLines = 1,
                                 fontWeight = FontWeight.Bold
@@ -248,10 +256,27 @@ fun lazyRowProgress(
             }
         }
     }
-
-    Log.e(TAG,daysMaxValue.toString())
-    Log.e(TAG,columnSize.toString())
-
-
-    return days.find { it.first == current }?.second ?: 404
+    return current
 }
+
+
+@Composable
+fun CardWithStepsAtEveryHour(stepsAtTheDay:String) {
+    val steps = stepsAtTheDay.split(", ").map { it.toInt() }
+    val max = maxOf(steps.max(),1)
+    var current by remember { mutableStateOf("") }
+    Column (horizontalAlignment = Alignment.CenterHorizontally){
+        Text(text = current)
+
+    LazyRow {
+        items(steps) {
+            VerticalProgressBar(
+                width = 5,
+                percent =it / max.toFloat(),
+                color = Color.Green,
+                h = 70,
+                padding = 7,
+                modifier = Modifier.clickable { current = "$it"})
+        }
+    }
+}}
