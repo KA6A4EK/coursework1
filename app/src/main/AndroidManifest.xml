@@ -20,10 +20,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Coursework">
         <receiver android:name=".model.Receiver" />
-        <receiver android:name=".model.StepsCounterReceiver" />
-<!--        <service android:name=".model.StepCounterService" />-->
-<!--        <service-->
-<!--            android:name=".model.StepCounterService"/>-->
         <service android:name=".model.StepCounterService"
             android:foregroundServiceType="health" />
         <activity

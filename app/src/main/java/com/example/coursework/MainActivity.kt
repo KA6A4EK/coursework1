@@ -1,5 +1,6 @@
 package com.example.coursework
 
+import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -17,14 +18,11 @@ import com.example.coursework.model.showNotificationAlarmManager
 import com.example.coursework.ui.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
 
-class MainActivity : ComponentActivity()//, SensorEventListener
-{
+class MainActivity : ComponentActivity() {
 
     lateinit var vm: HealthViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
         val appComponent = DaggerAppComponent.builder()
             .contextModule(ContextModule(this))
             .build()
@@ -41,39 +39,22 @@ class MainActivity : ComponentActivity()//, SensorEventListener
                 }
             }
         }
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                "android.permission.ACTIVITY_RECOGNITION"
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf("android.permission.ACTIVITY_RECOGNITION"),
-                3
-            )
-        } else {
-//            scheduleService(this,1,1)
-
-        }
-
     }
-
 
     override fun onStop() {
         super.onStop()
         if (ActivityCompat.checkSelfPermission(
                 this,
-                "android.permission.ACTIVITY_RECOGNITION"
+                Manifest.permission.ACTIVITY_RECOGNITION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             saveStepsInDatabase(this)
         }
         if (ActivityCompat.checkSelfPermission(
                 this,
-                "android.permission.POST_NOTIFICATIONS"
-        ) != PackageManager.PERMISSION_GRANTED
+                Manifest.permission.POST_NOTIFICATIONS
+            ) == PackageManager.PERMISSION_GRANTED
         ) {
-
             showNotificationAlarmManager(this, vm)
         }
     }

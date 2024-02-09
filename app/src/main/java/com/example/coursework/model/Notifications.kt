@@ -8,6 +8,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -158,5 +159,6 @@ fun showNotificationAlarmManager(context: Context,viewModel: HealthViewModel){
             interval.toLong(),
             pendingIntent
         )
+        Log.e(TAG,"triggerTime ${currentTime.time}")
     }
 }
