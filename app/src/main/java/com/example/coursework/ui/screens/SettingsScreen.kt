@@ -178,7 +178,12 @@ fun SettingsScreen(
                     modifier = Modifier.padding(8.dp)
                 )
             }
+            Text(text = "Шагов за все время ${viewModel.days.sumOf { it.steps }}")
+            Text(text = "Воды за все время ${viewModel.days.sumOf { it.water }}")
+            Text(text = "Активности всего за все время ${viewModel.days.sumOf { it.activity }}")
+            Text(text = "Шагов в среднем ${viewModel.days.sumOf { it.steps/viewModel.days.size }}")
         }
+
     }
 }
 

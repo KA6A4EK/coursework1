@@ -220,14 +220,14 @@ class StepCounterService1 : Service(), SensorEventListener {
             val repository = DaggerAppComponent.builder()
                 .contextModule(ContextModule(this))
                 .build().provideHealthRepository()
-            val hour = Calendar.HOUR
-            val lastHourSteps = sharedPreferences.getInt("lastHourSteps",stepCount)
             val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }!!
+            val hour = Calendar.getInstance().time.hours
+            val lastHourSteps = sharedPreferences.getInt("lastHourSteps",stepCount)
             val stepsAtTheDay =  currentDay.stepsAtTheDay.split(", ").toMutableList()
             Log.e(TAG,"stepsAtTheDay")
             stepsAtTheDay[hour] = (stepCount - lastHourSteps).toString()
             runBlocking { repository.Update(currentDay.copy(stepsAtTheDay =stepsAtTheDay.toList().toString().replace("[","").replace("]",""))) }
-            sharedPreferences.edit().putInt("lastHourSteps", stepCount!!).apply()
+            sharedPreferences.edit().putInt("lastHourSteps", stepCount).apply()
             Log.e(TAG, "lastHourSteps $stepCount")
         }
         stopSelf()

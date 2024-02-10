@@ -271,7 +271,7 @@ fun CardWithStepsAtEveryHour(stepsAtTheDay:String) {
     LazyRow {
         items(steps) {
             VerticalProgressBar(
-                width = 5,
+                width = 7,
                 percent =it / max.toFloat(),
                 color = Color.Green,
                 h = 70,

@@ -23,12 +23,10 @@ class SleepCounter(context: Context) : SensorEventListener {
 
                     if (isInMotion(x, y, z)) {
                         sleepTime = maxOf(sleepTime, currentTime-  lastMovementTime)
-//                        Log.e(TAG,"sleepTime${sleepTime}")
                     }
                 }
 
                 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                    // Не требуется для данной реализации.
                 }
             },
             accelerometer,
@@ -42,15 +40,11 @@ class SleepCounter(context: Context) : SensorEventListener {
     override fun onSensorChanged(sensorEvent: SensorEvent?) {
         if (sensorEvent?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
             lastMovementTime = sensorEvent.timestamp
-
         }
     }
 
     fun isInMotion(x: Float, y: Float, z: Float): Boolean {
-        // Рассчитываем модуль вектора ускорения
         val accelerationMagnitude = Math.sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-        // Задаем пороговое значение для среднеквадратичного ускорения,
-        // которое считаем достаточным для определения движения.
         val threshold = 10f
         if (accelerationMagnitude > threshold) {
             lastMovementTime = currentTime
@@ -58,6 +52,4 @@ class SleepCounter(context: Context) : SensorEventListener {
         }
         return accelerationMagnitude > threshold
     }
-
-
 }
