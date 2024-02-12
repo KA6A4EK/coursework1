@@ -22,6 +22,7 @@ import com.example.coursework.ui.screens.getCurrentDay
 import com.example.coursework.ui.screens.parceTime
 import dagger.Module
 import dagger.Provides
+import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Calendar
 import java.util.Date
@@ -113,8 +114,11 @@ fun showNotificationAlarmManager(context: Context,viewModel: HealthViewModel){
     val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
     val showNotifications = sharedPrefs.getBoolean("showNotifications", false)
     val days = viewModel.getDaysToNotification()
-
-    if (showNotifications && days[Calendar.DAY_OF_WEEK - 2]) {
+    Log.e(TAG,"LocalDate.now().dayOfWeek.value ${LocalDate.now().dayOfWeek.value }")
+    Log.e(TAG,"LocalDate.now().dayOfWeek.value ${days}")
+    Log.e(TAG,"showNotifications ${showNotifications}")
+    Log.e(TAG,"showNotifications ${showNotifications && days[LocalDate.now().dayOfWeek.value ]}")
+    if (showNotifications && days[LocalDate.now().dayOfWeek.value ]) {
         val startTime = parceTime(sharedPrefs.getString("startTime", "09:00")!!)
         val endTime = parceTime(sharedPrefs.getString("endTime", "21:00")!!)
         val alarmMgr = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
