@@ -8,4 +8,5 @@ data class HealthUiState(
     var bodyCompositionVisible: Boolean,
     var eatVisible: Boolean,
     var activityVisible: Boolean,
+    var sleepVisible: Boolean,
 )

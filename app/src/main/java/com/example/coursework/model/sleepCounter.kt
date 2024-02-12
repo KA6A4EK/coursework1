@@ -1,55 +1,115 @@
 package com.example.coursework.model
 
+import android.Manifest
+import android.annotation.SuppressLint
+import android.app.PendingIntent
+import android.content.BroadcastReceiver
+import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.content.Context
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.util.Log
+import androidx.core.content.ContextCompat
+import com.google.android.gms.location.ActivityRecognition
+import com.google.android.gms.location.SleepClassifyEvent
+import com.google.android.gms.location.SleepSegmentEvent
+import com.google.android.gms.location.SleepSegmentRequest
 
-class SleepCounter(context: Context) : SensorEventListener {
-    var sleepTime : Long = 0
-    var lastMovementTime: Long = 0
-    var currentTime: Long = System.currentTimeMillis()
-    private var sensorManager = (context.getSystemService(Context.SENSOR_SERVICE) as SensorManager)
-    private var accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+class SleepReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        Log.d(TAG, "SleepReceiver")
 
-    init {
-        sensorManager.registerListener(
-            object : SensorEventListener {
-                override fun onSensorChanged(event: SensorEvent) {
-                    val x = event.values[0]
-                    val y = event.values[1]
-                    val z = event.values[2]
+        if (SleepSegmentEvent.hasEvents(intent)) {
+            val events =
+                SleepSegmentEvent.extractEvents(intent)
 
-                    if (isInMotion(x, y, z)) {
-                        sleepTime = maxOf(sleepTime, currentTime-  lastMovementTime)
-                    }
-                }
+            Log.d(TAG, "Logging SleepSegmentEvents")
 
-                override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-                }
-            },
-            accelerometer,
-            SensorManager.SENSOR_DELAY_NORMAL
-        )
-    }
+            for (event in events) {
+                Log.d(
+                    TAG,
+                    "${event.startTimeMillis} to ${event.endTimeMillis} with status ${event.status}"
+                )
+            }
+            val sh = context.getSharedPreferences("HealthPrefs",Context.MODE_PRIVATE)
+            val sleepTime = events.sumOf { it.endTimeMillis - it.startTimeMillis }
+            sh.edit().putLong("sleepTime" ,sleepTime).apply()
+            Log.e(TAG,"sleepTimesleepTime$sleepTime")
+        } else if (SleepClassifyEvent.hasEvents(intent)) {
+            val events = SleepClassifyEvent.extractEvents(intent)
 
-    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-    }
+            Log.d(TAG, "Logging SleepClassifyEvents")
 
-    override fun onSensorChanged(sensorEvent: SensorEvent?) {
-        if (sensorEvent?.sensor?.type == Sensor.TYPE_ACCELEROMETER) {
-            lastMovementTime = sensorEvent.timestamp
+            for (event in events) {
+                Log.d(
+                    TAG,
+                    "Confidence: ${event.confidence} - Light: ${event.light} - Motion: ${event.motion}"
+                )
+            }
         }
     }
 
-    fun isInMotion(x: Float, y: Float, z: Float): Boolean {
-        val accelerationMagnitude = Math.sqrt((x * x + y * y + z * z).toDouble()).toFloat()
-        val threshold = 10f
-        if (accelerationMagnitude > threshold) {
-            lastMovementTime = currentTime
-            currentTime = System.currentTimeMillis()
+    companion object {
+        private const val TAG = "SLEEP_RECEIVER"
+        fun createPendingIntent(context: Context): PendingIntent {
+        Log.e(TAG,"createPendingIntent")
+            val intent = Intent(context, SleepReceiver::class.java)
+            return PendingIntent.getBroadcast(
+                context, 3125, intent, PendingIntent.FLAG_IMMUTABLE
+            )
         }
-        return accelerationMagnitude > threshold
+    }
+}
+
+class SleepRequestsManager(private val context: Context) {
+    private val sleepReceiverPendingIntent by lazy {
+        SleepReceiver.createPendingIntent(context)
+    }
+
+    @SuppressLint("MissingPermission")
+    fun subscribeToSleepUpdates() {
+        Log.d(TAG, "subscribeToSleepUpdates")
+
+        ActivityRecognition.getClient(context)
+            .requestSleepSegmentUpdates(
+                sleepReceiverPendingIntent,
+                SleepSegmentRequest.getDefaultSleepSegmentRequest()
+            )
+
+    }
+
+    fun unsubscribeFromSleepUpdates() {
+        ActivityRecognition.getClient(context)
+            .removeSleepSegmentUpdates(sleepReceiverPendingIntent)
+    }
+
+    fun requestSleepUpdates(requestPermission: () -> Unit = {}) {
+        Log.d(TAG, "requestSleepUpdates")
+
+        if (ContextCompat.checkSelfPermission(
+                context, Manifest.permission.ACTIVITY_RECOGNITION
+            ) ==
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e(ContentValues.TAG,"subscribeToSleepUpdates")
+            subscribeToSleepUpdates()
+        } else {
+            requestPermission()
+        }
+    }
+
+}
+
+class BootReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        val sleepRequestManager = SleepRequestsManager(context)
+
+        sleepRequestManager.requestSleepUpdates(requestPermission = {
+            Log.d(TAG, "Permission to listen for Sleep Activity has been removed")
+        })
+    }
+    companion object {
+        private const val TAG = "SLEEP_RECEIVER"
     }
 }

@@ -49,6 +49,20 @@ import kotlin.math.round
 
 
 @Composable
+fun SleepCard(viewModel: HealthViewModel){
+    StartScreenCard(
+        onCardClick = { /*TODO*/ },
+        onButtonClick = { /*TODO*/ },
+        cardValue = (viewModel.sleepTime/3600).toInt(),
+        target = 9,
+        text1 = "sleep time",
+        text2 = ""
+    ) {
+
+    }
+}
+
+@Composable
 fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var buttonIsClicked by remember { mutableStateOf(false) }
     var steps by remember { mutableStateOf(viewModel.currentDay.steps) }

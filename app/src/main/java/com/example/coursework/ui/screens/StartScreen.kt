@@ -5,10 +5,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,41 +36,49 @@ import com.example.coursework.ViewM.HealthViewModel
 fun StartScreen(modifier: Modifier, navController: NavController, viewModel: HealthViewModel) {
     Column(
         modifier
-            .padding(8.dp)
-            .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        if (viewModel.uiState.stepsVisible) {
-            CardSteps(
-                viewModel,
-                onCardClick = { navController.navigate("steps_screen") })
+            .padding(8.dp).verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
 
-        }
-        if (viewModel.uiState.waterVisible) {
-            CardWater(
-                viewModel,
-                onCardClick = { navController.navigate("water_screen") },
-            )
-        }
-        if (viewModel.uiState.eatVisible) {
-            CardEat(
-                onCardClick = { navController.navigate("eat_screen") },
-                viewModel = viewModel
-            )
-        }
-        if (viewModel.uiState.activityVisible) {
-            CardActivity(
-                viewModel,
-                onCardClick = { navController.navigate("activity_list") },
-            )
-        }
-        if (viewModel.uiState.bodyCompositionVisible) {
-            CardBMI(
-                onClick = { navController.navigate("weight_screen") },
-                viewModel = viewModel
-            )
+        ) {
+
+            if (viewModel.uiState.stepsVisible) {
+                CardSteps(
+                    viewModel,
+                    onCardClick = { navController.navigate("steps_screen") })
+
+            }
+            if (viewModel.uiState.waterVisible) {
+                CardWater(
+                    viewModel,
+                    onCardClick = { navController.navigate("water_screen") },
+                )
+            }
+            if (viewModel.uiState.sleepVisible) {
+                SleepCard(viewModel = viewModel)
+//            onCardClick = { navController.navigate("water_screen") }
+
+            }
+            if (viewModel.uiState.eatVisible) {
+                CardEat(
+                    onCardClick = { navController.navigate("eat_screen") },
+                    viewModel = viewModel
+                )
+            }
+            if (viewModel.uiState.activityVisible) {
+                CardActivity(
+                    viewModel,
+                    onCardClick = { navController.navigate("activity_list") },
+                )
+            }
+            if (viewModel.uiState.bodyCompositionVisible) {
+                CardBMI(
+                    onClick = { navController.navigate("weight_screen") },
+                    viewModel = viewModel
+                )
+            }
         }
     }
-}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)

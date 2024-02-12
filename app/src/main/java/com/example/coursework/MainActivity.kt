@@ -1,8 +1,10 @@
 package com.example.coursework
 
 import android.Manifest
+import android.content.ContentValues.TAG
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.model.ContextModule
 import com.example.coursework.model.DaggerAppComponent
+import com.example.coursework.model.SleepRequestsManager
 import com.example.coursework.model.saveStepsInDatabase
 import com.example.coursework.model.saveStepsInDatabase1
 import com.example.coursework.model.showNotificationAlarmManager
@@ -22,6 +25,10 @@ import com.example.coursework.ui.theme.CourseworkTheme
 class MainActivity : ComponentActivity() {
 
     lateinit var vm: HealthViewModel
+    private val sleepRequestManager by lazy{
+        SleepRequestsManager(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 //        this.deleteDatabase("HealthDatabase")
@@ -42,9 +49,25 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACTIVITY_RECOGNITION,Manifest.permission.POST_NOTIFICATIONS), 1)
-
-
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACTIVITY_RECOGNITION,
+                Manifest.permission.POST_NOTIFICATIONS,
+                Manifest.permission.RECEIVE_BOOT_COMPLETED,
+                Manifest.permission.SET_ALARM,
+                Manifest.permission.FOREGROUND_SERVICE_HEALTH
+            ),
+            1
+        )
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.e(TAG,"sleepRequestManager.subscribeToSleepUpdates()")
+            sleepRequestManager.subscribeToSleepUpdates()
+        }
 
     }
 
@@ -65,5 +88,9 @@ class MainActivity : ComponentActivity() {
         ) {
             showNotificationAlarmManager(this, vm)
         }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        sleepRequestManager.unsubscribeFromSleepUpdates()
     }
 }

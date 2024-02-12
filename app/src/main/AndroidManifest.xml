@@ -24,6 +24,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Coursework">
         <receiver android:name=".model.Receiver" />
+        <receiver android:name=".model.BootReceiver" />
+        <receiver android:name=".model.SleepReceiver" />
         <service android:name=".model.StepCounterService" android:foregroundServiceType="health" />
         <service android:name=".model.StepCounterService1" android:foregroundServiceType="health" />
         <activity
@@ -33,6 +35,10 @@
             android:theme="@style/Theme.Coursework">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+
+                <category android:name="android.intent.category.DEFAULT" />
                 <action android:name="CUSTOM_INTENT_USER_ACTION" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>

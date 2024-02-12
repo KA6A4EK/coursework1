@@ -110,7 +110,7 @@ class StepCounterService : Service(), SensorEventListener {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Step Counter Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
@@ -125,6 +125,7 @@ class StepCounterService : Service(), SensorEventListener {
             .setContentText("Foreground service collecting step data")
             .setSmallIcon(R.drawable.sprint_24px)
             .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
     }
 }
@@ -221,7 +222,10 @@ class StepCounterService1 : Service(), SensorEventListener {
                 .contextModule(ContextModule(this))
                 .build().provideHealthRepository()
             val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }!!
-            val hour = Calendar.getInstance().time.hours
+            var hour = Calendar.getInstance().time.hours
+            if (Calendar.getInstance().time.minutes<54){
+                hour-=1
+            }
             val lastHourSteps = sharedPreferences.getInt("lastHourSteps",stepCount)
             val stepsAtTheDay =  currentDay.stepsAtTheDay.split(", ").toMutableList()
             Log.e(TAG,"stepsAtTheDay")
@@ -241,7 +245,7 @@ class StepCounterService1 : Service(), SensorEventListener {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Step Counter Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_HIGH
             )
             val manager = getSystemService(NotificationManager::class.java)
             manager.createNotificationChannel(channel)
@@ -256,6 +260,7 @@ class StepCounterService1 : Service(), SensorEventListener {
             .setContentText("Foreground service collecting step data")
             .setSmallIcon(R.drawable.sprint_24px)
             .setContentIntent(pendingIntent)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
 
     }
 }

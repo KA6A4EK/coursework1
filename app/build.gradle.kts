@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt")
 }
 
+
 android {
     namespace = "com.example.coursework"
     compileSdk = 34
@@ -53,7 +54,6 @@ android {
 }
 
 dependencies {
-
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.activity:activity-compose:1.8.2")
@@ -78,7 +78,6 @@ dependencies {
     kapt("androidx.room:room-compiler:2.6.1")
     implementation ("com.google.dagger:dagger:2.50")
     kapt ("com.google.dagger:dagger-compiler:2.50")
-
     implementation ("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
     coreLibraryDesugaring ("com.android.tools:desugar_jdk_libs:2.0.4")
 }

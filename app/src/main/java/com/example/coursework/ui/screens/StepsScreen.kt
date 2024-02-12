@@ -111,6 +111,7 @@ fun VerticalProgressBar(
                 .height(h.dp)
 
         ) {
+            if (percent!=0f){
             drawLine(
                 color = color,
                 start = Offset(0f, size.height),
@@ -118,7 +119,7 @@ fun VerticalProgressBar(
                 strokeWidth = width.dp.toPx(),
                 cap = StrokeCap.Round,
             )
-        }
+        }}
     }
 }
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Здоровьечч</string>
+    <string name="app_name">coursework</string>
     <string name="enter_steps">Введите шаги</string>
     <string name="enter">Ввести</string>
     <string name="topAppBarText">Здоровье</string>
