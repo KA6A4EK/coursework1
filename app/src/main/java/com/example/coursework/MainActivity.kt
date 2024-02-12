@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
 
     lateinit var vm: HealthViewModel
     private val sleepRequestManager by lazy{
-        SleepRequestsManager(this)
+        SleepRequestsManager(applicationContext)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,6 +67,7 @@ class MainActivity : ComponentActivity() {
         ) {
             Log.e(TAG,"sleepRequestManager.subscribeToSleepUpdates()")
             sleepRequestManager.subscribeToSleepUpdates()
+            sleepRequestManager.requestSleepUpdates()
         }
 
     }

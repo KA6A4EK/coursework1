@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -39,6 +40,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coursework.R
@@ -65,7 +67,7 @@ fun SleepCard(viewModel: HealthViewModel){
 @Composable
 fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var buttonIsClicked by remember { mutableStateOf(false) }
-    var steps by remember { mutableStateOf(viewModel.currentDay.steps) }
+    var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }
 //    LaunchedEffect (viewModel.currentDay.steps){
 //        steps = viewModel.currentDay.steps
 //    }
@@ -163,7 +165,7 @@ fun StartScreenCard(
 
 @Composable
 fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var water by remember { mutableStateOf(viewModel.currentDay.water) }
+    var water by remember { mutableIntStateOf(viewModel.currentDay.water) }
     val cupSize = viewModel.cupSize
     StartScreenCard(
         onCardClick = { onCardClick() },
@@ -190,129 +192,6 @@ fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         )
     }
 }
-
-@Composable
-fun CardWaterстраое(
-    onCardClick: () -> Unit,
-    viewModel: HealthViewModel
-) {
-    var water by remember { mutableIntStateOf(viewModel.currentDay.water) }
-    Card(modifier = Modifier
-        .clickable { onCardClick() }
-        .fillMaxWidth()
-        .heightIn(100.dp)) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(modifier = Modifier.padding(10.dp)) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = "$water",
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = "/${stringResource(R.string.ml, viewModel.cupSize)}",
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Gray
-
-                    )
-                }
-                Button(onClick = {
-                    water += viewModel.cupSize
-                    viewModel.handleViewEvent(
-                        HealthViewEvent.Update(
-                            viewModel.currentDay.copy(
-                                water = water
-                            )
-                        )
-                    )
-                }) {
-                    Text(text = "+${stringResource(R.string.ml, viewModel.cupSize)}")
-                }
-            }
-            val image = when (viewModel.currentDay.water) {
-                in 0..viewModel.waterTarget / 3 -> R.drawable.water_loss_24px
-                in viewModel.waterTarget / 3 + 1..viewModel.waterTarget / 3 * 2 -> R.drawable.water_medium_24px
-                else -> R.drawable.water_full_24px
-            }
-            Image(
-                painter = painterResource(id = image),
-                contentDescription = stringResource(R.string.water_level),
-                modifier = Modifier
-                    .size(80.dp)
-                    .padding(5.dp)
-            )
-        }
-    }
-
-
-}
-
-@Composable
-fun CardStepsстарое(
-    onCardClick: () -> Unit,
-    viewModel: HealthViewModel
-) {
-    var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }
-    var buttonIsClicked by remember { mutableStateOf(false) }
-    val stepTarget = viewModel.stepsTarget
-
-    if (buttonIsClicked) {
-        AlertDialog(
-            number = steps,
-            title = stringResource(R.string.enter_steps)
-        ) {
-            if (it > 0) {
-                steps = it
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = it)))
-            }
-            buttonIsClicked = false
-
-        }
-    }
-    Card(modifier = Modifier
-        .clickable { onCardClick() }
-        .fillMaxWidth()
-        .heightIn(100.dp)) {
-        Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            Column(modifier = Modifier.padding(8.dp)) {
-                Row(
-
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    Text(
-                        text = "$steps",
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = stringResource(R.string.step, stepTarget),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Gray
-                    )
-                }
-
-                Button(onClick = {
-                    buttonIsClicked = true
-                }) {
-                    Text(text = stringResource(R.string.enter))
-                }
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            ProgressBar(
-                percent = steps / stepTarget.toFloat(),
-                barWidth = 10,
-                width = 100,
-                Color.Green
-            )
-        }
-    }
-
-}
-
 
 @Composable
 fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
@@ -359,7 +238,7 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
 
 @Composable
 fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var cal by remember { mutableStateOf(viewModel.currentDay.eat) }
+    var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
     var buttonIsClicked by remember { mutableStateOf(false) }
     if (buttonIsClicked) {
         AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
@@ -391,59 +270,10 @@ fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
 }
 
 @Composable
-fun CardEatстарое(
-    onCardClick: () -> Unit,
-    viewModel: HealthViewModel
-) {
-    var buttonIsClicked by remember { mutableStateOf(false) }
-    val calTarget = viewModel.eatTarget
-    var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
-    if (buttonIsClicked) {
-        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
-            if (it > 0) {
-                cal = it
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
-            }
-            buttonIsClicked = false
-        }
-
-    }
-    Card(modifier = Modifier
-        .clickable { onCardClick() }
-        .fillMaxWidth()
-        .heightIn(100.dp)) {
-        Row(
-            Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(Modifier.padding(10.dp)) {
-                Row(verticalAlignment = Alignment.Bottom) {
-                    Text(
-                        text = "$cal",
-                        style = MaterialTheme.typography.displaySmall,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Text(
-                        text = stringResource(R.string.calTarget, calTarget),
-                        style = MaterialTheme.typography.headlineSmall,
-                        color = Color.Gray
-                    )
-                }
-                Button(onClick = { buttonIsClicked = true }) {
-                    Text(text = stringResource(id = R.string.enter))
-                }
-            }
-        }
-    }
-
-}
-
-@Composable
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
     val bodyHeight = viewModel.userHeight
     val bodyWeight = viewModel.userWeight
-    Card (){
+    Card {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -581,6 +411,7 @@ fun AlertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
                     color = Color.White
                 )
                 OutlinedTextField(
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     value = duration,
                     onValueChange = { duration = it },
                     label = {

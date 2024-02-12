@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,19 +22,13 @@ import com.example.coursework.ViewM.HealthViewModel
 @Composable
 fun WaterScreen(viewModel: HealthViewModel) {
     var water by remember { mutableIntStateOf(0) }
-    val days = viewModel.days.map { Pair(it.date, it.water) }
     val color = Color(0, 166, 255, 255)
+    var current by remember { mutableStateOf(getCurrentDay()) }
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
 //        water = lazyRowProgress(target = viewModel.waterTarget, color = color, onClick = {}, days =days)
-        water = days.find {
-            it.first == lazyRowProgress(
-                target = viewModel.waterTarget,
-                color = color,
-                onClick = {},
-                days = days
-            )
-        }!!.second
+        current = lazyRowProgress(target = viewModel.waterTarget, color = color, onClick = {}, days = viewModel.days.map { Pair(it.date, it.water) })
+        water= viewModel.days.find { it.date==current }!!.water
 
         Card(Modifier.padding(10.dp)) {
             Column(

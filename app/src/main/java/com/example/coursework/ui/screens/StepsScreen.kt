@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
@@ -42,6 +43,7 @@ import com.example.coursework.ViewM.HealthViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.round
 
@@ -50,15 +52,19 @@ fun StepsScreen(viewModel: HealthViewModel) {
     val target = viewModel.stepsTarget
     val color = Color(168, 255, 65, 215)
     var current by remember { mutableStateOf(getCurrentDay()) }
-    var currentDay by remember { mutableStateOf(viewModel.days.find { it.date== getCurrentDay() }!!) }
+    var currentDay by remember { mutableStateOf(viewModel.days.find { it.date == getCurrentDay() }!!) }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        current = lazyRowProgress(target = target, color = color, onClick = {}, days =  viewModel.days.map { Pair(it.date, it.steps) })
-        currentDay  = viewModel.days.find { it.date==current }!!
+        current = lazyRowProgress(
+            target = target,
+            color = color,
+            onClick = {},
+            days = viewModel.days.map { Pair(it.date, it.steps) })
+        currentDay = viewModel.days.find { it.date == current }!!
         Card(Modifier.padding(10.dp)) {
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .height(300.dp),
+                    .height(250.dp),
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -78,7 +84,11 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 )
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
-                        text = "${round(currentDay.steps * 0.7 / 1000 * 100) / 100}${stringResource(R.string.km)}",
+                        text = "${round(currentDay.steps * 0.7 / 1000 * 100) / 100}${
+                            stringResource(
+                                R.string.km
+                            )
+                        }",
                         style = MaterialTheme.typography.headlineMedium
                     )
                     Text(
@@ -111,15 +121,16 @@ fun VerticalProgressBar(
                 .height(h.dp)
 
         ) {
-            if (percent!=0f){
-            drawLine(
-                color = color,
-                start = Offset(0f, size.height),
-                end = Offset(0f, size.height * (1 - percent / columnSize)),
-                strokeWidth = width.dp.toPx(),
-                cap = StrokeCap.Round,
-            )
-        }}
+            if (percent != 0f) {
+                drawLine(
+                    color = color,
+                    start = Offset(0f, size.height),
+                    end = Offset(0f, size.height * (1 - percent / columnSize)),
+                    strokeWidth = width.dp.toPx(),
+                    cap = StrokeCap.Round,
+                )
+            }
+        }
     }
 }
 
@@ -175,6 +186,7 @@ fun lazyRowProgress(
     onClick: (String) -> Unit,
     days: List<Pair<String, Int>>
 ): String {
+
     var current by remember { mutableStateOf(getCurrentDay()) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberLazyListState()
@@ -208,8 +220,12 @@ fun lazyRowProgress(
             modifier = Modifier.padding(end = 45.dp),
             reverseLayout = true
         ) {
-
             items(days, key = { it }) { date ->
+                val color = if (date.second<target){
+                    Color.Gray}
+
+                else{color}
+
                 Column(
                     Modifier
                         .padding(7.dp)
@@ -262,22 +278,42 @@ fun lazyRowProgress(
 
 
 @Composable
-fun CardWithStepsAtEveryHour(stepsAtTheDay:String) {
+fun CardWithStepsAtEveryHour(stepsAtTheDay: String) {
     val steps = stepsAtTheDay.split(", ").map { it.toInt() }
-    val max = maxOf(steps.max(),1)
-    var current by remember { mutableStateOf("") }
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
-        Text(text = current)
+    val max = maxOf(steps.max(), 1)
+    var time by remember { mutableStateOf(Calendar.getInstance().time.hours) }
+    var current by remember { mutableStateOf("${steps[time]}") }
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(text = "${time}:00-${time + 1}:00 $current")
 
-    LazyRow {
-        items(steps) {
-            VerticalProgressBar(
-                width = 7,
-                percent =it / max.toFloat(),
-                color = Color.Green,
-                h = 70,
-                padding = 7,
-                modifier = Modifier.clickable { current = "$it"})
+        LazyRow {
+            itemsIndexed(steps) { index, it ->
+                val color = if (time == index) {
+                    MaterialTheme.colorScheme.surfaceVariant
+                } else {
+                    MaterialTheme.colorScheme.background
+                }
+                VerticalProgressBar(
+                    width = 7,
+                    percent = it / max.toFloat(),
+                    color = Color.Green,
+                    h = 70,
+                    padding = 7,
+                    modifier = Modifier
+                        .clickable {
+                            current = "$it"
+                            time = index
+                        }
+                        .background(color, CircleShape)
+                )
+            }
+        }
+        Row(Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = "0")
+            Text(text = "6")
+            Text(text = "12")
+            Text(text = "18")
+            Text(text = "h")
         }
     }
-}}
+}

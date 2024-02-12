@@ -10,6 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -21,12 +22,12 @@ import com.example.coursework.ViewM.HealthViewModel
 @Composable
 fun EatScreen(viewModel : HealthViewModel){
     var cal by remember { mutableIntStateOf(0) }
-    val days = viewModel.days.map { Pair(it.date,it.eat) }
+    var current by remember { mutableStateOf(getCurrentDay()) }
+    val color = Color(0, 166, 255, 255)
 
     Column (horizontalAlignment = Alignment.CenterHorizontally){
-//        cal = lazyRowProgress(target = viewModel.eatTarget, color = Color.Yellow, onClick = {}, days =days)
-        cal = days.find{it.first==  lazyRowProgress(target = viewModel.eatTarget, color = Color.Yellow, onClick = {}, days =days)}!!.second
-
+        current = lazyRowProgress(target = viewModel.eatTarget, color = color, onClick = {}, days = viewModel.days.map { Pair(it.date, it.eat) })
+        cal= viewModel.days.find { it.date==current }!!.eat
         Card (Modifier.padding(10.dp)){
             Column(modifier = Modifier
                 .height(300.dp)
