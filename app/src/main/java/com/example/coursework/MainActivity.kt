@@ -66,7 +66,6 @@ class MainActivity : ComponentActivity() {
             ) == PackageManager.PERMISSION_GRANTED
         ) {
             Log.e(TAG,"sleepRequestManager.subscribeToSleepUpdates()")
-            sleepRequestManager.subscribeToSleepUpdates()
             sleepRequestManager.requestSleepUpdates()
         }
 

@@ -20,6 +20,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -77,12 +78,18 @@ class HealthViewModel @Inject constructor(
                 Log.e(TAG, "lastHourSteps added")
 
             }
+            val steps = stepsCounter.getSteps()
             val lastDaySteps = sharedPrefs.getInt("lastDaySteps", 404)
-
-            currentDay.steps = stepsCounter.getSteps() - lastDaySteps
+            val lastHourSteps = sharedPrefs.getInt("lastHourSteps", 132)
+            Log.e(TAG,currentDay.stepsAtTheDay)
+            currentDay.steps = steps - lastDaySteps
+            val s = currentDay.stepsAtTheDay.split(", ").toMutableList()
+            s[Calendar.getInstance().time.hours] = "${s[Calendar.getInstance().time.hours].toInt()+ steps-lastHourSteps}"
+            currentDay.stepsAtTheDay = s.joinToString(separator = ", ")
+            sharedPrefs.edit().putInt("lastHourSteps",steps).apply()
             Log.e(TAG, "view model last day steps$lastDaySteps")
-            Log.e(TAG, "viewmodel get steps ${stepsCounter.getSteps()}")
-            Log.e(TAG, "viewmodel get last hour steps ${sharedPrefs.getInt("lastHourSteps", 132)}")
+            Log.e(TAG, "viewmodel get steps ${steps}")
+            Log.e(TAG, "viewmodel get last hour steps ${lastHourSteps}")
             delay(100L)
             waterFromNotifications()
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))

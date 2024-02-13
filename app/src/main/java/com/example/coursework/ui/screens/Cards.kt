@@ -1,7 +1,6 @@
 package com.example.coursework.ui.screens
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -178,18 +177,7 @@ fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         text1 = stringResource(id = R.string.ml),
         text2 = "+${viewModel.cupSize}${stringResource(id = R.string.ml)}"
     ) {
-        val image = when (viewModel.currentDay.water) {
-            in 0..viewModel.waterTarget / 3 -> R.drawable.water_loss_24px
-            in viewModel.waterTarget / 3 + 1..viewModel.waterTarget / 3 * 2 -> R.drawable.water_medium_24px
-            else -> R.drawable.water_full_24px
-        }
-        Image(
-            painter = painterResource(id = image),
-            contentDescription = stringResource(R.string.water_level),
-            modifier = Modifier
-                .size(80.dp)
-                .padding(5.dp)
-        )
+        drawWater(width = 75, height = 80, percent = minOf(1f,water.toFloat()/viewModel.waterTarget))
     }
 }
 

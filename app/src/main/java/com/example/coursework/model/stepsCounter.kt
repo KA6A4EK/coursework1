@@ -21,6 +21,7 @@ import com.example.coursework.R
 import com.example.coursework.ui.screens.getCurrentDay
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
+import java.text.SimpleDateFormat
 import java.util.Calendar
 
 class StepsCounter(context: Context) : SensorEventListener {
@@ -93,8 +94,10 @@ class StepCounterService : Service(), SensorEventListener {
             val repository = DaggerAppComponent.builder()
                 .contextModule(ContextModule(this))
                 .build().provideHealthRepository()
-            val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }
-
+            var currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }
+            if (Calendar.getInstance().time.hours<22){
+                 currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getYesterdayDate() }
+            }
             runBlocking { repository.Update(currentDay!!.copy(steps = stepCount!! - sharedPreferences.getInt("lastDaySteps", 0))) }
             sharedPreferences.edit().putInt("lastDaySteps", stepCount!!).apply()
             Log.e(TAG, "onSensorChanged $stepCount")
@@ -221,16 +224,24 @@ class StepCounterService1 : Service(), SensorEventListener {
             val repository = DaggerAppComponent.builder()
                 .contextModule(ContextModule(this))
                 .build().provideHealthRepository()
-            val currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }!!
+            var currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getCurrentDay() }!!
             var hour = Calendar.getInstance().time.hours
             if (Calendar.getInstance().time.minutes<54){
-                hour-=1
+
+                if (Calendar.getInstance().time.hours==0)
+                {
+                    currentDay = runBlocking { async { repository.Init() }.await() }.find { it.date == getYesterdayDate() }!!
+                    hour = 23
+                }
+                else{
+                    hour-=1
+                }
             }
             val lastHourSteps = sharedPreferences.getInt("lastHourSteps",stepCount)
             val stepsAtTheDay =  currentDay.stepsAtTheDay.split(", ").toMutableList()
             Log.e(TAG,"stepsAtTheDay")
             stepsAtTheDay[hour] = (stepCount - lastHourSteps).toString()
-            runBlocking { repository.Update(currentDay.copy(stepsAtTheDay =stepsAtTheDay.toList().toString().replace("[","").replace("]",""))) }
+            runBlocking { repository.Update(currentDay.copy(stepsAtTheDay =stepsAtTheDay.toList().joinToString (separator =  ", " ))) }
             sharedPreferences.edit().putInt("lastHourSteps", stepCount).apply()
             Log.e(TAG, "lastHourSteps $stepCount")
         }
@@ -264,3 +275,7 @@ class StepCounterService1 : Service(), SensorEventListener {
 
     }
 }
+
+
+fun getYesterdayDate() = SimpleDateFormat("dd/MM/yyyy").format(  Calendar.getInstance().add(Calendar.DATE,-1))
+

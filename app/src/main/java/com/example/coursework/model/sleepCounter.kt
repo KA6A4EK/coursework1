@@ -47,7 +47,6 @@ class SleepReceiver : BroadcastReceiver() {
                 )
             }
         }
-
     }
 
     companion object {

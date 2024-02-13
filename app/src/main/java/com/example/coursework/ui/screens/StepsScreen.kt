@@ -65,7 +65,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
                 Modifier
                     .fillMaxWidth()
                     .height(250.dp),
-                verticalArrangement = Arrangement.SpaceBetween,
+                verticalArrangement = Arrangement.SpaceAround,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Row(verticalAlignment = Alignment.Bottom) {
@@ -79,9 +79,18 @@ fun StepsScreen(viewModel: HealthViewModel) {
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
-                ProgressBar(
-                    percent = currentDay.steps / target.toFloat(), barWidth = 30, width = 290, color
-                )
+                Column(horizontalAlignment = Alignment.End) {
+
+
+                    ProgressBar(
+                        percent = currentDay.steps / target.toFloat(),
+                        barWidth = 30,
+                        width = 290,
+                        color
+                    )
+                    Text(text = "${stringResource(R.string.target)}  ${viewModel.stepsTarget}",modifier = Modifier.padding(5.dp),
+                        Color.Gray)
+                }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     Text(
                         text = "${round(currentDay.steps * 0.7 / 1000 * 100) / 100}${
@@ -308,7 +317,10 @@ fun CardWithStepsAtEveryHour(stepsAtTheDay: String) {
                 )
             }
         }
-        Row(Modifier.fillMaxWidth().padding(start = 15.dp, end = 15.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(start = 15.dp, end = 15.dp), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = "0")
             Text(text = "6")
             Text(text = "12")

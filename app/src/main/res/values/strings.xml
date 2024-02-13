@@ -39,4 +39,5 @@
     <string name="cal">Cal</string>
     <string name="hello">Hello %1$s</string>
     <string name="kg">kg</string>
+    <string name="target">Target</string>
 </resources>

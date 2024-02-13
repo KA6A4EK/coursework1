@@ -13,7 +13,11 @@ data class Day(
     val eat: Int = 0,
     var activity : Int =0,
     val bmi :Int = 0,
-    val x :Int =1,
+    val x :Int =1,//удалит
+//    val stepsTarget :Int = 10000,
+//    val eatTarget :Int = 2500,
+//    val waterTarget :Int = 2000,
+//    val activityTarget :Int = 90,
     var stepsAtTheDay : String = "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0"
 )
 
