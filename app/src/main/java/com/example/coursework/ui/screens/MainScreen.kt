@@ -41,12 +41,13 @@ import com.example.coursework.ViewM.HealthViewModel
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
     viewModel: HealthViewModel,
-    context:Context
+    context:Context,
+    applicationContext:Context,
+    camera: @Composable () -> Unit
 ) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = backStackEntry?.destination?.route ?: "start"
-
     Scaffold(
         topBar = { TopAppbar(currentScreen, navController) },
         bottomBar = {
@@ -89,6 +90,9 @@ fun MainScreen(
                 SelectNotificationsPeriod(viewModel) }
             composable(route = "weight_screen"){
                 WeightScreen(viewModel)
+            }
+            composable(route = "heart_rate_screen"){
+                camera()
             }
         }
     }

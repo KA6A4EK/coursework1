@@ -126,6 +126,7 @@ class HealthViewModel @Inject constructor(
     }
 
     fun provideSharedPreference() = sharedPrefs
+    fun provideContext() = context
 
     fun waterFromNotifications() {
         val water = sharedPrefs.getString("countWater", "${getCurrentDay()} 0")!!.split(" ")

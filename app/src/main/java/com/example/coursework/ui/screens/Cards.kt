@@ -161,7 +161,17 @@ fun StartScreenCard(
 
 }
 
-
+@Composable
+fun CardHeartRate(onClick: () -> Unit){
+    Card {
+        Row {
+            Text(text = "bpm")
+            Button(onClick = { onClick() }) {
+                Text(text = stringResource(R.string.measure))
+            }
+        }
+    }
+}
 @Composable
 fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var water by remember { mutableIntStateOf(viewModel.currentDay.water) }

@@ -36,49 +36,52 @@ import com.example.coursework.ViewM.HealthViewModel
 fun StartScreen(modifier: Modifier, navController: NavController, viewModel: HealthViewModel) {
     Column(
         modifier
-            .padding(8.dp).verticalScroll(rememberScrollState()),
+            .padding(8.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(10.dp),
 
         ) {
 
-            if (viewModel.uiState.stepsVisible) {
-                CardSteps(
-                    viewModel,
-                    onCardClick = { navController.navigate("steps_screen") })
+        if (viewModel.uiState.stepsVisible) {
+            CardSteps(
+                viewModel,
+                onCardClick = { navController.navigate("steps_screen") })
 
-            }
-            if (viewModel.uiState.waterVisible) {
-                CardWater(
-                    viewModel,
-                    onCardClick = { navController.navigate("water_screen") },
-                )
-            }
-            if (viewModel.uiState.sleepVisible) {
-                SleepCard(viewModel = viewModel)
+        }
+        if (viewModel.uiState.waterVisible) {
+            CardWater(
+                viewModel,
+                onCardClick = { navController.navigate("water_screen") },
+            )
+        }
+        if (viewModel.uiState.sleepVisible) {
+            SleepCard(viewModel = viewModel)
 //            onCardClick = { navController.navigate("water_screen") }
 
-            }
-            if (viewModel.uiState.eatVisible) {
-                CardEat(
-                    onCardClick = { navController.navigate("eat_screen") },
-                    viewModel = viewModel
-                )
-            }
-            if (viewModel.uiState.activityVisible) {
-                CardActivity(
-                    viewModel,
-                    onCardClick = { navController.navigate("activity_list") },
-                )
-            }
-            if (viewModel.uiState.bodyCompositionVisible) {
-                CardBMI(
-                    onClick = { navController.navigate("weight_screen") },
-                    viewModel = viewModel
-                )
-            }
+        }
+        if (viewModel.uiState.eatVisible) {
+            CardEat(
+                onCardClick = { navController.navigate("eat_screen") },
+                viewModel = viewModel
+            )
+        }
+        if (viewModel.uiState.activityVisible) {
+            CardActivity(
+                viewModel,
+                onCardClick = { navController.navigate("activity_list") },
+            )
+        }
+        if (viewModel.uiState.bodyCompositionVisible) {
+            CardBMI(
+                onClick = { navController.navigate("weight_screen") },
+                viewModel = viewModel
+            )
+        }
+        if (true) {
+            CardHeartRate(onClick = {navController.navigate("heart_rate_screen")})
         }
     }
-
+}
 
 
 @OptIn(ExperimentalMaterial3Api::class)
