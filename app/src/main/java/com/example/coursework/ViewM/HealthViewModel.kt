@@ -45,6 +45,7 @@ class HealthViewModel @Inject constructor(
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
     var trainingActivity: List<Training> = runBlocking { async { repos.getAllActivity() }.await() }
     var weightTarget: Int = sharedPrefs.getInt("weightTarget", 60)
+    var heartRate = 0
     val permissionForSteps = ActivityCompat.checkSelfPermission(
         context,
         Manifest.permission.ACTIVITY_RECOGNITION

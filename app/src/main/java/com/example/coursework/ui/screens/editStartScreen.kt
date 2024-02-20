@@ -20,6 +20,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.coursework.ViewM.HealthViewModel
 
+
+//экран для редактирования показа карточек какие показывать а какие нет
+//каждая карточка помещается в BOX и сверху нее кнопка
 @Composable
 fun editStartScreen(viewModel: HealthViewModel) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(10.dp)) {
@@ -66,6 +69,7 @@ fun editStartScreen(viewModel: HealthViewModel) {
     }
     viewModel.saveUiState()
 }
+
 
 @Composable
 fun editStartScreenButton(visible: Boolean, onClick: (Boolean) -> Unit) {

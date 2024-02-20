@@ -31,7 +31,7 @@ import androidx.navigation.NavController
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 
-
+//стартовый экран на котором распологаются все карточки
 @Composable
 fun StartScreen(modifier: Modifier, navController: NavController, viewModel: HealthViewModel) {
     Column(
@@ -78,7 +78,7 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
             )
         }
         if (true) {
-            CardHeartRate(onClick = {navController.navigate("heart_rate_screen")})
+            CardHeartRate(viewModel,onClick = {navController.navigate("heart_rate_screen")})
         }
     }
 }

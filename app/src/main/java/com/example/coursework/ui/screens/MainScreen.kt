@@ -37,6 +37,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 
+
+//главный экра тут определяется BottomBar, TopAppBar и навигация
 @Composable
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
@@ -98,9 +100,12 @@ fun MainScreen(
     }
 }
 
+//тут описывается TopAppBar и действия при клике на кнопку в зависимости от текущего экрана
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppbar(curent: String, navController: NavHostController) {
+fun TopAppbar(curent: String, //текущий экран
+              navController: NavHostController//обьект отвечающий за навигацию
+) {
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
     val screens =
         listOf("steps_screen", "activity_list", "eat_screen", "water_screen", "bmi_screen")

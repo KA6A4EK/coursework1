@@ -22,8 +22,12 @@ import androidx.compose.ui.unit.dp
 import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 
+
+//экран для выбора целей  в зависимости от прошлого экрана
 @Composable
-fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> Unit) {
+fun TargetScreen(viewModel: HealthViewModel, curent: String,// текущий экран
+                 navigateUp: () -> Unit//
+) {
     Text(text = curent)
     when (curent) {
         "{steps_screen}" -> {
@@ -96,14 +100,14 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String, navigateUp: () -> U
     viewModel.saveHealthData()
 }
 
-
+//карточка для выбора элемента
 @Composable
 fun CardWithLazyColumnForSelect(
-    num: Int,
-    listSize: Int,
-    text: String,
-    pitch: Int,
-    initialIndex: Int = 0,
+    num: Int,  //начальный элемент
+    listSize: Int,  //размер списка для выбора
+    text: String,//текст оописание
+    pitch: Int,///шаг между элеметами
+    initialIndex: Int = 0,  //значение первого элемента если 0 то 0 и его выбрать нельзя если -1 то можно выбрать 0
     onDismiss: (Int) -> Unit
 ) {
     var ret by remember { mutableIntStateOf(num) }

@@ -19,10 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.coursework.ViewM.HealthViewModel
 
+
+//экран для показа статистики еды
 @Composable
 fun EatScreen(viewModel : HealthViewModel){
-    var cal by remember { mutableIntStateOf(0) }
-    var current by remember { mutableStateOf(getCurrentDay()) }
+    var cal by remember { mutableIntStateOf(0) }   //калории для выбранного дня
+    var current by remember { mutableStateOf(getCurrentDay()) }//дата выбранного дня
     val color = Color(0, 166, 255, 255)
 
     Column (horizontalAlignment = Alignment.CenterHorizontally){

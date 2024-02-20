@@ -28,13 +28,14 @@ import com.example.coursework.R
 import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.model.Training
 
+//экран для показа графика активности и списка активности за каждый день
 @Composable
 fun ActivityScreen(viewModel: HealthViewModel) {
-    val days = viewModel.days.map { Pair(it.date, it.activity) }
+    val days = viewModel.days.map { Pair(it.date, it.activity) } //список пар дата-время активности
     Log.e(TAG, days.toString())
     Log.e(TAG, viewModel.days.toString())
 
-    var current by remember { mutableStateOf(getCurrentDay()) }
+    var current by remember { mutableStateOf(getCurrentDay()) } //выбранная дата
     LazyColumn(
         contentPadding = PaddingValues(1.dp),
         verticalArrangement = Arrangement.spacedBy(10.dp),
@@ -48,6 +49,7 @@ fun ActivityScreen(viewModel: HealthViewModel) {
                 days = days
             )
         }
+
         item {
             TotalActivityTime(time = viewModel.trainingActivity.filter { it.date == current }
                 .sumOf { it.duration }, target = viewModel.activityTarget)
@@ -58,8 +60,11 @@ fun ActivityScreen(viewModel: HealthViewModel) {
     }
 }
 
+//карточка для списка активности содержит описание конкретной активности название, продолжительность, дата
 @Composable
-fun CardActivityList(training: Training) {
+fun CardActivityList(
+    training: Training
+) {
     Card {
         Row(
             Modifier
@@ -86,8 +91,13 @@ fun CardActivityList(training: Training) {
     }
 }
 
+
+//карточка показывающая время активности за выбранный день и цель активности за этот день
 @Composable
-fun TotalActivityTime(time: Int, target: Int) {
+fun TotalActivityTime(
+    time: Int, //время активности в выбранный день
+    target: Int //цель активности в выбранный день
+) {
     Card {
         Text(
             text = stringResource(R.string.this_day),

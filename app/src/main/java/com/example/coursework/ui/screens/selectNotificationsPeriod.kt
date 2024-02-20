@@ -48,13 +48,13 @@ import java.time.format.DateTimeFormatter
 fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     val sharedPreferences = viewModel.provideSharedPreference()
     val days = viewModel.getDaysToNotification()
-    var startTime by remember { mutableStateOf(sharedPreferences.getString("startTime", "09:00")!!) }
-    var period by remember { mutableStateOf(sharedPreferences.getString("NotificationPeriod", "02:00")!!) }
+    var startTime by remember { mutableStateOf(sharedPreferences.getString("startTime", "09:00")!!) }//время старта уведомлений
+    var period by remember { mutableStateOf(sharedPreferences.getString("NotificationPeriod", "02:00")!!) } //период уведомлений через который отправляются уведомления
     val color1 = Color(0, 144, 255, 222)
     val color2 = Color(71, 71, 71, 150)
-    var endTime by remember { mutableStateOf(sharedPreferences.getString("endTime", "21:00")!!) }
-    var showNotifications by remember { mutableStateOf(sharedPreferences.getBoolean("showNotifications", false)) }
-    var showAlertDialogToSelectPeriod by remember { mutableStateOf(false) }
+    var endTime by remember { mutableStateOf(sharedPreferences.getString("endTime", "21:00")!!) }//время до которого можно отправлять уведомления
+    var showNotifications by remember { mutableStateOf(sharedPreferences.getBoolean("showNotifications", false)) }//можно ли отправлять уведомления
+    var showAlertDialogToSelectPeriod by remember { mutableStateOf(false) }//можно ли показать диалог
     var sunday by remember { mutableStateOf(days[0]) }
     var monday by remember { mutableStateOf(days[1]) }
     var tuesday by remember { mutableStateOf(days[2]) }
@@ -67,6 +67,7 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     val textSize = 37
 
     fun saveDays() = sharedPreferences.edit().apply {
+        //сохраняет значения разрешения уведомлений в каждый день
         putBoolean("monday", monday)
         putBoolean("tuesday", tuesday)
         putBoolean("wednesday", wednesday)
@@ -78,6 +79,7 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     }
 
     if (showAlertDialogToSelectPeriod) {
+        //вызов диалога выбора времени
         alertDialogSelectNotificationsInterval(edit = period) {
             if (it != "" && it.toSet().size>2) {
                 period = it
@@ -245,10 +247,10 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     }
 }
 
-
+//диалог для выбора даты
 @Composable
 fun PickTime(
-    edit: String,
+    edit: String,//время для редактирования
     text: String,
     dateDialogState: MaterialDialogState,
     onDismiss: (LocalTime) -> Unit
@@ -276,7 +278,7 @@ fun PickTime(
     }
 }
 
-
+//текст в круге для выбора дня в который отправлять уведомления
 @Composable
 fun CircledText(
     size: Int,
@@ -303,10 +305,10 @@ fun CircledText(
 
     }
 }
-
+//функция парсит время из строки
 fun parceTime(time: String) = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
 
-
+//диалог для выбора времени
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> Unit) {
@@ -348,8 +350,8 @@ fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> 
 
 @Composable
 fun ScrolableLazyColumn(
-    num: Int,
-    listSize: Int,
+    num: Int,  //стартовое значение
+    listSize: Int,//размер списка
     pitch: Int,//шаг значений для часов 1 2 3 для минут 5 10 15
     initialIndex: Int = 0, // если надо выбирать значение ноль что надо поставить -1
     onDismiss: (Int) -> Unit

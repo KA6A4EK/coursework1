@@ -48,7 +48,7 @@ import com.example.coursework.ViewM.HealthViewModel
 import com.example.coursework.model.Training
 import kotlin.math.round
 
-
+//карточка показывающая данные сна
 @Composable
 fun SleepCard(viewModel: HealthViewModel){
     StartScreenCard(
@@ -63,10 +63,11 @@ fun SleepCard(viewModel: HealthViewModel){
     }
 }
 
+//карточка шагов
 @Composable
 fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var buttonIsClicked by remember { mutableStateOf(false) }
-    var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }
+    var buttonIsClicked by remember { mutableStateOf(false) }  //нажата ли кнопка ввода шагов
+    var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }//шаги текущего дня
 //    LaunchedEffect (viewModel.currentDay.steps){
 //        steps = viewModel.currentDay.steps
 //    }
@@ -100,16 +101,17 @@ fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     }
 }
 
+//шаблон для карточек
 @Composable
 fun StartScreenCard(
-    onCardClick: () -> Unit,
-    onButtonClick: () -> Unit,
-    cardValue: Int,
-    showButtonAction:Boolean = true,
-    target: Int,
+    onCardClick: () -> Unit,  //действие при клике на карточку
+    onButtonClick: () -> Unit, //дейстие при клике на кнопку
+    cardValue: Int,                //значение в карточке
+    showButtonAction:Boolean = true,      // показывать ли кнопку в карточке
+    target: Int,                                //цель в карточке
     text1: String,
     text2: String,
-    composable: @Composable () -> Unit
+    composable: @Composable () -> Unit      //дополнительный элемент в карточке справа для прогресс бара и тд
 ) {
 
     Card(modifier = Modifier
@@ -161,21 +163,25 @@ fun StartScreenCard(
 
 }
 
+
+//карточка пульса
 @Composable
-fun CardHeartRate(onClick: () -> Unit){
-    Card {
+fun CardHeartRate(viewModel: HealthViewModel,onClick: () -> Unit){
+    Card(modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp)) {
         Row {
-            Text(text = "bpm")
+            Text(text = "${viewModel.heartRate} bpm")
             Button(onClick = { onClick() }) {
                 Text(text = stringResource(R.string.measure))
             }
         }
     }
 }
+
+//карточка воды
 @Composable
 fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var water by remember { mutableIntStateOf(viewModel.currentDay.water) }
-    val cupSize = viewModel.cupSize
+    var water by remember { mutableIntStateOf(viewModel.currentDay.water) } // вода для текущего дня
+    val cupSize = viewModel.cupSize  //размер кружки
     StartScreenCard(
         onCardClick = { onCardClick() },
         onButtonClick = {
@@ -191,10 +197,11 @@ fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     }
 }
 
+//карточка активности
 @Composable
 fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var buttonIsClicked by remember { mutableStateOf("") }
-    val activities = listOf("Skiing", "Hiking", "Sprint", "Martial")
+    var buttonIsClicked by remember { mutableStateOf("") }//нажата ли кнопка для ввода
+    val activities = listOf("Skiing", "Hiking", "Sprint", "Martial") //список активностей
     if (buttonIsClicked in activities) {
         AlertDialogForActivity(type = buttonIsClicked) {
             if (it.duration > 0) {
@@ -233,11 +240,11 @@ fun CardActivity(viewModel: HealthViewModel, onCardClick: () -> Unit) {
 
 }
 
-
+//карточка еды
 @Composable
 fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) }
-    var buttonIsClicked by remember { mutableStateOf(false) }
+    var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) } //калории в текущий день
+    var buttonIsClicked by remember { mutableStateOf(false) }     //нажата ли кнопка ввода калорий
     if (buttonIsClicked) {
         AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
             if (it > 0) {
@@ -267,6 +274,7 @@ fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     }
 }
 
+//карточка индекса массы тела
 @Composable
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
     val bodyHeight = viewModel.userHeight
@@ -299,11 +307,15 @@ fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
 
 }
 
+//прогресс бар показывающий в како зоне находится индекс массы тела и граничные показатели веса для каждой границы
 @Composable
-fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
-    val minWeight = round(18.5 * bodyHeight * bodyHeight / 10000)
-    val maxWeight = round((25 * bodyHeight * bodyHeight / 10000).toDouble())
-    val bmi = bodyWeight / bodyHeight.toFloat() / bodyHeight.toFloat() * 10000
+fun BMIProgress(width: Int, //максимальная ширина прогресс бара
+                bodyHeight: Int, // рост
+                bodyWeight: Int //вес
+) {
+    val minWeight = round(18.5 * bodyHeight * bodyHeight / 10000)  //минимальный вес для нормальной зоны
+    val maxWeight = round((25 * bodyHeight * bodyHeight / 10000).toDouble()) //максимальный вес для нормы
+    val bmi = bodyWeight / bodyHeight.toFloat() / bodyHeight.toFloat() * 10000 // индекс массы тела
     Column {
         Canvas(
             modifier = Modifier
@@ -353,9 +365,13 @@ fun BMIProgress(width: Int, bodyHeight: Int, bodyWeight: Int) {
     }
 }
 
-
+//прогресс бар
 @Composable
-fun ProgressBar(percent: Float, barWidth: Int, width: Int, color: Color) {
+fun ProgressBar(percent: Float, //процент выполнения цели\чего нибудь
+                barWidth: Int, //ширина прогресс бара
+                width: Int, //толщина линии
+                color: Color // цвет линии
+) {
     val percent = minOf(1f, percent)
     Box {
         Canvas(
@@ -381,8 +397,13 @@ fun ProgressBar(percent: Float, barWidth: Int, width: Int, color: Color) {
     }
 }
 
+
+//иконка для активностей
 @Composable
-fun IconForActivities(drawable: Int, description: String = "", onClick: () -> Unit) {
+fun IconForActivities(drawable: Int,// id иконки
+                      description: String = "",//описание активности
+                      onClick: () -> Unit // действие при клике на иконку
+) {
     Box(
         modifier = Modifier
             .size(70.dp)
@@ -396,10 +417,13 @@ fun IconForActivities(drawable: Int, description: String = "", onClick: () -> Un
     }
 }
 
+//всплывающее окно для ввода активности
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlertDialogForActivity(type: String, onDismiss: (Training) -> Unit) {
-    var duration by remember { mutableStateOf("") }
+fun AlertDialogForActivity(type: String, //тип активности - бег,..
+                           onDismiss: (Training) -> Unit  //действие при нажатии на закрытие или сохранение
+) {
+    var duration by remember { mutableStateOf("") }   //продолжительность активности
     AlertDialog(onDismissRequest = { }) {
         Card {
             Column(Modifier.padding(20.dp)) {

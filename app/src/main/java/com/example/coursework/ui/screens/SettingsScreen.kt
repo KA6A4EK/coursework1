@@ -43,12 +43,15 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.util.Date
 
+
+//экран настроек или другой не придумал
 @Composable
 fun SettingsScreen(
     viewModel: HealthViewModel
 ) {
     var buttonIsClicked by remember { mutableStateOf("") }
     val dateDialogState = rememberMaterialDialogState()
+    //в зависимости от значения вызвает определенный alertDialog если значение не пустое
     if (buttonIsClicked != "") {
         when (buttonIsClicked) {
             "weight" -> SnapToBlockList(num = viewModel.userWeight, listSize = 500, text = stringResource(
@@ -187,6 +190,7 @@ fun SettingsScreen(
     }
 }
 
+//диалог для выбора пола
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun GenderAlertDialog(Gender: String, onDismiss: (String) -> Unit) {
@@ -220,7 +224,7 @@ fun GenderAlertDialog(Gender: String, onDismiss: (String) -> Unit) {
     }
 }
 
-
+//диалог для выбора даты рождения можно выбрать дату только меньше текущей
 @Composable
 fun PickDate(edit: String, dateDialogState: MaterialDialogState, onDismiss: (Date) -> Unit) {
 
@@ -245,6 +249,7 @@ fun PickDate(edit: String, dateDialogState: MaterialDialogState, onDismiss: (Dat
     }
 }
 
+//диалог для ввода имени
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
@@ -289,6 +294,7 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
     }
 }
 
+//диалог для выбора веса роста
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
@@ -299,6 +305,8 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> U
     }
 }
 
+
+//карточка которая используется при выборе скролом
 @Composable
 fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
     if (n >=0) {
