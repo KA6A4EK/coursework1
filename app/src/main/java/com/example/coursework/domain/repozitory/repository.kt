@@ -1,6 +1,10 @@
-package com.example.coursework.model
+package com.example.coursework.domain.repozitory
 
-import com.example.coursework.ui.screens.getCurrentDay
+import com.example.coursework.data.TrainingDao
+import com.example.coursework.data.dao
+import com.example.coursework.domain.model.Day
+import com.example.coursework.domain.model.Training
+import com.example.coursework.presentation.screens.getCurrentDay
 import dagger.Module
 import dagger.Provides
 import java.text.SimpleDateFormat

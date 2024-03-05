@@ -1,4 +1,4 @@
-package com.example.coursework.ViewM
+package com.example.coursework.presentation.ViewM
 
 
 data class HealthUiState(

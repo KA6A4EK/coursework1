@@ -1,4 +1,4 @@
-package com.example.coursework.model
+package com.example.coursework.util
 
 import android.Manifest
 import android.app.Activity
@@ -17,9 +17,9 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.coursework.R
-import com.example.coursework.ViewM.HealthViewModel
-import com.example.coursework.ui.screens.getCurrentDay
-import com.example.coursework.ui.screens.parceTime
+import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.screens.getCurrentDay
+import com.example.coursework.presentation.screens.parceTime
 import dagger.Module
 import dagger.Provides
 import java.time.LocalDate

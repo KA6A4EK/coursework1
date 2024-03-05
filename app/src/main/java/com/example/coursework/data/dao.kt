@@ -1,4 +1,4 @@
-package com.example.coursework.model
+package com.example.coursework.data
 
 import android.content.Context
 import androidx.room.Dao
@@ -8,6 +8,8 @@ import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.Update
+import com.example.coursework.domain.model.Day
+import com.example.coursework.domain.model.Training
 import dagger.Module
 import dagger.Provides
 
@@ -35,7 +37,7 @@ interface TrainingDao{
 }
 
 
-@Database(entities = [Day::class,Training::class], version = 1)
+@Database(entities = [Day::class, Training::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract val HealthDao: dao
     abstract val TrainingDao: TrainingDao
@@ -64,6 +66,7 @@ class DaoModule() {
             .build()
     }
 }
+
 
 
 

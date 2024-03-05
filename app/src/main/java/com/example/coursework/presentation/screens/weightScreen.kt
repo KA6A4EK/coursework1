@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,7 +22,7 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 import kotlin.random.Random
 
 

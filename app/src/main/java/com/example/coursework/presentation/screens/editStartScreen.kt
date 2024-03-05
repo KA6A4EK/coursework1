@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 
 
 //экран для редактирования показа карточек какие показывать а какие нет

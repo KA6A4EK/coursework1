@@ -1,4 +1,4 @@
-package com.example.coursework.model
+package com.example.coursework.util
 
 import android.Manifest
 import android.annotation.SuppressLint

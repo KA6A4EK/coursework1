@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import android.content.ContentValues.TAG
 import android.util.Log
@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.coursework.R
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.time.timepicker

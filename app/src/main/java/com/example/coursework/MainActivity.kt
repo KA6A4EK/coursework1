@@ -42,15 +42,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.LifecycleOwner
-import com.example.coursework.ViewM.HealthViewModel
-import com.example.coursework.model.ContextModule
-import com.example.coursework.model.DaggerAppComponent
-import com.example.coursework.model.SleepRequestsManager
-import com.example.coursework.model.saveStepsInDatabase
-import com.example.coursework.model.saveStepsInDatabase1
-import com.example.coursework.model.showNotificationAlarmManager
-import com.example.coursework.ui.screens.MainScreen
+import com.example.coursework.AppContainer.ContextModule
+import com.example.coursework.AppContainer.DaggerAppComponent
+import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
+import com.example.coursework.util.SleepRequestsManager
+import com.example.coursework.util.saveStepsInDatabase1
+import com.example.coursework.util.showNotificationAlarmManager
 import java.util.concurrent.Executors
 
 class MainActivity : ComponentActivity() {
@@ -135,7 +134,6 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACTIVITY_RECOGNITION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            saveStepsInDatabase(this)
             saveStepsInDatabase1(this)
         }
         if (ActivityCompat.checkSelfPermission(

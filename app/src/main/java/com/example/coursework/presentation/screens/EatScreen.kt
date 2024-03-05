@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 
 
 //экран для показа статистики еды

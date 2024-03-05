@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -43,18 +43,18 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coursework.R
-import com.example.coursework.ViewM.HealthViewEvent
-import com.example.coursework.ViewM.HealthViewModel
-import com.example.coursework.model.Training
+import com.example.coursework.presentation.ViewM.HealthViewEvent
+import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.domain.model.Training
 import kotlin.math.round
 
 //карточка показывающая данные сна
 @Composable
-fun SleepCard(viewModel: HealthViewModel){
+fun SleepCard(viewModel: HealthViewModel) {
     StartScreenCard(
         onCardClick = { /*TODO*/ },
         onButtonClick = { /*TODO*/ },
-        cardValue = (viewModel.sleepTime/3600).toInt(),
+        cardValue = (viewModel.sleepTime / 3600).toInt(),
         target = 9,
         text1 = "sleep time",
         text2 = ""
@@ -107,11 +107,11 @@ fun StartScreenCard(
     onCardClick: () -> Unit,  //действие при клике на карточку
     onButtonClick: () -> Unit, //дейстие при клике на кнопку
     cardValue: Int,                //значение в карточке
-    showButtonAction:Boolean = true,      // показывать ли кнопку в карточке
+    showButtonAction: Boolean = true,      // показывать ли кнопку в карточке
     target: Int,                                //цель в карточке
     text1: String,
     text2: String,
-    composable: @Composable () -> Unit      //дополнительный элемент в карточке справа для прогресс бара и тд
+    composable: @Composable () -> Unit,      //дополнительный элемент в карточке справа для прогресс бара и тд
 ) {
 
     Card(modifier = Modifier
@@ -135,25 +135,27 @@ fun StartScreenCard(
                         style = MaterialTheme.typography.displaySmall,
                         fontWeight = FontWeight.Bold,
                     )
-                    if (showButtonAction){
+                    if (showButtonAction) {
+                        Text(
+                            text = "/$target$text1",
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = Color.Gray
+                        )
+                    }
+                }
+                if (showButtonAction) {
+                    Button(onClick = {
+                        onButtonClick()
+                    }) {
+                        Text(text = text2)
+                    }
+                } else {
                     Text(
                         text = "/$target$text1",
                         style = MaterialTheme.typography.headlineSmall,
                         color = Color.Gray
-                    )}
+                    )
                 }
-                if (showButtonAction){
-                Button(onClick = {
-                    onButtonClick()
-                }) {
-                    Text(text = text2)
-                }}
-                else{
-                    Text(
-                    text = "/$target$text1",
-                    style = MaterialTheme.typography.headlineSmall,
-                    color = Color.Gray
-                )}
             }
             Spacer(modifier = Modifier.weight(1f))
             composable()
@@ -166,10 +168,21 @@ fun StartScreenCard(
 
 //карточка пульса
 @Composable
-fun CardHeartRate(viewModel: HealthViewModel,onClick: () -> Unit){
-    Card(modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp)) {
-        Row {
-            Text(text = "${viewModel.heartRate} bpm")
+fun CardHeartRate(viewModel: HealthViewModel, onClick: () -> Unit) {
+    Card {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = 100.dp)
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "${viewModel.heartRate} ${stringResource(R.string.bpm)}",
+                style = MaterialTheme.typography.displaySmall,
+                fontWeight = FontWeight.Medium
+            )
             Button(onClick = { onClick() }) {
                 Text(text = stringResource(R.string.measure))
             }
@@ -193,7 +206,11 @@ fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         text1 = stringResource(id = R.string.ml),
         text2 = "+${viewModel.cupSize}${stringResource(id = R.string.ml)}"
     ) {
-        drawWater(width = 75, height = 80, percent = minOf(1f,water.toFloat()/viewModel.waterTarget))
+        drawWater(
+            width = 75,
+            height = 80,
+            percent = minOf(1f, water.toFloat() / viewModel.waterTarget)
+        )
     }
 }
 
@@ -309,12 +326,15 @@ fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
 
 //прогресс бар показывающий в како зоне находится индекс массы тела и граничные показатели веса для каждой границы
 @Composable
-fun BMIProgress(width: Int, //максимальная ширина прогресс бара
-                bodyHeight: Int, // рост
-                bodyWeight: Int //вес
+fun BMIProgress(
+    width: Int, //максимальная ширина прогресс бара
+    bodyHeight: Int, // рост
+    bodyWeight: Int, //вес
 ) {
-    val minWeight = round(18.5 * bodyHeight * bodyHeight / 10000)  //минимальный вес для нормальной зоны
-    val maxWeight = round((25 * bodyHeight * bodyHeight / 10000).toDouble()) //максимальный вес для нормы
+    val minWeight =
+        round(18.5 * bodyHeight * bodyHeight / 10000)  //минимальный вес для нормальной зоны
+    val maxWeight =
+        round((25 * bodyHeight * bodyHeight / 10000).toDouble()) //максимальный вес для нормы
     val bmi = bodyWeight / bodyHeight.toFloat() / bodyHeight.toFloat() * 10000 // индекс массы тела
     Column {
         Canvas(
@@ -367,10 +387,11 @@ fun BMIProgress(width: Int, //максимальная ширина прогре
 
 //прогресс бар
 @Composable
-fun ProgressBar(percent: Float, //процент выполнения цели\чего нибудь
-                barWidth: Int, //ширина прогресс бара
-                width: Int, //толщина линии
-                color: Color // цвет линии
+fun ProgressBar(
+    percent: Float, //процент выполнения цели\чего нибудь
+    barWidth: Int, //ширина прогресс бара
+    width: Int, //толщина линии
+    color: Color, // цвет линии
 ) {
     val percent = minOf(1f, percent)
     Box {
@@ -400,9 +421,10 @@ fun ProgressBar(percent: Float, //процент выполнения цели\�
 
 //иконка для активностей
 @Composable
-fun IconForActivities(drawable: Int,// id иконки
-                      description: String = "",//описание активности
-                      onClick: () -> Unit // действие при клике на иконку
+fun IconForActivities(
+    drawable: Int,// id иконки
+    description: String = "",//описание активности
+    onClick: () -> Unit, // действие при клике на иконку
 ) {
     Box(
         modifier = Modifier
@@ -420,8 +442,9 @@ fun IconForActivities(drawable: Int,// id иконки
 //всплывающее окно для ввода активности
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AlertDialogForActivity(type: String, //тип активности - бег,..
-                           onDismiss: (Training) -> Unit  //действие при нажатии на закрытие или сохранение
+fun AlertDialogForActivity(
+    type: String, //тип активности - бег,..
+    onDismiss: (Training) -> Unit,  //действие при нажатии на закрытие или сохранение
 ) {
     var duration by remember { mutableStateOf("") }   //продолжительность активности
     AlertDialog(onDismissRequest = { }) {

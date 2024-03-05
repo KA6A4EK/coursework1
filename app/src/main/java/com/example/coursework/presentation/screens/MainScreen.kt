@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import android.content.Context
 import androidx.compose.foundation.clickable
@@ -35,7 +35,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coursework.R
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 
 
 //главный экра тут определяется BottomBar, TopAppBar и навигация

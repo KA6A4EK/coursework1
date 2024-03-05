@@ -1,4 +1,4 @@
-package com.example.coursework.ui.screens
+package com.example.coursework.presentation.screens
 
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
@@ -34,7 +34,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.coursework.R
-import com.example.coursework.ViewM.HealthViewModel
+import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.MaterialDialogState
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -300,7 +300,7 @@ fun FillNameAlertDialog(name: String, onDismiss: (String) -> Unit) {
 fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> Unit) {
     AlertDialog(onDismissRequest = { onDismiss(num) }) {
         CardWithLazyColumnForSelect(num = num+1, listSize = listSize, text = text, pitch = 1) {
-            onDismiss(it-1)
+            onDismiss(it)
         }
     }
 }

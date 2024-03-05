@@ -1,4 +1,4 @@
-package com.example.coursework.ViewM
+package com.example.coursework.presentation.ViewM
 
 import android.Manifest
 import android.app.Activity
@@ -9,11 +9,11 @@ import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.coursework.model.Day
-import com.example.coursework.model.StepsCounter
-import com.example.coursework.model.Training
-import com.example.coursework.model.repository
-import com.example.coursework.ui.screens.getCurrentDay
+import com.example.coursework.domain.model.Day
+import com.example.coursework.util.StepsCounter
+import com.example.coursework.domain.model.Training
+import com.example.coursework.domain.repozitory.repository
+import com.example.coursework.presentation.screens.getCurrentDay
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.async
