@@ -3,14 +3,12 @@ package com.example.coursework.presentation.screens
 import android.icu.text.SimpleDateFormat
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -20,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,17 +27,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.datetime.date.datepicker
+import com.example.coursework.presentation.components.CardWithLazyColumnForSelect
+import com.example.coursework.presentation.components.PickDate
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import java.time.LocalDate
-import java.time.ZoneId
 import java.util.Date
 
 
@@ -224,30 +216,6 @@ fun GenderAlertDialog(Gender: String, onDismiss: (String) -> Unit) {
     }
 }
 
-//диалог для выбора даты рождения можно выбрать дату только меньше текущей
-@Composable
-fun PickDate(edit: String, dateDialogState: MaterialDialogState, onDismiss: (Date) -> Unit) {
-
-    var date by remember { mutableStateOf(Date()) }
-    LaunchedEffect(edit) {
-        date = SimpleDateFormat("dd/MM/yyyy").parse(edit)
-    }
-
-    MaterialDialog(
-        dialogState = dateDialogState,
-        buttons = {
-            positiveButton(text = stringResource(R.string.ok), onClick = { onDismiss(date) })
-
-        }
-    ) {
-        datepicker(
-            initialDate = LocalDate.now(),
-            title = stringResource(R.string.enter_birthday_date)
-        ) {
-            date = Date.from(it.atStartOfDay(ZoneId.systemDefault()).toInstant())
-        }
-    }
-}
 
 //диалог для ввода имени
 @OptIn(ExperimentalMaterial3Api::class)
@@ -305,36 +273,3 @@ fun SnapToBlockList(num: Int, listSize: Int, text: String, onDismiss: (Int) -> U
     }
 }
 
-
-//карточка которая используется при выборе скролом
-@Composable
-fun ScrollCard(n: Int, h: Dp, isMiddle: Boolean = false) {
-    if (n >=0) {
-        Box(
-            modifier = Modifier
-                .height(h)
-                .width(100.dp), contentAlignment = Alignment.Center
-        ) {
-            if (isMiddle) {
-                Text(
-                    text = "$n",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
-            } else {
-                Text(
-                    text = "$n",
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = Color.Gray
-                )
-            }
-        }
-    } else {
-        Box(
-            modifier = Modifier
-                .height(h)
-                .width(100.dp)
-        ) {}
-    }
-}

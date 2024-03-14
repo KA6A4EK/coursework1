@@ -9,12 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Divider
@@ -22,12 +18,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,13 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
-import com.vanpra.composematerialdialogs.MaterialDialog
-import com.vanpra.composematerialdialogs.MaterialDialogState
-import com.vanpra.composematerialdialogs.datetime.time.timepicker
+import com.example.coursework.presentation.components.PickTime
+import com.example.coursework.presentation.components.ScrolableLazyColumn
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import kotlinx.coroutines.launch
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
@@ -247,36 +237,7 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
     }
 }
 
-//диалог для выбора даты
-@Composable
-fun PickTime(
-    edit: String,//время для редактирования
-    text: String,
-    dateDialogState: MaterialDialogState,
-    onDismiss: (LocalTime) -> Unit
-) {
 
-    var time by remember { mutableStateOf(parceTime(edit)) }
-    LaunchedEffect(edit) {
-        time = parceTime(edit)
-    }
-
-    MaterialDialog(
-        dialogState = dateDialogState,
-        buttons = {
-            positiveButton(text = stringResource(R.string.ok), onClick = { onDismiss(time) })
-
-        }
-    ) {
-        timepicker(
-            initialTime = time,
-            is24HourClock = true,
-            title = text
-        ) {
-            time = it
-        }
-    }
-}
 
 //текст в круге для выбора дня в который отправлять уведомления
 @Composable
@@ -305,8 +266,7 @@ fun CircledText(
 
     }
 }
-//функция парсит время из строки
-fun parceTime(time: String) = LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"))
+
 
 //диалог для выбора времени
 @OptIn(ExperimentalMaterial3Api::class)
@@ -345,45 +305,6 @@ fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> 
             }
         }
 
-    }
-}
-
-@Composable
-fun ScrolableLazyColumn(
-    num: Int,  //стартовое значение
-    listSize: Int,//размер списка
-    pitch: Int,//шаг значений для часов 1 2 3 для минут 5 10 15
-    initialIndex: Int = 0, // если надо выбирать значение ноль что надо поставить -1
-    onDismiss: (Int) -> Unit
-) {
-    val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = maxOf(num-1-initialIndex, 0))
-    val scope = rememberCoroutineScope()
-    val itemHeight = 50.dp
-    val firstIndex = scrollState.firstVisibleItemIndex
-    val firstOffset = scrollState.firstVisibleItemScrollOffset
-
-
-    LazyColumn(
-        state = scrollState, modifier = Modifier
-            .height(190.dp)
-            .padding(20.dp)
-    ) {
-        items((initialIndex..listSize).toList(),
-            key = {it} ) { index ->
-            ScrollCard(n = index * pitch, h = itemHeight, isMiddle = index == firstIndex+1+initialIndex)
-        }
-    }
-    LaunchedEffect(firstIndex) {
-        if (firstOffset != 0) {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex + 1)
-            }
-        } else {
-            scope.launch {
-                scrollState.animateScrollToItem(firstIndex)
-            }
-        }
-        onDismiss((firstIndex+1+initialIndex) * pitch)
     }
 }
 

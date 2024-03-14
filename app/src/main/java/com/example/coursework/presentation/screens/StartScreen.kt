@@ -30,6 +30,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.cards.CardActivity
+import com.example.coursework.presentation.cards.CardBMI
+import com.example.coursework.presentation.cards.CardEat
+import com.example.coursework.presentation.cards.CardHeartRate
+import com.example.coursework.presentation.cards.CardSteps
+import com.example.coursework.presentation.cards.CardWater
+import com.example.coursework.presentation.cards.SleepCard
 
 //стартовый экран на котором распологаются все карточки
 @Composable
@@ -67,7 +74,7 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
         }
         if (viewModel.uiState.activityVisible) {
             CardActivity(
-                viewModel,
+                viewModel = viewModel,
                 onCardClick = { navController.navigate("activity_list") },
             )
         }

@@ -1,13 +1,26 @@
 package com.example.coursework.domain.model
 
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.TypeConverter
 import com.example.coursework.presentation.screens.getCurrentDay
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-@Entity(tableName = "Training_Activity")
+@Serializable
 data class Training(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val title: String = "",
     val date: String = getCurrentDay(),
     val duration: Int,
 )
+
+class TrainingListConverter {
+    @TypeConverter
+    fun fromTargets(training: List<Training>): String {
+        return Json.encodeToString(training)
+    }
+
+    @TypeConverter
+    fun toTargets(trainingString: String): List<Training> {
+        return Json.decodeFromString(trainingString)
+    }
+}

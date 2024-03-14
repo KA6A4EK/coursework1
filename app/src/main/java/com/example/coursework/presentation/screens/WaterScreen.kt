@@ -12,7 +12,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -29,20 +28,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.components.dayForLazyRow
+import com.example.coursework.presentation.components.lazyRowProgress1
 
 @Composable
 fun WaterScreen(viewModel: HealthViewModel) {
-    var water by remember { mutableIntStateOf(0) }
     val color = Color(0, 166, 255, 255)
     var current by remember { mutableStateOf(getCurrentDay()) }
+    var selectedDay by remember { mutableStateOf(viewModel.currentDay) }
+
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        current = lazyRowProgress(
-            target = viewModel.waterTarget,
+        current = lazyRowProgress1(
+            target = selectedDay.targets.water,
             color = color,
             onClick = {},
-            days = viewModel.days.map { Pair(it.date, it.water) })
-        water = viewModel.days.find { it.date == current }!!.water
+            days = viewModel.days.map { dayForLazyRow(it.date,it.water,it.targets.water) })
+        selectedDay = viewModel.days.find { it.date == current }!!
 
         Card(
             Modifier
@@ -58,16 +60,16 @@ fun WaterScreen(viewModel: HealthViewModel) {
             ) {
                 drawWater(
                     width = 120, height = 130,
-                    percent = minOf(water.toFloat() / viewModel.waterTarget, 0.93f),
-                    target = viewModel.waterTarget
+                    percent = minOf(selectedDay.water.toFloat() / selectedDay.targets.water, 0.93f),
+                    target = selectedDay.targets.water
                 )
                 Column {
                     Text(
-                        text = "$water",
+                        text = "${selectedDay.water}",
                         style = MaterialTheme.typography.displayMedium,
                     )
                     Text(
-                        text = "${stringResource(id = R.string.target)} ${viewModel.waterTarget}",
+                        text = "${stringResource(id = R.string.target)} ${selectedDay.targets.water}",
                         color = Color.Gray
                     )
                 }

@@ -19,6 +19,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.cards.CardActivity
+import com.example.coursework.presentation.cards.CardBMI
+import com.example.coursework.presentation.cards.CardEat
+import com.example.coursework.presentation.cards.CardSteps
+import com.example.coursework.presentation.cards.CardWater
 
 
 //экран для редактирования показа карточек какие показывать а какие нет

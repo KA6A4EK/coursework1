@@ -1,9 +1,7 @@
-package com.example.coursework.domain.repozitory
+package com.example.coursework.domain.repository
 
-import com.example.coursework.data.TrainingDao
 import com.example.coursework.data.dao
 import com.example.coursework.domain.model.Day
-import com.example.coursework.domain.model.Training
 import com.example.coursework.presentation.screens.getCurrentDay
 import dagger.Module
 import dagger.Provides
@@ -14,7 +12,6 @@ import javax.inject.Inject
 @Module
 class repository @Inject constructor(
     val dao: dao,
-    val trainingDao: TrainingDao
 ) {
 
     suspend fun Update(day: Day) {
@@ -25,13 +22,6 @@ class repository @Inject constructor(
         dao.Insert(day)
     }
 
-    suspend fun getAllActivity(): List<Training> {
-        return trainingDao.getAllActivities()
-    }
-
-    suspend fun InsertTraining(training: Training) {
-        trainingDao.Insert(training)
-    }
 
     suspend fun Init(): List<Day> {
         val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
@@ -54,7 +44,7 @@ class repository @Inject constructor(
 @Module
 class RepositoryModule {
     @Provides
-    fun provideHealthRepository(dao: dao, trainingDao: TrainingDao): repository {
-        return repository(dao = dao, trainingDao = trainingDao)
+    fun provideHealthRepository(dao: dao): repository {
+        return repository(dao = dao)
     }
 }

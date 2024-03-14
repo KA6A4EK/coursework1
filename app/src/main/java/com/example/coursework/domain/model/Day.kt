@@ -19,12 +19,8 @@ data class Day(
     val height: Int = 170,
     val sleepTime: Int = 0,
     val sleepPeriod: String = "",
-    val target_steps: Int = 10000,
-    val target_eat: Int = 2500,
-    val target_water: Int = 2000,
-    val target_activity: Int = 90,
-    val target_sleep: Int = 8 * 60,
-    val target_weight: Int = 60,
-//    val training: List<Training> = listOf(),
+    val targets: Targets = Targets(),
+    var trainings: List<Training> = listOf(),
     var stepsAtTheDay: String = "0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0",
 )
+

@@ -7,9 +7,11 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.room.Update
 import com.example.coursework.domain.model.Day
-import com.example.coursework.domain.model.Training
+import com.example.coursework.domain.model.TargetsConverter
+import com.example.coursework.domain.model.TrainingListConverter
 import dagger.Module
 import dagger.Provides
 
@@ -27,20 +29,12 @@ interface dao {
 }
 
 
-@Dao
-interface TrainingDao{
-    @Query("SELECT * FROM Training_Activity")
-    suspend fun getAllActivities():List<Training>
-
-    @Insert
-    suspend fun Insert(training: Training)
-}
 
 
-@Database(entities = [Day::class, Training::class], version = 1)
+@TypeConverters(TargetsConverter::class,TrainingListConverter::class)
+@Database(entities = [Day::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract val HealthDao: dao
-    abstract val TrainingDao: TrainingDao
 }
 
 @Module
@@ -49,10 +43,7 @@ class DaoModule() {
     fun provideDao(database: AppDatabase): dao {
         return database.HealthDao
     }
-    @Provides
-    fun provideTrainingDao(database: AppDatabase): TrainingDao {
-        return database.TrainingDao
-    }
+
 
     @Provides
     fun provideDB(context: Context): AppDatabase {
@@ -62,7 +53,6 @@ class DaoModule() {
             "HealthDatabase"
         )
 //            .fallbackToDestructiveMigration()
-
             .build()
     }
 }
