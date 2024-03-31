@@ -13,7 +13,7 @@ data class Targets(
     @SerialName ("water") var water: Int = 2000,
     @SerialName ("activity") var activity: Int = 90,
     @SerialName ("sleep") val  sleep: Int = 8 * 60,
-    @SerialName ("weight") val  weight: Int = 60,
+    @SerialName ("weight") var weight: Int = 60,
 )
 
 class TargetsConverter {

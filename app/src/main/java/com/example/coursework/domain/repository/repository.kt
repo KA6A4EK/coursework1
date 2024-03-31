@@ -3,6 +3,7 @@ package com.example.coursework.domain.repository
 import com.example.coursework.data.dao
 import com.example.coursework.domain.model.Day
 import com.example.coursework.presentation.screens.getCurrentDay
+import com.example.coursework.util.getYesterdayDate
 import dagger.Module
 import dagger.Provides
 import java.text.SimpleDateFormat
@@ -30,9 +31,14 @@ class repository @Inject constructor(
             Insert(Day())
         } else {
             if (days.find { it.date == getCurrentDay() } == null) {
+                val lastDay = days.find { it.date == getYesterdayDate() }
                 val day = Day()
+                if (lastDay != null) {
+                    day.height = lastDay.height
+                    day.weight = lastDay.weight
+                    day.targets = lastDay.targets
+                }
                 Insert(day)
-
                 return (days + day).sortedBy { format.parse(it.date) }.reversed()
             }
         }

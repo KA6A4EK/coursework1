@@ -10,7 +10,6 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coursework.domain.model.Day
-import com.example.coursework.domain.model.Training
 import com.example.coursework.domain.repository.repository
 import com.example.coursework.presentation.screens.getCurrentDay
 import com.example.coursework.util.StepsCounter
@@ -32,19 +31,11 @@ class HealthViewModel @Inject constructor(
     private val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
     var name: String = sharedPrefs.getString("name", "User") ?: "User"
     var gender: String = sharedPrefs.getString("gender", "Male") ?: "Male"
-    var userHeight: Int = sharedPrefs.getInt("userHeight", 170)
-    var userWeight: Int = sharedPrefs.getInt("userWeight", 60)
-    var birthdayDate: String =
-        sharedPrefs.getString("birthdayDate", getCurrentDay()) ?: getCurrentDay()
+    var birthdayDate: String = sharedPrefs.getString("birthdayDate", getCurrentDay()) ?: getCurrentDay()
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
-//    var stepsTarget: Int = sharedPrefs.getInt("stepsTarget", 10000)
-//    var waterTarget: Int = sharedPrefs.getInt("waterTarget", 2000)
     var cupSize: Int = sharedPrefs.getInt("cupSize", 200)
-//    var activityTarget: Int = sharedPrefs.getInt("activityTarget", 90)
     var eatTarget: Int = sharedPrefs.getInt("eatTarget", 2500)
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
-    var trainingActivity: List<Training> = listOf()
-    var weightTarget: Int = sharedPrefs.getInt("weightTarget", 60)
     var heartRate = 0
     val permissionForSteps = ActivityCompat.checkSelfPermission(
         context,
@@ -80,15 +71,13 @@ class HealthViewModel @Inject constructor(
 
             }
             val steps = stepsCounter.getSteps()
-            val lastDaySteps = sharedPrefs.getInt("lastDaySteps", 404)
             val lastHourSteps = sharedPrefs.getInt("lastHourSteps", 132)
-            Log.e(TAG,currentDay.stepsAtTheDay)
-            currentDay.steps = steps - lastDaySteps
-            val s = currentDay.stepsAtTheDay.split(", ").toMutableList()
-            s[Calendar.getInstance().time.hours] = "${s[Calendar.getInstance().time.hours].toInt()+ steps-lastHourSteps}"
-            currentDay.stepsAtTheDay = s.joinToString(separator = ", ")
+            Log.e(TAG,currentDay.stepsAtTheDay.toString())
+            currentDay.steps = currentDay.stepsAtTheDay.sum()
+            val s = currentDay.stepsAtTheDay.toMutableList()
+            s[Calendar.getInstance().time.hours] = s[Calendar.getInstance().time.hours].toInt()+ steps-lastHourSteps
+            currentDay.stepsAtTheDay = s.toList()
             sharedPrefs.edit().putInt("lastHourSteps",steps).apply()
-            Log.e(TAG, "view model last day steps$lastDaySteps")
             Log.e(TAG, "viewmodel get steps ${steps}")
             Log.e(TAG, "viewmodel get last hour steps ${lastHourSteps}")
             delay(100L)
@@ -150,15 +139,12 @@ class HealthViewModel @Inject constructor(
         sharedPrefs.edit().apply {
             putString("name", name)
             putString("gender", gender)
-            putInt("userHeight", userHeight)
-            putInt("userWeight", userWeight)
             putString("birthdayDate", birthdayDate)
 //            putInt("stepsTarget", stepsTarget)
 //            putInt("waterTarget", waterTarget)
 //            putInt("activityTarget", activityTarget)
             putInt("eatTarget", eatTarget)
             putInt("cupSize", cupSize)
-            putInt("weightTarget", weightTarget)
             apply()
         }
     }

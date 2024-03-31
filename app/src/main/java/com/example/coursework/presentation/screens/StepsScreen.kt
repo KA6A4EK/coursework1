@@ -106,16 +106,15 @@ fun getCurrentDay() = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/
 
 
 @Composable
-fun CardWithStepsAtEveryHour(stepsAtTheDay: String) {
-    val steps = stepsAtTheDay.split(", ").map { it.toInt() }
-    val max = maxOf(steps.max(), 1)
+fun CardWithStepsAtEveryHour(stepsAtTheDay: List<Int>) {
+    val max = maxOf(stepsAtTheDay.max(), 1)
     var time by remember { mutableStateOf(Calendar.getInstance().time.hours) }
-    var current by remember { mutableStateOf("${steps[time]}") }
+    var current by remember { mutableStateOf("${stepsAtTheDay[time]}") }
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "${time}:00-${time + 1}:00 $current")
 
         LazyRow {
-            itemsIndexed(steps) { index, it ->
+            itemsIndexed(stepsAtTheDay) { index, it ->
                 val color = if (time == index) {
                     MaterialTheme.colorScheme.surfaceVariant
                 } else {

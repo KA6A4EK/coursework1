@@ -36,6 +36,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.util.heartRateMeasure.Camera
 
 
 //главный экра тут определяется BottomBar, TopAppBar и навигация
@@ -43,9 +44,9 @@ import com.example.coursework.presentation.ViewM.HealthViewModel
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
     viewModel: HealthViewModel,
-    context:Context,
-    applicationContext:Context,
-    camera: @Composable () -> Unit
+    context: Context,
+    applicationContext: Context,
+    camera: Camera,
 ) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()
@@ -72,29 +73,38 @@ fun MainScreen(
             modifier = Modifier.padding(paddingValues)
         ) {
             composable(route = "start") {
-                StartScreen(modifier = Modifier, navController, viewModel) }
+                StartScreen(modifier = Modifier, navController, viewModel)
+            }
             composable(route = "settings") {
-                SettingsScreen(viewModel) }
+                SettingsScreen(viewModel)
+            }
             composable(route = "steps_screen") {
-                StepsScreen(viewModel) }
+                StepsScreen(viewModel)
+            }
             composable(route = "water_screen") {
-                WaterScreen(viewModel) }
+                WaterScreen(viewModel)
+            }
             composable(route = "eat_screen") {
-                EatScreen(viewModel) }
+                EatScreen(viewModel)
+            }
             composable(route = "activity_list") {
-                ActivityScreen(viewModel) }
+                ActivityScreen(viewModel)
+            }
             composable(route = "target/{edit_target}") {
                 val curent = backStackEntry?.arguments?.getString("edit_target") ?: "start"
-                TargetScreen(viewModel, curent, navigateUp = { navController.navigateUp() }) }
-            composable(route = "edit_start"){
-                editStartScreen(viewModel = viewModel) }
-            composable(route = "notifications_period"){
-                SelectNotificationsPeriod(viewModel) }
-            composable(route = "weight_screen"){
+                TargetScreen(viewModel, curent, navigateUp = { navController.navigateUp() })
+            }
+            composable(route = "edit_start") {
+                editStartScreen(viewModel = viewModel)
+            }
+            composable(route = "notifications_period") {
+                SelectNotificationsPeriod(viewModel)
+            }
+            composable(route = "weight_screen") {
                 WeightScreen(viewModel)
             }
-            composable(route = "heart_rate_screen"){
-                camera()
+            composable(route = "heart_rate_screen") {
+                camera.measure(viewModel = viewModel)
             }
         }
     }
@@ -103,8 +113,9 @@ fun MainScreen(
 //тут описывается TopAppBar и действия при клике на кнопку в зависимости от текущего экрана
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopAppbar(curent: String, //текущий экран
-              navController: NavHostController//обьект отвечающий за навигацию
+fun TopAppbar(
+    curent: String, //текущий экран
+    navController: NavHostController,//обьект отвечающий за навигацию
 ) {
     var dropDownMenuExpanded by remember { mutableStateOf(false) }
     val screens =
@@ -127,10 +138,14 @@ fun TopAppbar(curent: String, //текущий экран
                     modifier = Modifier.padding(10.dp)
                 ) {
                     if (curent == "start") {
-                        Text(text = stringResource(R.string.edit_screen), modifier = Modifier.clickable {
-                            navController.navigate("edit_start")
-                            dropDownMenuExpanded = false
-                        }, style = MaterialTheme.typography.headlineLarge)
+                        Text(
+                            text = stringResource(R.string.edit_screen),
+                            modifier = Modifier.clickable {
+                                navController.navigate("edit_start")
+                                dropDownMenuExpanded = false
+                            },
+                            style = MaterialTheme.typography.headlineLarge
+                        )
                         Text(text = "Notifications", modifier = Modifier.clickable {
                             navController.navigate("notifications_period")
                             dropDownMenuExpanded = false
@@ -184,4 +199,3 @@ fun BottomAppbar(homeClick: () -> Unit, settingsClick: () -> Unit) {
         }
     })
 }
-

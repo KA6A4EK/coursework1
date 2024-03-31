@@ -46,20 +46,20 @@ fun SettingsScreen(
     //в зависимости от значения вызвает определенный alertDialog если значение не пустое
     if (buttonIsClicked != "") {
         when (buttonIsClicked) {
-            "weight" -> SnapToBlockList(num = viewModel.userWeight, listSize = 500, text = stringResource(
+            "weight" -> SnapToBlockList(num = viewModel.currentDay.weight, listSize = 500, text = stringResource(
                 R.string.kg
             )
             ) {
                 buttonIsClicked = ""
-                viewModel.userWeight = it
+                viewModel.currentDay.weight = it
                 viewModel.saveHealthData()
             }
 
-            "height" -> SnapToBlockList(num = viewModel.userHeight, listSize = 300, text = stringResource(
+            "height" -> SnapToBlockList(num = viewModel.currentDay.height, listSize = 300, text = stringResource(
                 id = R.string.cm
             )) {
                 buttonIsClicked = ""
-                viewModel.userHeight = it
+                viewModel.currentDay.height = it
                 viewModel.saveHealthData()
 
             }
@@ -136,7 +136,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = "${viewModel.userHeight}",
+                    text = "${viewModel.currentDay.height}",
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -152,7 +152,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = "${viewModel.userWeight}",
+                    text = "${viewModel.currentDay.weight}",
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )

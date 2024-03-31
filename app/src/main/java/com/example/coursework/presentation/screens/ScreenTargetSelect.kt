@@ -62,11 +62,11 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String,// текущий э
         }
         "{bmi_screen}" -> {
             CardWithLazyColumnForSelect(
-                num = viewModel.weightTarget, listSize = 500, text = stringResource(
+                num = viewModel.currentDay.targets.weight, listSize = 500, text = stringResource(
                     R.string.weight_target
                 ), pitch = 1
             ) {
-                viewModel.weightTarget = it
+                viewModel.currentDay.targets.weight = it
                 navigateUp()
             }
         }
