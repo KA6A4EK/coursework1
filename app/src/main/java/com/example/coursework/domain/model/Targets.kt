@@ -9,7 +9,7 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class Targets(
     @SerialName ("steps") var steps: Int = 10000,
-    @SerialName ("eat") val  eat: Int = 2500,
+    @SerialName ("eat") var eat: Int = 2500,
     @SerialName ("water") var water: Int = 2000,
     @SerialName ("activity") var activity: Int = 90,
     @SerialName ("sleep") val  sleep: Int = 8 * 60,

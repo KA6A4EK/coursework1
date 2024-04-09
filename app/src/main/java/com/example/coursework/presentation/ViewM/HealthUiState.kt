@@ -3,10 +3,10 @@ package com.example.coursework.presentation.ViewM
 
 data class HealthUiState(
     var edit: Boolean = false,
-    var stepsVisible: Boolean,
-    var waterVisible: Boolean,
-    var bodyCompositionVisible: Boolean,
-    var eatVisible: Boolean,
-    var activityVisible: Boolean,
-    var sleepVisible: Boolean,
+    var stepsVisible: Boolean =true,
+    var waterVisible: Boolean=true,
+    var bodyCompositionVisible: Boolean=true,
+    var eatVisible: Boolean=true,
+    var activityVisible: Boolean=true,
+    var sleepVisible: Boolean=true,
 )

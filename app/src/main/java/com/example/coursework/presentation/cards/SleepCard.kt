@@ -10,11 +10,11 @@ fun SleepCard(viewModel: HealthViewModel) {
     StartScreenCard(
         onCardClick = { /*TODO*/ },
         onButtonClick = { /*TODO*/ },
-        cardValue = (viewModel.sleepTime / 3600).toInt(),
+        cardValue = (30000 / 3600).toInt(),
         target = 9,
         text1 = "sleep time",
         text2 = ""
     ) {
 
     }
-}
+}//TODO решить что со сном

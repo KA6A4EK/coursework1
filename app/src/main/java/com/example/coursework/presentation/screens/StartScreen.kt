@@ -49,36 +49,36 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
 
         ) {
 
-        if (viewModel.uiState.stepsVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.stepsVisible) {
             CardSteps(
                 viewModel,
                 onCardClick = { navController.navigate("steps_screen") })
 
         }
-        if (viewModel.uiState.waterVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.waterVisible) {
             CardWater(
                 viewModel,
                 onCardClick = { navController.navigate("water_screen") },
             )
         }
-        if (viewModel.uiState.sleepVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.sleepVisible) {
             SleepCard(viewModel = viewModel)
 //            onCardClick = { navController.navigate("water_screen") }
 
         }
-        if (viewModel.uiState.eatVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.eatVisible) {
             CardEat(
                 onCardClick = { navController.navigate("eat_screen") },
                 viewModel = viewModel
             )
         }
-        if (viewModel.uiState.activityVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.activityVisible) {
             CardActivity(
                 viewModel = viewModel,
                 onCardClick = { navController.navigate("activity_list") },
             )
         }
-        if (viewModel.uiState.bodyCompositionVisible) {
+        if (viewModel.user.value.userSettings.healthUiState.bodyCompositionVisible) {
             CardBMI(
                 onClick = { navController.navigate("weight_screen") },
                 viewModel = viewModel

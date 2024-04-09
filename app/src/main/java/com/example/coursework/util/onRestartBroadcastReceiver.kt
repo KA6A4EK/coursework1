@@ -1,3 +1,3 @@
 package com.example.coursework.util
 
-//TODO
+//TODO сделать чтобы приложение инициализировалось после перезагрузка

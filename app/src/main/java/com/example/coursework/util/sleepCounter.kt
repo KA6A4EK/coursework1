@@ -33,7 +33,7 @@ class SleepReceiver : BroadcastReceiver() {
                     "${event.startTimeMillis} to ${event.endTimeMillis} with status ${event.status}"
                 )
             }
-            sh.edit().putLong("sleepTime" ,sleepTime).apply()
+            sh.edit().putLong("sleepTime" ,sleepTime).apply()//TODO тут надо это или модуля не будет совсем
             Log.e(TAG,"sleepTimesleepTime$sleepTime")
         } else if (SleepClassifyEvent.hasEvents(intent)) {
             val events = SleepClassifyEvent.extractEvents(intent)

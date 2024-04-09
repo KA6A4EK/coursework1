@@ -32,47 +32,46 @@ import com.example.coursework.presentation.cards.CardWater
 fun editStartScreen(viewModel: HealthViewModel) {
     Column(verticalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.padding(10.dp)) {
         Box(contentAlignment = Alignment.TopEnd) {
-            var visible by remember { mutableStateOf(viewModel.uiState.stepsVisible) }
+            var visible by remember { mutableStateOf(viewModel.user.value.userSettings.healthUiState.stepsVisible) }
             CardSteps(onCardClick = { }, viewModel = viewModel)
             editStartScreenButton(visible = visible) {
                 visible = it
-                viewModel.uiState.stepsVisible = it
+                viewModel.user.value.userSettings.healthUiState.stepsVisible = it
             }
         }
         Box(contentAlignment = Alignment.TopEnd) {
-            var visible by remember { mutableStateOf(viewModel.uiState.waterVisible) }
+            var visible by remember { mutableStateOf(viewModel.user.value.userSettings.healthUiState.waterVisible) }
             CardWater(onCardClick = { }, viewModel = viewModel)
             editStartScreenButton(visible = visible) {
                 visible = it
-                viewModel.uiState.waterVisible = it
+                viewModel.user.value.userSettings.healthUiState.waterVisible = it
             }
         }
         Box(contentAlignment = Alignment.TopEnd) {
-            var visible by remember { mutableStateOf(viewModel.uiState.eatVisible) }
+            var visible by remember { mutableStateOf(viewModel.user.value.userSettings.healthUiState.eatVisible) }
             CardEat(onCardClick = { }, viewModel = viewModel)
             editStartScreenButton(visible = visible) {
                 visible= it
-                viewModel.uiState.eatVisible = it
+                viewModel.user.value.userSettings.healthUiState.eatVisible = it
             }
         }
         Box(contentAlignment = Alignment.TopEnd) {
-            var visible by remember { mutableStateOf(viewModel.uiState.activityVisible) }
+            var visible by remember { mutableStateOf(viewModel.user.value.userSettings.healthUiState.activityVisible) }
             CardActivity(onCardClick = { }, viewModel = viewModel)
             editStartScreenButton(visible = visible) {
                 visible= it
-                viewModel.uiState.activityVisible = it
+                viewModel.user.value.userSettings.healthUiState.activityVisible = it
             }
         }
         Box(contentAlignment = Alignment.TopEnd) {
-            var visible by remember { mutableStateOf(viewModel.uiState.bodyCompositionVisible) }
+            var visible by remember { mutableStateOf(viewModel.user.value.userSettings.healthUiState.bodyCompositionVisible) }
             CardBMI(onClick = { }, viewModel = viewModel)
             editStartScreenButton(visible = visible) {
                 visible= it
-                viewModel.uiState.bodyCompositionVisible = it
+                viewModel.user.value.userSettings.healthUiState.bodyCompositionVisible = it
             }
         }
     }
-    viewModel.saveUiState()
 }
 
 

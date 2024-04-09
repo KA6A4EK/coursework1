@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
     }
     override fun onStop() {
         super.onStop()
+        vm.saveUser()
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION

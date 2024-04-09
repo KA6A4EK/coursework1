@@ -36,67 +36,42 @@ import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 
 @Composable
 fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
-    val sharedPreferences = viewModel.provideSharedPreference()
-    val days = viewModel.getDaysToNotification()
-    var startTime by remember { mutableStateOf(sharedPreferences.getString("startTime", "09:00")!!) }//время старта уведомлений
-    var period by remember { mutableStateOf(sharedPreferences.getString("NotificationPeriod", "02:00")!!) } //период уведомлений через который отправляются уведомления
     val color1 = Color(0, 144, 255, 222)
     val color2 = Color(71, 71, 71, 150)
-    var endTime by remember { mutableStateOf(sharedPreferences.getString("endTime", "21:00")!!) }//время до которого можно отправлять уведомления
-    var showNotifications by remember { mutableStateOf(sharedPreferences.getBoolean("showNotifications", false)) }//можно ли отправлять уведомления
     var showAlertDialogToSelectPeriod by remember { mutableStateOf(false) }//можно ли показать диалог
-    var sunday by remember { mutableStateOf(days[0]) }
-    var monday by remember { mutableStateOf(days[1]) }
-    var tuesday by remember { mutableStateOf(days[2]) }
-    var wednesday by remember { mutableStateOf(days[3]) }
-    var thursday by remember { mutableStateOf(days[4]) }
-    var friday by remember { mutableStateOf(days[5]) }
-    var saturday by remember { mutableStateOf(days[6]) }
     val timeDialogStateStart = rememberMaterialDialogState()
     val timeDialogStateEnd = rememberMaterialDialogState()
     val textSize = 37
 
-    fun saveDays() = sharedPreferences.edit().apply {
-        //сохраняет значения разрешения уведомлений в каждый день
-        putBoolean("monday", monday)
-        putBoolean("tuesday", tuesday)
-        putBoolean("wednesday", wednesday)
-        putBoolean("thursday", thursday)
-        putBoolean("friday", friday)
-        putBoolean("saturday", saturday)
-        putBoolean("sunday", sunday)
-        apply()
-    }
 
     if (showAlertDialogToSelectPeriod) {
         //вызов диалога выбора времени
-        alertDialogSelectNotificationsInterval(edit = period) {
-            if (it != "" && it.toSet().size>2) {
-                period = it
-                sharedPreferences.edit().putString("NotificationPeriod", it).apply()
+        alertDialogSelectNotificationsInterval(edit = viewModel.user.value.userSettings.notificationsSettings.notificationsPeriod) {
+            if (it != "" && it.toSet().size > 2) {
+                viewModel.user.value.userSettings.notificationsSettings.notificationsPeriod = it
             }
             showAlertDialogToSelectPeriod = false
         }
     }
 
     PickTime(
-        edit = startTime,
+        edit = viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodStart,
         text = "select start time",
         dateDialogState = timeDialogStateStart
     ) {
-        if (it.toString() < endTime) {
-            startTime = it.toString()
-            sharedPreferences.edit().putString("startTime", startTime).apply()
+        if (it.toString() < viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodEnd) {
+            viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodStart =
+                it.toString()
         }
     }
     PickTime(
-        edit = endTime,
+        edit = viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodEnd,
         text = "select end time",
         dateDialogState = timeDialogStateEnd
     ) {
-        if (startTime < it.toString()) {
-            endTime = it.toString()
-            sharedPreferences.edit().putString("endTime", endTime).apply()
+        if (viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodStart < it.toString()) {
+            viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodEnd =
+                it.toString()
         }
     }
     Card(
@@ -110,13 +85,15 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(text = "Send notification", style = MaterialTheme.typography.headlineMedium)
-            Checkbox(checked = showNotifications, onCheckedChange = {
-                Log.e(TAG,"$it")
-                if (viewModel.requestPermission()) {
-                    showNotifications = it
-                    sharedPreferences.edit().putBoolean("showNotifications", it).apply()
-                }
-            })
+            Checkbox(
+                checked = viewModel.user.value.userSettings.notificationsSettings.canSendNotifications,
+                onCheckedChange = {
+                    Log.e(TAG, "$it")
+                    if (viewModel.requestPermission()) {
+                        viewModel.user.value.userSettings.notificationsSettings.canSendNotifications =
+                            it
+                    }
+                })
         }
         Divider()
         Column(
@@ -126,13 +103,13 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
             Text(text = "Time", style = MaterialTheme.typography.headlineMedium)
             Row {
                 Text(
-                    text = "$startTime ",
+                    text = "${viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodStart} ",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.clickable {
                         timeDialogStateStart.show()
                     })
                 Text(
-                    text = " $endTime",
+                    text = " ${viewModel.user.value.userSettings.notificationsSettings.notificationsPeriodEnd}",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.clickable {
                         timeDialogStateEnd.show()
@@ -149,7 +126,10 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
                 style = MaterialTheme.typography.headlineMedium
             )
             Text(
-                text = stringResource(R.string.hours, period),
+                text = stringResource(
+                    R.string.hours,
+                    viewModel.user.value.userSettings.notificationsSettings.notificationsPeriod
+                ),
                 style = MaterialTheme.typography.headlineSmall,
                 modifier = Modifier.clickable {
                     showAlertDialogToSelectPeriod = true
@@ -166,77 +146,76 @@ fun SelectNotificationsPeriod(viewModel: HealthViewModel) {
                 color2 = color2,
                 color = color1,
                 text = "M",
-                clicked = monday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.monday
             ) {
-                monday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.monday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "T",
-                clicked = tuesday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.tuesday
             )
             {
-                tuesday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.tuesday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "W",
-                clicked = wednesday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.wednesday
             ) {
-                wednesday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.wednesday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "T",
-                clicked = thursday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.thursday
             ) {
-                thursday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.thursday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "F",
-                clicked = friday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.friday
             ) {
-                friday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.friday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "S",
-                clicked = saturday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.saturday
             ) {
-                saturday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.saturday =
+                    it
             }
             CircledText(
                 size = textSize,
                 color2 = color2,
                 color = color1,
                 text = "S",
-                clicked = sunday
+                clicked = viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.sunday
             ) {
-                sunday = it
-                saveDays()
+                viewModel.user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.sunday =
+                    it
             }
         }
 
     }
 }
-
 
 
 //текст в круге для выбора дня в который отправлять уведомления
@@ -247,7 +226,7 @@ fun CircledText(
     color2: Color = Color.Gray,
     text: String,
     clicked: Boolean,
-    onClick: (Boolean) -> Unit
+    onClick: (Boolean) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -298,8 +277,9 @@ fun alertDialogSelectNotificationsInterval(edit: String, onDismiss: (String) -> 
                     text = stringResource(id = R.string.save),
                     modifier = Modifier
                         .clickable {
-                            Log.e(TAG,("0$h:${(m+100).toString().substring(1)}"))
-                            onDismiss("0$h:${(m+100).toString().substring(1)}") },
+                            Log.e(TAG, ("0$h:${(m + 100).toString().substring(1)}"))
+                            onDismiss("0$h:${(m + 100).toString().substring(1)}")
+                        },
                     style = MaterialTheme.typography.displaySmall
                 )
             }

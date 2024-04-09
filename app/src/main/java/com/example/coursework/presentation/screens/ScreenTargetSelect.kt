@@ -41,11 +41,11 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String,// текущий э
         "{eat_screen}" -> {
             val pitch = 50
             CardWithLazyColumnForSelect(
-                num = viewModel.eatTarget / pitch, listSize = 500, text = stringResource(
+                num = viewModel.currentDay.targets.eat / pitch, listSize = 500, text = stringResource(
                     id = R.string.eat_target
                 ), pitch = pitch
             ) {
-                viewModel.eatTarget = it
+                viewModel.currentDay.targets.eat = it
                 navigateUp()
             }
         }
@@ -73,15 +73,14 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String,// текущий э
         "{cupSize}" -> {
             val pitch = 10
             CardWithLazyColumnForSelect(
-                num = viewModel.cupSize / pitch, listSize = 500, text = stringResource(
+                num = viewModel.user.value.userSettings.CupSize / pitch, listSize = 500, text = stringResource(
                     id = R.string.set_cup_size
                 ), pitch = pitch
             ) {
-                viewModel.cupSize = it
+                viewModel.user.value.userSettings.CupSize = it
                 navigateUp()
             }
         }
     }
-    viewModel.saveHealthData()
 }
 

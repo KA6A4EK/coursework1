@@ -31,7 +31,7 @@ fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         ) {
             if (it > 0) {
                 steps = it
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(steps = it)))
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(stepsAtTheDay = listOf(it))))
             }
             buttonIsClicked = false
         }

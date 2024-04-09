@@ -14,7 +14,6 @@ import kotlinx.serialization.json.Json
 data class Day(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val date: String = getCurrentDay(),
-    var steps: Int = 0,
     var water: Int = 0,
     val eat: Int = 0,
     var activity: Int = 0,
@@ -26,7 +25,14 @@ data class Day(
     var targets: Targets = Targets(),
     var trainings: List<Training> = listOf(),
     @SerialName("stepsAtTheDay") var stepsAtTheDay: List<Int> = List(24) { 0 },
-)
+){
+    val steps: Int
+        get(
+        ) {
+            return stepsAtTheDay.sum()
+        }
+
+}
 
 
 class StepsAtTheDayConverter {

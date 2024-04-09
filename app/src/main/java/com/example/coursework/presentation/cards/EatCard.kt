@@ -37,12 +37,12 @@ fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             buttonIsClicked = true
         },
         cardValue = cal,
-        target = viewModel.eatTarget,
+        target = viewModel.currentDay.targets.eat,
         text1 = stringResource(id = R.string.cal),
         text2 = stringResource(id = R.string.enter),
     ) {
         ProgressBar(
-            percent = cal / viewModel.eatTarget.toFloat(),
+            percent = cal / viewModel.currentDay.targets.eat.toFloat(),
             barWidth = 10,
             width = 120,
             Color.Yellow

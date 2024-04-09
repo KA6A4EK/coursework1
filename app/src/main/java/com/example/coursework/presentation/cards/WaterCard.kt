@@ -17,17 +17,17 @@ import com.example.coursework.presentation.screens.drawWater
 @Composable
 fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var water by remember { mutableIntStateOf(viewModel.currentDay.water) } // вода для текущего дня
-    val cupSize = viewModel.cupSize  //размер кружки
+    val cupSize = viewModel.user.value.userSettings.CupSize  //размер кружки
     StartScreenCard(
         onCardClick = { onCardClick() },
         onButtonClick = {
-            water += cupSize
+            water += viewModel.user.value.userSettings.CupSize
             viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(water = water)))
         },
         cardValue = water,
         target = viewModel.currentDay.targets.water,
         text1 = stringResource(id = R.string.ml),
-        text2 = "+${viewModel.cupSize}${stringResource(id = R.string.ml)}"
+        text2 = "+${viewModel.user.value.userSettings.CupSize}${stringResource(id = R.string.ml)}"
     ) {
         drawWater(
             width = 75,

@@ -52,7 +52,6 @@ fun SettingsScreen(
             ) {
                 buttonIsClicked = ""
                 viewModel.currentDay.weight = it
-                viewModel.saveHealthData()
             }
 
             "height" -> SnapToBlockList(num = viewModel.currentDay.height, listSize = 300, text = stringResource(
@@ -60,35 +59,31 @@ fun SettingsScreen(
             )) {
                 buttonIsClicked = ""
                 viewModel.currentDay.height = it
-                viewModel.saveHealthData()
 
             }
 
-            "gender" -> GenderAlertDialog(Gender = viewModel.gender) {
+            "gender" -> GenderAlertDialog(Gender = viewModel.user.value.gender) {
                 buttonIsClicked = ""
-                viewModel.gender = it
-                viewModel.saveHealthData()
+                viewModel.user.value.gender = it
             }
 
             "birthdayDate" -> {
                 dateDialogState.show()
-                PickDate(dateDialogState = dateDialogState, edit = viewModel.birthdayDate) {
-                    viewModel.birthdayDate = if (it < Date()) {
+                PickDate(dateDialogState = dateDialogState, edit = viewModel.user.value.birthdayDate) {
+                    viewModel.user.value.birthdayDate = if (it < Date()) {
                         SimpleDateFormat("dd/MM/yyyy").format(it).toString()
                     } else {
-                        viewModel.birthdayDate
+                        viewModel.user.value.birthdayDate
                     }
-                    viewModel.saveHealthData()
                     buttonIsClicked = ""
                 }
 
             }
 
             "name" -> {
-                FillNameAlertDialog(name = viewModel.name) {
+                FillNameAlertDialog(name = viewModel.user.value.name.toString()) {
                     if (it != "") {
-                        viewModel.name = it
-                        viewModel.saveHealthData()
+                        viewModel.user.value.name = it
                     }
                     buttonIsClicked = ""
 
@@ -99,7 +94,7 @@ fun SettingsScreen(
     }
     Column {
         Text(
-            text = stringResource(R.string.hello, viewModel.name),
+            text = stringResource(R.string.hello, viewModel.user.value.name),
             style = MaterialTheme.typography.displayMedium,
             modifier = Modifier
                 .padding(10.dp)
@@ -118,7 +113,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = if (viewModel.gender=="Male"){
+                    text = if (viewModel.user.value.gender=="Male"){
                         stringResource(id = R.string.male)}else{
                         stringResource(id = R.string.female)},
                     style = MaterialTheme.typography.displaySmall,
@@ -168,7 +163,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = viewModel.birthdayDate,
+                    text = viewModel.user.value.birthdayDate,
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )

@@ -8,7 +8,6 @@ import android.app.Service
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -25,6 +24,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Date
 
 class StepsCounter(context: Context) : SensorEventListener {
     private var sensorManager = (context.getSystemService(Context.SENSOR_SERVICE) as SensorManager)
@@ -77,7 +77,6 @@ class StepCounterService1 : Service(), SensorEventListener {
 
     private lateinit var sensorManager: SensorManager
     private lateinit var stepSensor: Sensor
-    private lateinit var sharedPreferences: SharedPreferences
 
     companion object {
         const val CHANNEL_ID = "StepCounterChannel2"
@@ -89,16 +88,12 @@ class StepCounterService1 : Service(), SensorEventListener {
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         stepSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)!!
         createNotificationChannel()
-        sharedPreferences = getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
-        Log.e(TAG, "onCreate")
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         startForeground(NOTIFICATION_ID, createNotification().build())
         sensorManager.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_NORMAL)
-        Log.e(TAG, "onStartCommand")
         return START_STICKY
-
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -108,16 +103,17 @@ class StepCounterService1 : Service(), SensorEventListener {
     override fun onDestroy() {
         super.onDestroy()
         sensorManager.unregisterListener(this)
-        Log.e(TAG, "onDestroy")
 
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             val stepCount = event.values?.get(0)?.toInt()!!
-            val repository = DaggerAppComponent.builder()
+            val appModule =DaggerAppComponent.builder()
                 .contextModule(ContextModule(this))
-                .build().provideHealthRepository()
+                .build()
+            val repository = appModule.provideHealthRepository()
+            val healthManager = appModule.provideHealthManager()
             val days = runBlocking { async { repository.Init() }.await() }
             var currentDay = days.find { it.date == getCurrentDay() }!!
             var hour = Calendar.getInstance().time.hours
@@ -131,7 +127,7 @@ class StepCounterService1 : Service(), SensorEventListener {
                 }
             }
 
-            val lastHourSteps = sharedPreferences.getInt("lastHourSteps", stepCount)
+            val lastHourSteps = runBlocking{healthManager.readLastHourSteps()}?:0
             val stepsAtTheDay = currentDay.stepsAtTheDay.toMutableList()
             stepsAtTheDay[hour] =
                 if (stepCount >= lastHourSteps) (stepCount - lastHourSteps) else 0
@@ -142,8 +138,7 @@ class StepCounterService1 : Service(), SensorEventListener {
                     )
                 )
             }
-            sharedPreferences.edit().putInt("lastHourSteps", stepCount).apply()
-            Log.e(TAG, "lastHourSteps $stepCount")
+            runBlocking { healthManager.saveLastHourSteps(stepCount) }
         }
         stopSelf()
     }
@@ -176,6 +171,8 @@ class StepCounterService1 : Service(), SensorEventListener {
     }
 }
 
-fun getYesterdayDate() =
-    SimpleDateFormat("dd/MM/yyyy").format(Calendar.getInstance().add(Calendar.DATE, -1))
+fun getYesterdayDate(): String = SimpleDateFormat("dd/MM/yyyy").format(Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24)))
+
+
+
 

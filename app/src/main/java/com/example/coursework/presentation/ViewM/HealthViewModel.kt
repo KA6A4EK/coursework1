@@ -6,9 +6,11 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.pm.PackageManager
 import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.coursework.data.local.HealthManager
 import com.example.coursework.domain.model.Day
 import com.example.coursework.domain.repository.repository
 import com.example.coursework.presentation.screens.getCurrentDay
@@ -25,79 +27,37 @@ import javax.inject.Inject
 
 class HealthViewModel @Inject constructor(
     private val repos: repository,
-    private val context: Context
+    private val context: Context,
+    private val healthManager: HealthManager,
 ) :
     ViewModel() {
-    private val sharedPrefs = context.getSharedPreferences("HealthPrefs", Context.MODE_PRIVATE)
-    var name: String = sharedPrefs.getString("name", "User") ?: "User"
-    var gender: String = sharedPrefs.getString("gender", "Male") ?: "Male"
-    var birthdayDate: String = sharedPrefs.getString("birthdayDate", getCurrentDay()) ?: getCurrentDay()
+    private val _user = mutableStateOf(runBlocking { healthManager.readUser() })
+    val user = _user
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
-    var cupSize: Int = sharedPrefs.getInt("cupSize", 200)
-    var eatTarget: Int = sharedPrefs.getInt("eatTarget", 2500)
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
     var heartRate = 0
-    val permissionForSteps = ActivityCompat.checkSelfPermission(
-        context,
-        Manifest.permission.ACTIVITY_RECOGNITION
-    ) != PackageManager.PERMISSION_GRANTED
-    val sleepTime = sharedPrefs.getLong("sleepTime",123)
-
-    private val uiStateSharedPref = context.getSharedPreferences("uiState", Context.MODE_PRIVATE)
-    val uiState = HealthUiState(
-        stepsVisible = uiStateSharedPref.getBoolean("stepsVisible", true),
-        waterVisible = uiStateSharedPref.getBoolean("waterVisible", true),
-        bodyCompositionVisible = uiStateSharedPref.getBoolean("bodyCompositionVisible", true),
-        eatVisible = uiStateSharedPref.getBoolean("eatVisible", true),
-        activityVisible = uiStateSharedPref.getBoolean("activityVisible", true),
-        sleepVisible = uiStateSharedPref.getBoolean("sleepVisible", true)
-    )
+    val permissionForSteps = ActivityCompat.checkSelfPermission(context,
+        Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED
     val stepsCounter = StepsCounter(context)
-
-
 
     init {
         viewModelScope.launch {
-//            sharedPrefs.edit().clear().apply()
             delay(100L)
-
-            if (!sharedPrefs.contains("lastDaySteps")) {
-                sharedPrefs.edit().putInt("lastDaySteps", stepsCounter.getSteps()).apply()
-                Log.e(TAG, "lastDaySteps added")
-            }
-            if (!sharedPrefs.contains("lastHourSteps")) {
-                sharedPrefs.edit().putInt("lastHourSteps", stepsCounter.getSteps()).apply()
-                Log.e(TAG, "lastHourSteps added")
-
-            }
             val steps = stepsCounter.getSteps()
-            val lastHourSteps = sharedPrefs.getInt("lastHourSteps", 132)
-            Log.e(TAG,currentDay.stepsAtTheDay.toString())
-            currentDay.steps = currentDay.stepsAtTheDay.sum()
+            val lastHourSteps = healthManager.readLastHourSteps()?:steps
+            Log.e(TAG, currentDay.stepsAtTheDay.toString())
             val s = currentDay.stepsAtTheDay.toMutableList()
-            s[Calendar.getInstance().time.hours] = s[Calendar.getInstance().time.hours].toInt()+ steps-lastHourSteps
+            s[Calendar.getInstance().time.hours] =
+                s[Calendar.getInstance().time.hours] + steps - lastHourSteps
             currentDay.stepsAtTheDay = s.toList()
-            sharedPrefs.edit().putInt("lastHourSteps",steps).apply()
-            Log.e(TAG, "viewmodel get steps ${steps}")
-            Log.e(TAG, "viewmodel get last hour steps ${lastHourSteps}")
+            healthManager.saveLastHourSteps(steps)
             delay(100L)
             waterFromNotifications()
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
-            Log.e(TAG,"${sharedPrefs.getLong("sleepTime",3600)}")
         }
     }
 
-    fun saveUiState() {
-        uiStateSharedPref.edit().apply {
-            putBoolean("stepsVisible", uiState.stepsVisible)
-            putBoolean("waterVisible", uiState.waterVisible)
-            putBoolean("bodyCompositionVisible", uiState.bodyCompositionVisible)
-            putBoolean("eatVisible", uiState.eatVisible)
-            putBoolean("activityVisible", uiState.activityVisible)
-            putBoolean("sleepVisible", uiState.sleepVisible)
-        }.apply()
-    }
-
+    fun saveUser() = viewModelScope.launch {healthManager.saveUser(user.value) }
     fun requestPermission(): Boolean {
         ActivityCompat.requestPermissions(
             context as Activity,
@@ -115,48 +75,31 @@ class HealthViewModel @Inject constructor(
         }
     }
 
-    fun provideSharedPreference() = sharedPrefs
-    fun provideContext() = context
-
     fun waterFromNotifications() {
-        val water = sharedPrefs.getString("countWater", "${getCurrentDay()} 0")!!.split(" ")
-        sharedPrefs.edit()?.putString("countWater", "${getCurrentDay()} 0")?.apply()
-        if (days.isNotEmpty()) {
-            if (water[0] == getCurrentDay()) {
-                currentDay.water += water[1].toInt() * cupSize
-                handleViewEvent(HealthViewEvent.Update(currentDay))
-            } else {
-                val day = days.find { it.date == water[0] }
-                if (day != null) {
-                    handleViewEvent(HealthViewEvent.Update(day.copy(water = day.water + water[1].toInt() * cupSize)))
+        viewModelScope.launch {
+            val water = healthManager.readCountWater().split(" ")
+            if (days.isNotEmpty()) {
+                if (water[0] == getCurrentDay()) {
+                    currentDay.water += water[1].toInt() * user.value.userSettings.CupSize
+                    handleViewEvent(HealthViewEvent.Update(currentDay))
+                } else {
+                    val day = days.find { it.date == water[0] }
+                    if (day != null) {
+                        handleViewEvent(HealthViewEvent.Update(day.copy(water = day.water + water[1].toInt() * user.value.userSettings.CupSize)))
+                    }
                 }
             }
         }
-    }
+    }//TODO сделать чтобы сохранялось при записи шагов
 
-
-    fun saveHealthData() {
-        sharedPrefs.edit().apply {
-            putString("name", name)
-            putString("gender", gender)
-            putString("birthdayDate", birthdayDate)
-//            putInt("stepsTarget", stepsTarget)
-//            putInt("waterTarget", waterTarget)
-//            putInt("activityTarget", activityTarget)
-            putInt("eatTarget", eatTarget)
-            putInt("cupSize", cupSize)
-            apply()
-        }
-    }
-
-    fun getDaysToNotification() = listOf(
-        sharedPrefs.getBoolean("sunday", false),
-        sharedPrefs.getBoolean("monday", false),
-        sharedPrefs.getBoolean("tuesday", false),
-        sharedPrefs.getBoolean("wednesday", false),
-        sharedPrefs.getBoolean("thursday", false),
-        sharedPrefs.getBoolean("friday", false),
-        sharedPrefs.getBoolean("saturday", false),
+    fun getDaysToNotificationList() = listOf(
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.sunday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.monday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.tuesday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.wednesday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.thursday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.friday,
+        user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.saturday,
     )
 
     fun handleViewEvent(viewEvent: HealthViewEvent) {
@@ -174,12 +117,8 @@ class HealthViewModel @Inject constructor(
                     currentDay = viewEvent.day
                 }
             }
-
-
         }
     }
-
-
 }
 
 @Module
@@ -188,14 +127,16 @@ class ProvideViewModel() {
     fun provideHealthViewModel(
         context: Context,
         repository: repository,
-    ): HealthViewModel {
+        healthManager: HealthManager,
+
+        ): HealthViewModel {
         return HealthViewModel(
             repository,
-            context
+            context,
+            healthManager,
         )
     }
 }
-
 
 sealed class HealthViewEvent {
     data class Update(val day: Day) : HealthViewEvent()

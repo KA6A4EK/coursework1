@@ -41,6 +41,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
     val color = Color(168, 255, 65, 215)
     var current by remember { mutableStateOf(getCurrentDay()) }
     var currentDay by remember { mutableStateOf(viewModel.days.find { it.date == getCurrentDay() }!!) }
+
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         current = lazyRowProgress1(
             target = currentDay.targets.steps,
