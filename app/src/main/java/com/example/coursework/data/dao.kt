@@ -10,6 +10,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.Update
 import com.example.coursework.domain.model.Day
+import com.example.coursework.domain.model.HeartRateConverter
 import com.example.coursework.domain.model.StepsAtTheDayConverter
 import com.example.coursework.domain.model.TargetsConverter
 import com.example.coursework.domain.model.TrainingListConverter
@@ -32,7 +33,7 @@ interface dao {
 
 
 
-@TypeConverters(TargetsConverter::class,TrainingListConverter::class, StepsAtTheDayConverter::class)
+@TypeConverters(TargetsConverter::class,TrainingListConverter::class, StepsAtTheDayConverter::class ,HeartRateConverter::class)
 @Database(entities = [Day::class], version = 1)
 abstract class AppDatabase : RoomDatabase() {
     abstract val HealthDao: dao

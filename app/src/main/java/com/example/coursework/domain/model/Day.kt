@@ -24,6 +24,7 @@ data class Day(
     val sleepPeriod: String = "",
     var targets: Targets = Targets(),
     var trainings: List<Training> = listOf(),
+    @SerialName("heartRateList") var heartRateList: List<HeartRate> = listOf(),
     @SerialName("stepsAtTheDay") var stepsAtTheDay: List<Int> = List(24) { 0 },
 ){
     val steps: Int

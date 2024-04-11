@@ -42,4 +42,5 @@
     <string name="target">Target</string>
     <string name="measure">measure</string>
     <string name="bpm">bpm</string>
+    <string name="heartRateListvalueisNull">----</string>
 </resources>

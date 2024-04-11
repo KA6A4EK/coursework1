@@ -39,6 +39,8 @@ import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.example.coursework.util.heartRateMeasure.Camera
 
 
+
+
 //главный экра тут определяется BottomBar, TopAppBar и навигация
 @Composable
 fun MainScreen(
@@ -46,7 +48,7 @@ fun MainScreen(
     viewModel: HealthViewModel,
     context: Context,
     applicationContext: Context,
-    camera: Camera,
+    camera: Camera
 ) {
 
     val backStackEntry by navController.currentBackStackEntryAsState()

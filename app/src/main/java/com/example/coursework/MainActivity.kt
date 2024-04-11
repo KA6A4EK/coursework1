@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import com.example.coursework.AppContainer.ContextModule
 import com.example.coursework.AppContainer.DaggerAppComponent
+import com.example.coursework.presentation.ViewM.HealthViewEvent
 import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.example.coursework.presentation.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val camera = Camera(applicationContext, this)
+
                     MainScreen(
                         viewModel = vm, context = this,
                         applicationContext = applicationContext,
@@ -78,6 +80,7 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         vm.saveUser()
+        vm.handleViewEvent(HealthViewEvent.Update(vm.currentDay))
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION

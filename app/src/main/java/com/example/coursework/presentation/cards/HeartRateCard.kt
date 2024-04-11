@@ -32,7 +32,7 @@ fun CardHeartRate(viewModel: HealthViewModel, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${viewModel.heartRate} ${stringResource(R.string.bpm)}",
+                text = "${viewModel.currentDay.heartRateList.lastOrNull()?.value?: stringResource(R.string.heartRateListvalueisNull)} ${stringResource(R.string.bpm)}",
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Medium
             )

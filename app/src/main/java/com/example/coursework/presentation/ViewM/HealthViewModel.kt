@@ -35,7 +35,6 @@ class HealthViewModel @Inject constructor(
     val user = _user
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
-    var heartRate = 0
     val permissionForSteps = ActivityCompat.checkSelfPermission(context,
         Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED
     val stepsCounter = StepsCounter(context)
@@ -47,8 +46,7 @@ class HealthViewModel @Inject constructor(
             val lastHourSteps = healthManager.readLastHourSteps()?:steps
             Log.e(TAG, currentDay.stepsAtTheDay.toString())
             val s = currentDay.stepsAtTheDay.toMutableList()
-            s[Calendar.getInstance().time.hours] =
-                s[Calendar.getInstance().time.hours] + steps - lastHourSteps
+            s[Calendar.getInstance().time.hours] = s[Calendar.getInstance().time.hours] + steps - lastHourSteps
             currentDay.stepsAtTheDay = s.toList()
             healthManager.saveLastHourSteps(steps)
             delay(100L)

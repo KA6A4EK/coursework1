@@ -1,7 +1,5 @@
 package com.example.coursework.presentation.screens
 
-import android.content.ContentValues.TAG
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -55,7 +53,6 @@ fun ActivityScreen(viewModel: HealthViewModel) {
             TotalActivityTime(time = currentDay.trainings
                 .sumOf { it.duration }, target = currentDay.targets.activity)
         }
-        Log.e(TAG,"${currentDay.trainings}")
         items(currentDay.trainings) {
             CardActivityList(training = it)
         }
