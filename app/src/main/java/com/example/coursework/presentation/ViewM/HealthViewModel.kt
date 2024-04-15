@@ -2,10 +2,8 @@ package com.example.coursework.presentation.ViewM
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
@@ -35,27 +33,35 @@ class HealthViewModel @Inject constructor(
     val user = _user
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
-    val permissionForSteps = ActivityCompat.checkSelfPermission(context,
-        Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED
+    val permissionForSteps = ActivityCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACTIVITY_RECOGNITION
+    ) != PackageManager.PERMISSION_GRANTED
+    val _scanEnabled = mutableStateOf(false)
+
+    //    var scanEnabled: State<Boolean> = _scanEnabled
     val stepsCounter = StepsCounter(context)
 
     init {
         viewModelScope.launch {
             delay(100L)
             val steps = stepsCounter.getSteps()
-            val lastHourSteps = healthManager.readLastHourSteps()?:steps
-            Log.e(TAG, currentDay.stepsAtTheDay.toString())
+            val lastHourSteps = healthManager.readLastHourSteps() ?: steps
             val s = currentDay.stepsAtTheDay.toMutableList()
-            s[Calendar.getInstance().time.hours] = s[Calendar.getInstance().time.hours] + steps - lastHourSteps
-            currentDay.stepsAtTheDay = s.toList()
+            if (lastHourSteps < steps) {
+                s[Calendar.getInstance().time.hours] =
+                    s[Calendar.getInstance().time.hours] + steps - lastHourSteps
+                currentDay.stepsAtTheDay = s.toList()
+            }
             healthManager.saveLastHourSteps(steps)
             delay(100L)
-            waterFromNotifications()
+            waterFromNotifications(healthManager)
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
         }
     }
 
-    fun saveUser() = viewModelScope.launch {healthManager.saveUser(user.value) }
+
+    fun saveUser() = viewModelScope.launch { healthManager.saveUser(user.value) }
     fun requestPermission(): Boolean {
         ActivityCompat.requestPermissions(
             context as Activity,
@@ -73,7 +79,7 @@ class HealthViewModel @Inject constructor(
         }
     }
 
-    fun waterFromNotifications() {
+    fun waterFromNotifications(healthManager: HealthManager) {
         viewModelScope.launch {
             val water = healthManager.readCountWater().split(" ")
             if (days.isNotEmpty()) {
@@ -88,7 +94,7 @@ class HealthViewModel @Inject constructor(
                 }
             }
         }
-    }//TODO сделать чтобы сохранялось при записи шагов
+    }
 
     fun getDaysToNotificationList() = listOf(
         user.value.userSettings.notificationsSettings.CanSendNotificationsByDay.sunday,

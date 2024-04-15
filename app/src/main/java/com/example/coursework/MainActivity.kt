@@ -19,7 +19,6 @@ import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.example.coursework.presentation.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
 import com.example.coursework.util.SleepRequestsManager
-import com.example.coursework.util.heartRateMeasure.Camera
 import com.example.coursework.util.saveStepsInDatabase1
 import com.example.coursework.util.showNotificationAlarmManager
 
@@ -45,12 +44,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val camera = Camera(applicationContext, this)
-
                     MainScreen(
-                        viewModel = vm, context = this,
-                        applicationContext = applicationContext,
-                        camera = camera
+                        viewModel = vm
                     )
                 }
             }
@@ -77,6 +72,7 @@ class MainActivity : ComponentActivity() {
             sleepRequestManager.requestSleepUpdates()
         }
     }
+
     override fun onStop() {
         super.onStop()
         vm.saveUser()
@@ -96,6 +92,7 @@ class MainActivity : ComponentActivity() {
             showNotificationAlarmManager(this, vm)
         }
     }
+
     override fun onDestroy() {
         super.onDestroy()
         sleepRequestManager.unsubscribeFromSleepUpdates()

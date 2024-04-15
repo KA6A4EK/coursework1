@@ -114,6 +114,7 @@ class StepCounterService1 : Service(), SensorEventListener {
                 .build()
             val repository = appModule.provideHealthRepository()
             val healthManager = appModule.provideHealthManager()
+            appModule.provideHealthViewModel().waterFromNotifications(healthManager)
             val days = runBlocking { async { repository.Init() }.await() }
             var currentDay = days.find { it.date == getCurrentDay() }!!
             var hour = Calendar.getInstance().time.hours

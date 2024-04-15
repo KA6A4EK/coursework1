@@ -25,9 +25,7 @@ class HealthManager @Inject constructor(
         val data = dataStore.data.firstOrNull()?.get(UserKey)
         if (data != null) {
             return Gson().fromJson(data, User::class.java)
-        }
-        else
-        {
+        } else {
             return User()
         }
     }

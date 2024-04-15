@@ -1,5 +1,7 @@
 package com.example.coursework.presentation.screens
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
@@ -18,37 +20,49 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.coursework.domain.model.Day
 import com.example.coursework.presentation.ViewM.HealthViewModel
 import kotlin.random.Random
 
 
 @Composable
 fun WeightScreen(viewModel: HealthViewModel) {
-    Graph()
+    var lastDayWeight = viewModel.currentDay.weight
+    val list = mutableListOf(viewModel.currentDay)
+    viewModel.days.forEach {
+        if (it.weight != lastDayWeight) {
+            list.add(it)
+            lastDayWeight = it.weight
+        }
+    }
+    Log.e(TAG, list.toList().toString())
+//        for ( i in 0..viewModel.days.size-1){
+//        if ( viewModel.days[i].weight!=viewModel.days[i-1].weight) }
+    Graph(list.toList())
 
 }
 
 @Composable
-fun Graph() {
-    val pairsList = remember { generateRandomPairsList() }
-    val width = remember { (pairsList.size * 61).dp }
-
+fun Graph(list: List<Day>) {
+    val screenWidth = LocalConfiguration.current.screenWidthDp.dp
+    val width = remember { maxOf(screenWidth,(list.size * 61).dp) }
     Column(
         modifier = Modifier
             .horizontalScroll(rememberScrollState())
-            .width(width)
+            .width(width),
+        horizontalAlignment = Alignment.End
     ) {
-        GraphCanvas(pairsList)
-        GraphLegend(pairsList)
+        GraphCanvas(list)
+        GraphLegend(list)
     }
 }
 
 @Composable
-private fun GraphCanvas(pairsList: List<Pair<Int, Int>>) {
+private fun GraphCanvas(list: List<Day>) {
     Box(
         modifier = Modifier
             .height(200.dp)
@@ -56,7 +70,7 @@ private fun GraphCanvas(pairsList: List<Pair<Int, Int>>) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                //.padding(.dp)
+            //.padding(.dp)
         ) {
             val target = 80f
             val pitch = 46.dp.toPx()
@@ -66,30 +80,38 @@ private fun GraphCanvas(pairsList: List<Pair<Int, Int>>) {
                 color = Color.Yellow.toArgb()
             }
 
-            pairsList.windowed(2) { (current, next) ->
-                val startX = current.first * pitch+23.dp.toPx()
-                val startY = size.height / 2 * (current.second / target)
-                val endX = next.first * pitch+23.dp.toPx()
-                val endY = size.height / 2 * (next.second / target)
-                drawCircle(Color.Yellow, radius = 20f, Offset(startX,startY))
+            for (i in 0..list.size - 2) {
+                val startX = i * pitch + 23.dp.toPx()
+                val startY = size.height / 2 * (list[i].weight / target)
+                val endX = (i + 1) * pitch + 23.dp.toPx()
+                val endY = size.height / 2 * (list[i + 1].weight / target)
+                drawCircle(Color.Yellow, radius = 20f, Offset(startX, startY))
                 drawLine(Color.Yellow, Offset(startX, startY), Offset(endX, endY), strokeWidth)
-                drawLine(Color.Yellow, Offset(startX, startY), Offset(startX, size.height*2), 1f)
+                drawLine(Color.Yellow, Offset(startX, startY), Offset(startX, size.height * 2), 1f)
 //                drawContext.canvas.nativeCanvas.drawText("${current.second}", startX, size.height / 3 * 2, paint)
-                drawContext.canvas.nativeCanvas.drawText("${current.first}", startX, size.height / 3 * 2 - 30, paint)
+//                drawContext.canvas.nativeCanvas.drawText(
+//                    "${current.first}",
+//                    startX,
+//                    size.height / 3 * 2 - 30,
+//                    paint
+//                )
             }
         }
     }
 }
 
 @Composable
-private fun GraphLegend(pairsList: List<Pair<Int, Int>>) {
+private fun GraphLegend(list: List<Day>) {
     Row(
         modifier = Modifier.background(Color.Gray),
     ) {
-        pairsList.forEach {
-            Column(modifier = Modifier.width(46.sp.value.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = it.second.toString())
-                Text(text = it.first.toString())
+        list.forEach {
+            Column(
+                modifier = Modifier.width(46.sp.value.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(text = it.weight.toString())
+//                Text(text = it.first.toString())
             }
         }
     }

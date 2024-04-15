@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun LineChart(dataPoints: List<DataPoint>) {
+fun LineChart(dataPoint: Float, i: Int) {
     Box(
         modifier = Modifier
             .height(200.dp)
@@ -26,27 +26,20 @@ fun LineChart(dataPoints: List<DataPoint>) {
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .width(3000.dp)
+                .width(300.dp)
         ) {
             val strokeWidth = 3.dp.toPx()
-            dataPoints.windowed(2) { (current, next) ->
-                val startX = current.x / 6
-                val startY = size.height / 2 + current.y
-                val endX = next.x / 6
-                val endY = size.height / 2 + next.y
-                drawLine(
-                    Color(255, 21, 123, 240),
-                    Offset(startX, startY),
-                    Offset(endX, endY),
-                    strokeWidth
-                )
-                drawLine(
-                    Color(255, 21, 123, 240),
-                    Offset(startX, startY),
-                    Offset(startX, size.height),//TODO delete
-                    strokeWidth
-                )
-            }
+            val startX = i.toFloat() * 3
+            val startY = size.height / 2 + dataPoint
+            val endX = i.toFloat() * 3
+            val endY = size.height / 2 + dataPoint
+            drawLine(
+                Color(255, 21, 123, 240),
+                Offset(startX, startY),
+                Offset(endX, endY),
+                strokeWidth
+            )
+
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.coursework.presentation.screens
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -36,9 +35,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
-import com.example.coursework.util.heartRateMeasure.Camera
-
-
 
 
 //главный экра тут определяется BottomBar, TopAppBar и навигация
@@ -46,11 +42,7 @@ import com.example.coursework.util.heartRateMeasure.Camera
 fun MainScreen(
     navController: NavHostController = rememberNavController(),
     viewModel: HealthViewModel,
-    context: Context,
-    applicationContext: Context,
-    camera: Camera
 ) {
-
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = backStackEntry?.destination?.route ?: "start"
     Scaffold(
@@ -106,7 +98,7 @@ fun MainScreen(
                 WeightScreen(viewModel)
             }
             composable(route = "heart_rate_screen") {
-                camera.measure(viewModel = viewModel)
+                MeasureHeartRateScreen(viewModel)
             }
         }
     }
