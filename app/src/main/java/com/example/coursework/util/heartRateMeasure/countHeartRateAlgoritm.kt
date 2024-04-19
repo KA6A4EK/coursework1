@@ -18,4 +18,3 @@ fun heartRateAnalysis(list: List<DataPoint>): Int {
     }
     return heartRate * (60000 / (list.last().x - list.first().x)).toInt() / 2
 }
-//TODO

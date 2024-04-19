@@ -16,8 +16,9 @@ import com.example.coursework.presentation.ViewM.ProvideViewModel
 import dagger.Component
 import dagger.Module
 import dagger.Provides
+import javax.inject.Singleton
 
-
+@Singleton
 @Component(modules = [DaoModule::class, DataStoreModule::class, ProvideViewModel::class, RepositoryModule::class, ContextModule::class,HealthManager::class])
 interface AppComponent {
     fun provideContext(): Context
@@ -36,6 +37,7 @@ interface AppComponent {
 @Module
 class ContextModule(private val context: Context) {
     @Provides
+    @Singleton
     fun provideContext(): Context {
         return context
     }
@@ -45,6 +47,7 @@ class ContextModule(private val context: Context) {
 @Module
 class DataStoreModule() {
     @Provides
+    @Singleton
     fun provideDataStore(
         context: Context,
     ): DataStore<Preferences> {

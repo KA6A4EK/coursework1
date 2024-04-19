@@ -19,7 +19,7 @@ import com.example.coursework.presentation.ViewM.HealthViewModel
 import com.example.coursework.presentation.screens.MainScreen
 import com.example.coursework.ui.theme.CourseworkTheme
 import com.example.coursework.util.SleepRequestsManager
-import com.example.coursework.util.saveStepsInDatabase1
+import com.example.coursework.util.saveStepsInDatabase
 import com.example.coursework.util.showNotificationAlarmManager
 
 class MainActivity : ComponentActivity() {
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 Manifest.permission.ACTIVITY_RECOGNITION
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            saveStepsInDatabase1(this)
+            saveStepsInDatabase(this)
         }
         if (ActivityCompat.checkSelfPermission(
                 this,

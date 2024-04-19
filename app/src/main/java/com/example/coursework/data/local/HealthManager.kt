@@ -13,6 +13,7 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Module
 class HealthManager @Inject constructor(
@@ -64,6 +65,7 @@ class HealthManager @Inject constructor(
 @Module
 class ProvideHealthManager() {
     @Provides
+    @Singleton
     fun provideHealthManager(
         dataStore: DataStore<Preferences>,
     ): HealthManager = HealthManager(dataStore)

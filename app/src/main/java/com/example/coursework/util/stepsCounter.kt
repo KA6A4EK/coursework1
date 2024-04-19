@@ -51,8 +51,7 @@ class StepsCounter(context: Context) : SensorEventListener {
 
     fun getSteps() = step
 }
-
-fun saveStepsInDatabase1(context: Context) {
+fun saveStepsInDatabase(context: Context) {
     Log.e(TAG, "saveStepsInDatabase")
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val alarmIntent = Intent(context, StepCounterService1::class.java)
@@ -61,7 +60,6 @@ fun saveStepsInDatabase1(context: Context) {
     val currentTime = Calendar.getInstance()
     currentTime.set(Calendar.MINUTE, 55)
     currentTime.set(Calendar.SECOND, 0)
-
 
 // Установка повтора на каждый час
     alarmManager.setRepeating(
@@ -109,12 +107,12 @@ class StepCounterService1 : Service(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_STEP_COUNTER) {
             val stepCount = event.values?.get(0)?.toInt()!!
-            val appModule =DaggerAppComponent.builder()
+            val appModule = DaggerAppComponent.builder()
                 .contextModule(ContextModule(this))
                 .build()
             val repository = appModule.provideHealthRepository()
             val healthManager = appModule.provideHealthManager()
-            appModule.provideHealthViewModel().waterFromNotifications(healthManager)
+            val water = runBlocking { async { healthManager.readCountWater() }.await() }
             val days = runBlocking { async { repository.Init() }.await() }
             var currentDay = days.find { it.date == getCurrentDay() }!!
             var hour = Calendar.getInstance().time.hours
@@ -128,18 +126,19 @@ class StepCounterService1 : Service(), SensorEventListener {
                 }
             }
 
-            val lastHourSteps = runBlocking{healthManager.readLastHourSteps()}?:0
+            val lastHourSteps =
+                runBlocking { async { healthManager.readLastHourSteps() }.await() } ?: 0
+            runBlocking { async { healthManager.saveLastHourSteps(stepCount) }.await() }
             val stepsAtTheDay = currentDay.stepsAtTheDay.toMutableList()
-            stepsAtTheDay[hour] =
-                if (stepCount >= lastHourSteps) (stepCount - lastHourSteps) else 0
+            stepsAtTheDay[hour] = if (stepCount >= lastHourSteps) (stepCount - lastHourSteps) else 0
             runBlocking {
                 repository.Update(
                     currentDay.copy(
-                        stepsAtTheDay = stepsAtTheDay.toList()
+                        stepsAtTheDay = stepsAtTheDay.toList(),
+                        water = if (water.split(" ")[0] == getCurrentDay()) water.split(" ")[1].toInt() else 0
                     )
                 )
             }
-            runBlocking { healthManager.saveLastHourSteps(stepCount) }
         }
         stopSelf()
     }
@@ -172,7 +171,8 @@ class StepCounterService1 : Service(), SensorEventListener {
     }
 }
 
-fun getYesterdayDate(): String = SimpleDateFormat("dd/MM/yyyy").format(Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24)))
+fun getYesterdayDate(): String =
+    SimpleDateFormat("dd/MM/yyyy").format(Date(System.currentTimeMillis() - (1000 * 60 * 60 * 24)))
 
 
 

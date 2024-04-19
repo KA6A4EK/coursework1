@@ -36,7 +36,6 @@ import com.example.coursework.presentation.cards.CardEat
 import com.example.coursework.presentation.cards.CardHeartRate
 import com.example.coursework.presentation.cards.CardSteps
 import com.example.coursework.presentation.cards.CardWater
-import com.example.coursework.presentation.cards.SleepCard
 
 //стартовый экран на котором распологаются все карточки
 @Composable
@@ -61,11 +60,11 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
                 onCardClick = { navController.navigate("water_screen") },
             )
         }
-        if (viewModel.user.value.userSettings.healthUiState.sleepVisible) {
-            SleepCard(viewModel = viewModel)
-//            onCardClick = { navController.navigate("water_screen") }
-
-        }
+//        if (viewModel.user.value.userSettings.healthUiState.sleepVisible) {
+//            SleepCard(viewModel = viewModel)
+////            onCardClick = { navController.navigate("water_screen") }
+//
+//        }
         if (viewModel.user.value.userSettings.healthUiState.eatVisible) {
             CardEat(
                 onCardClick = { navController.navigate("eat_screen") },

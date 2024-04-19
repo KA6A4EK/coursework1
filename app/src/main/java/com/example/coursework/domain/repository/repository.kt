@@ -9,6 +9,7 @@ import dagger.Provides
 import java.text.SimpleDateFormat
 import java.util.Locale
 import javax.inject.Inject
+import javax.inject.Singleton
 
 @Module
 class repository @Inject constructor(
@@ -50,6 +51,7 @@ class repository @Inject constructor(
 @Module
 class RepositoryModule {
     @Provides
+    @Singleton
     fun provideHealthRepository(dao: dao): repository {
         return repository(dao = dao)
     }

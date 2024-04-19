@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.coursework.presentation.ViewM.HealthViewModel
-import com.example.coursework.presentation.components.BMIProgress
+import com.example.coursework.presentation.components.bmi.BMIProgress
 
 
 //карточка индекса массы тела

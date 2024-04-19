@@ -1,11 +1,11 @@
 package com.example.coursework.presentation.cards
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -22,7 +22,7 @@ import com.example.coursework.presentation.ViewM.HealthViewModel
 //карточка пульса
 @Composable
 fun CardHeartRate(viewModel: HealthViewModel, onClick: () -> Unit) {
-    Card {
+    Card(modifier = Modifier.clickable { onClick() }) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -36,9 +36,6 @@ fun CardHeartRate(viewModel: HealthViewModel, onClick: () -> Unit) {
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Medium
             )
-            Button(onClick = { onClick() }) {
-                Text(text = stringResource(R.string.measure))
-            }
         }
     }
 }

@@ -17,20 +17,23 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.util.Calendar
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
+@Singleton
 class HealthViewModel @Inject constructor(
     private val repos: repository,
     private val context: Context,
     private val healthManager: HealthManager,
 ) :
     ViewModel() {
-    private val _user = mutableStateOf(runBlocking { healthManager.readUser() })
-    val user = _user
+
+    val user = mutableStateOf(runBlocking { healthManager.readUser() })
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
     var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
     val permissionForSteps = ActivityCompat.checkSelfPermission(
@@ -39,27 +42,30 @@ class HealthViewModel @Inject constructor(
     ) != PackageManager.PERMISSION_GRANTED
     val _scanEnabled = mutableStateOf(false)
 
-    //    var scanEnabled: State<Boolean> = _scanEnabled
     val stepsCounter = StepsCounter(context)
+
+    val heartRateValues = MutableStateFlow(mutableListOf<Float>())
+    val liveData: StateFlow<MutableList<Float>> = heartRateValues
 
     init {
         viewModelScope.launch {
-            delay(100L)
             val steps = stepsCounter.getSteps()
             val lastHourSteps = healthManager.readLastHourSteps() ?: steps
+
             val s = currentDay.stepsAtTheDay.toMutableList()
             if (lastHourSteps < steps) {
                 s[Calendar.getInstance().time.hours] =
                     s[Calendar.getInstance().time.hours] + steps - lastHourSteps
                 currentDay.stepsAtTheDay = s.toList()
             }
-            healthManager.saveLastHourSteps(steps)
-            delay(100L)
-            waterFromNotifications(healthManager)
             handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
+
+            waterFromNotifications()
+            delay(300L)
+            healthManager.saveLastHourSteps(steps)
+
         }
     }
-
 
     fun saveUser() = viewModelScope.launch { healthManager.saveUser(user.value) }
     fun requestPermission(): Boolean {
@@ -79,7 +85,7 @@ class HealthViewModel @Inject constructor(
         }
     }
 
-    fun waterFromNotifications(healthManager: HealthManager) {
+    fun waterFromNotifications() {
         viewModelScope.launch {
             val water = healthManager.readCountWater().split(" ")
             if (days.isNotEmpty()) {

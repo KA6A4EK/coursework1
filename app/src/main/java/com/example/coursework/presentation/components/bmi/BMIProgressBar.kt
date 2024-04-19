@@ -1,4 +1,4 @@
-package com.example.coursework.presentation.components
+package com.example.coursework.presentation.components.bmi
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
