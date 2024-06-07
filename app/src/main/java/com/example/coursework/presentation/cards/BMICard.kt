@@ -22,8 +22,8 @@ import com.example.coursework.presentation.components.bmi.BMIProgress
 //карточка индекса массы тела
 @Composable
 fun CardBMI(onClick: () -> Unit, viewModel: HealthViewModel) {
-    val bodyHeight = viewModel.currentDay.height
-    val bodyWeight = viewModel.currentDay.weight
+    val bodyHeight = viewModel.currentDay.value.height
+    val bodyWeight = viewModel.currentDay.value.weight
     Card {
         Row(
             modifier = Modifier

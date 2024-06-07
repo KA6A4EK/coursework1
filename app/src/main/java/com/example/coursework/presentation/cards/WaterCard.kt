@@ -16,23 +16,23 @@ import com.example.coursework.presentation.screens.drawWater
 //карточка воды
 @Composable
 fun CardWater(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var water by remember { mutableIntStateOf(viewModel.currentDay.water) } // вода для текущего дня
+    var water by remember { mutableIntStateOf(viewModel.currentDay.value.water) } // вода для текущего дня
     val cupSize = viewModel.user.value.userSettings.CupSize  //размер кружки
     StartScreenCard(
         onCardClick = { onCardClick() },
         onButtonClick = {
             water += viewModel.user.value.userSettings.CupSize
-            viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(water = water)))
+            viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.value.copy(water = water)))
         },
         cardValue = water,
-        target = viewModel.currentDay.targets.water,
+        target = viewModel.currentDay.value.targets.water,
         text1 = stringResource(id = R.string.ml),
         text2 = "+${viewModel.user.value.userSettings.CupSize}${stringResource(id = R.string.ml)}"
     ) {
         drawWater(
             width = 75,
             height = 80,
-            percent = minOf(1f, water.toFloat() / viewModel.currentDay.targets.water)
+            percent = minOf(1f, water.toFloat() / viewModel.currentDay.value.targets.water)
         )
     }
 }

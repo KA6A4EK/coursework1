@@ -58,3 +58,47 @@ fun BoxWithProgress(target: Int, columnSize: Float) {
         }
     }
 }
+
+
+@Composable
+fun BoxWithProgressForHeartRate(min: Int,max: Int) {
+    Box(modifier = Modifier.height(210.dp), contentAlignment = Alignment.BottomStart) {
+        Canvas(
+            modifier = Modifier
+                .padding(10.dp)
+                .fillMaxWidth()
+                .height(150.dp)
+        ) {
+            val maxY = size.height /6
+            drawLine(
+                color = Color.Green,
+                start = Offset(0f, maxY ),
+                end = Offset(size.width, maxY ),
+                strokeWidth = 1.dp.toPx(),
+            )
+            val minY = size.height /7*6
+            drawLine(
+                color = Color.Yellow,
+                start = Offset(0f, minY),
+                end = Offset(size.width, minY),
+                strokeWidth = 1.dp.toPx(),
+            )
+            val paint = Paint().asFrameworkPaint().apply {
+                isAntiAlias = true
+                textSize = 13.sp.toPx()
+                color = android.graphics.Color.WHITE
+            }
+
+            drawContext.canvas.nativeCanvas.drawText(
+                "$max",
+                size.width - 100, maxY  + 33f,
+                paint
+            )
+            drawContext.canvas.nativeCanvas.drawText(
+                "$min",
+                size.width - 100, minY + 33f,
+                paint
+            )
+        }
+    }
+}

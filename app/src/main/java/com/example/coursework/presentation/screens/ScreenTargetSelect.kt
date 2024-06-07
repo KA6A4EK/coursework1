@@ -18,55 +18,55 @@ fun TargetScreen(viewModel: HealthViewModel, curent: String,// текущий э
         "{steps_screen}" -> {
             val pitch = 100
             CardWithLazyColumnForSelect(
-                num = viewModel.currentDay.targets.steps / pitch, listSize = 500, text = stringResource(
+                num = viewModel.currentDay.value.targets.steps / pitch, listSize = 500, text = stringResource(
                     id = R.string.steps_target
                 ), pitch = pitch
             ) {
-                viewModel.currentDay.targets.steps = it
+                viewModel.currentDay.value.targets.steps = it
                 navigateUp()
             }
         }
         "{activity_list}" -> {
             val pitch = 5
             CardWithLazyColumnForSelect(
-                num = viewModel.currentDay.targets.activity / pitch,
+                num = viewModel.currentDay.value.targets.activity / pitch,
                 listSize = 50,
                 text = stringResource(R.string.activity_target),
                 pitch = pitch
             ) {
-                viewModel.currentDay.targets.activity = it
+                viewModel.currentDay.value.targets.activity = it
                 navigateUp()
             }
         }
         "{eat_screen}" -> {
             val pitch = 50
             CardWithLazyColumnForSelect(
-                num = viewModel.currentDay.targets.eat / pitch, listSize = 500, text = stringResource(
+                num = viewModel.currentDay.value.targets.eat / pitch, listSize = 500, text = stringResource(
                     id = R.string.eat_target
                 ), pitch = pitch
             ) {
-                viewModel.currentDay.targets.eat = it
+                viewModel.currentDay.value.targets.eat = it
                 navigateUp()
             }
         }
         "{water_screen}" -> {
             val pitch = 100
             CardWithLazyColumnForSelect(
-                num = viewModel.currentDay.targets.water / pitch, listSize = 100, text = stringResource(
+                num = viewModel.currentDay.value.targets.water / pitch, listSize = 100, text = stringResource(
                     id = R.string.water_target
                 ), pitch = pitch
             ) {
-                viewModel.currentDay.targets.water = it
+                viewModel.currentDay.value.targets.water = it
                 navigateUp()
             }
         }
         "{bmi_screen}" -> {
             CardWithLazyColumnForSelect(
-                num = viewModel.currentDay.targets.weight, listSize = 500, text = stringResource(
+                num = viewModel.currentDay.value.targets.weight, listSize = 500, text = stringResource(
                     R.string.weight_target
                 ), pitch = 1
             ) {
-                viewModel.currentDay.targets.weight = it
+                viewModel.currentDay.value.targets.weight = it
                 navigateUp()
             }
         }

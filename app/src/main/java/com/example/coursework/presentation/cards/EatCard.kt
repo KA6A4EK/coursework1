@@ -19,13 +19,13 @@ import com.example.coursework.presentation.screens.AlertDialog
 //карточка еды
 @Composable
 fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
-    var cal by remember { mutableIntStateOf(viewModel.currentDay.eat) } //калории в текущий день
+    var cal by remember { mutableIntStateOf(viewModel.currentDay.value.eat) } //калории в текущий день
     var buttonIsClicked by remember { mutableStateOf(false) }     //нажата ли кнопка ввода калорий
     if (buttonIsClicked) {
-        AlertDialog(number = cal, title = stringResource(R.string.enter_calories)) {
+        AlertDialog(number = 0, title = stringResource(R.string.enter_calories)) {
             if (it > 0) {
-                cal = it
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(eat = it)))
+                cal += it
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.value.copy(eat = viewModel.currentDay.value.eat+it)))
             }
             buttonIsClicked = false
         }
@@ -37,12 +37,12 @@ fun CardEat(viewModel: HealthViewModel, onCardClick: () -> Unit) {
             buttonIsClicked = true
         },
         cardValue = cal,
-        target = viewModel.currentDay.targets.eat,
+        target = viewModel.currentDay.value.targets.eat,
         text1 = stringResource(id = R.string.cal),
         text2 = stringResource(id = R.string.enter),
     ) {
         ProgressBar(
-            percent = cal / viewModel.currentDay.targets.eat.toFloat(),
+            percent = cal / viewModel.currentDay.value.targets.eat.toFloat(),
             barWidth = 10,
             width = 120,
             Color.Yellow

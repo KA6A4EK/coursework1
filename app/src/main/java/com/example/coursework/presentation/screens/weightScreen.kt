@@ -31,8 +31,8 @@ import kotlin.random.Random
 
 @Composable
 fun WeightScreen(viewModel: HealthViewModel) {
-    var lastDayWeight = viewModel.currentDay.weight
-    val list = mutableListOf(viewModel.currentDay)
+    var lastDayWeight = viewModel.currentDay.value.weight
+    val list = mutableListOf(viewModel.currentDay.value)
     viewModel.days.forEach {
         if (it.weight != lastDayWeight) {
             list.add(it)

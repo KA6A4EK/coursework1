@@ -21,9 +21,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.LifecycleEventObserver
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.components.dialogs.ErrorDialog
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import kotlinx.coroutines.withContext
+import kotlin.math.abs
 
 @OptIn(ExperimentalGetImage::class)
 @Composable
@@ -32,8 +34,8 @@ fun ScannerScreen(
     onMeasured: (Int) -> Unit,
     viewModel: HealthViewModel,
 ) {
+    val showError = remember { mutableStateOf("") }
     val numOf = 250
-//    val heartbeat_values by remember { mutableStateOf(Array(numOf) { 0f }) }
     val heartbeat_values = remember { mutableStateOf(mutableListOf(0f)) }
 
     val heartbeat_times = Array(numOf) { System.currentTimeMillis() }
@@ -115,7 +117,19 @@ fun ScannerScreen(
             heartbeat_count++
             imageProxy.close()
             viewModel.heartRateValues.value.add(averageRed)
-            Log.e(TAG, viewModel.liveData.value.toList().toString())
+            if (!viewModel.checkCamera.value && (averageRed > 60 && heartbeat_count > 30 && abs(
+                    averageRed - viewModel.heartRateValues.value.average()
+                ) / viewModel.heartRateValues.value.average() > 0.1)
+            ) {
+                showError.value = "Ошибка во время измерения попробуйте еще раз"
+                Log.e(TAG, viewModel.liveData.value.toList().toString())
+
+            }
+            if (viewModel.checkCamera.value && viewModel.heartRateValues.value.average() > 60 && heartbeat_count == 60) {
+                showError.value = "Попробуйте приложить палец к другой камере"
+            } else if (viewModel.checkCamera.value && heartbeat_count == 60) {
+                showError.value = "Вы выбрали правильную камеру"
+            }
 
         } else {
             onMeasured(
@@ -145,6 +159,20 @@ fun ScannerScreen(
             withContext(Dispatchers.IO) {
                 cameraProvider.get()
             }.bindToLifecycle(lifecycleOwner, cameraSelector, preview)
+        }
+    }
+    if (showError.value != "") {
+        viewModel._scanEnabled.value = false
+        ErrorDialog(text = showError.value) {
+            showError.value = ""
+            viewModel.restartHeartRate()
+            heartbeat_count = 0
+            if (!viewModel.checkCamera.value) {
+                viewModel._scanEnabled.value = true
+            }
+            else{
+                viewModel.checkCamera.value = false
+            }
         }
     }
 }

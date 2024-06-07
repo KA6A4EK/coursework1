@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,19 +47,19 @@ fun SettingsScreen(
     //в зависимости от значения вызвает определенный alertDialog если значение не пустое
     if (buttonIsClicked != "") {
         when (buttonIsClicked) {
-            "weight" -> SnapToBlockList(num = viewModel.currentDay.weight, listSize = 500, text = stringResource(
+            "weight" -> SnapToBlockList(num = viewModel.currentDay.value.weight, listSize = 500, text = stringResource(
                 R.string.kg
             )
             ) {
                 buttonIsClicked = ""
-                viewModel.currentDay.weight = it
+                viewModel.currentDay.value.weight = it
             }
 
-            "height" -> SnapToBlockList(num = viewModel.currentDay.height, listSize = 300, text = stringResource(
+            "height" -> SnapToBlockList(num = viewModel.currentDay.value.height, listSize = 300, text = stringResource(
                 id = R.string.cm
             )) {
                 buttonIsClicked = ""
-                viewModel.currentDay.height = it
+                viewModel.currentDay.value.height = it
 
             }
 
@@ -131,7 +132,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = "${viewModel.currentDay.height}",
+                    text = "${viewModel.currentDay.value.height}",
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -147,7 +148,7 @@ fun SettingsScreen(
                     Modifier.size(38.dp)
                 )
                 Text(
-                    text = "${viewModel.currentDay.weight}",
+                    text = "${viewModel.currentDay.value.weight}",
                     style = MaterialTheme.typography.displaySmall,
                     modifier = Modifier.padding(8.dp)
                 )
@@ -168,11 +169,12 @@ fun SettingsScreen(
                     modifier = Modifier.padding(8.dp)
                 )
             }
-            Text(text = "Шагов за все время ${viewModel.days.sumOf { it.steps }}")
-            Text(text = "Воды за все время ${viewModel.days.sumOf { it.water }}")
-            Text(text = "Активности всего за все время ${viewModel.days.sumOf { it.activity }}")
-            Text(text = "Шагов в среднем ${viewModel.days.sumOf { it.steps/viewModel.days.size }}")
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(text = "Шагов за все время ${viewModel.days.sumOf { it.steps }}", style = MaterialTheme.typography.headlineSmall)
+        Text(text = "Воды за все время ${viewModel.days.sumOf { it.water }}", style = MaterialTheme.typography.headlineSmall)
+        Text(text = "Активности всего за все время ${viewModel.days.sumOf { it.trainings.sumOf { it.duration } }}", style = MaterialTheme.typography.headlineSmall)
+        Text(text = "Шагов в среднем ${viewModel.days.sumOf { it.steps/viewModel.days.size }}", style = MaterialTheme.typography.headlineSmall)
 
     }
 }

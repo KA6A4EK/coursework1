@@ -20,7 +20,7 @@ import com.example.coursework.presentation.screens.AlertDialog
 @Composable
 fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
     var buttonIsClicked by remember { mutableStateOf(false) }  //нажата ли кнопка ввода шагов
-    var steps by remember { mutableIntStateOf(viewModel.currentDay.steps) }//шаги текущего дня
+    var steps by remember { mutableIntStateOf(viewModel.currentDay.value.steps) }//шаги текущего дня
 //    LaunchedEffect (viewModel.currentDay.steps){
 //        steps = viewModel.currentDay.steps
 //    }
@@ -31,7 +31,7 @@ fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         ) {
             if (it > 0) {
                 steps = it
-                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.copy(stepsAtTheDay = listOf(it))))
+                viewModel.handleViewEvent(HealthViewEvent.Update(viewModel.currentDay.value.copy(stepsAtTheDay = listOf(it))))
             }
             buttonIsClicked = false
         }
@@ -41,12 +41,12 @@ fun CardSteps(viewModel: HealthViewModel, onCardClick: () -> Unit) {
         onCardClick = { onCardClick() },
         onButtonClick = { buttonIsClicked = true },
         cardValue = steps,
-        target = viewModel.currentDay.targets.steps,
+        target = viewModel.currentDay.value.targets.steps,
         text1 = stringResource(R.string.step),
         text2 = stringResource(id = R.string.enter)
     ) {
         ProgressBar(
-            percent = steps / viewModel.currentDay.targets.steps.toFloat(),
+            percent = steps / viewModel.currentDay.value.targets.steps.toFloat(),
             barWidth = 10,
             width = 120,
             Color.Green

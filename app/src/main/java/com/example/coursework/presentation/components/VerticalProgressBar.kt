@@ -18,9 +18,11 @@ fun VerticalProgressBar(
     padding: Int = 10,
     width: Int = 12,
     percent: Float,
+    percentMin: Float= 1f,
     h: Int,
     modifier: Modifier = Modifier,
-    color: Color
+    color: Color,
+    show : Boolean = true,
 ) {
     Box {
         Canvas(
@@ -29,10 +31,10 @@ fun VerticalProgressBar(
                 .height(h.dp)
 
         ) {
-            if (percent != 0f) {
+            if (percent != 0f&&show) {
                 drawLine(
                     color = color,
-                    start = Offset(0f, size.height),
+                    start =  Offset(0f, size.height *  percentMin ),
                     end = Offset(0f, size.height * (1 - percent / columnSize)),
                     strokeWidth = width.dp.toPx(),
                     cap = StrokeCap.Round,
@@ -41,3 +43,4 @@ fun VerticalProgressBar(
         }
     }
 }
+

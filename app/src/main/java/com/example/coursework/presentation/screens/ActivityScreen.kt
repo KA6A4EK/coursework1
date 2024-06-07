@@ -31,7 +31,7 @@ import com.example.coursework.presentation.components.lazyRowProgress1
 //экран для показа графика активности и списка активности за каждый день
 @Composable
 fun ActivityScreen(viewModel: HealthViewModel) {
-    val days = viewModel.days.map { dayForLazyRow(it.date,it.activity,it.targets.activity) } //список пар дата-время активности
+    val days = viewModel.days.map { dayForLazyRow(it.date,it.trainings.sumOf { it.duration },it.targets.activity) } //список пар дата-время активности
     var current by remember { mutableStateOf(getCurrentDay()) } //выбранная дата
     var currentDay by remember { mutableStateOf(viewModel.currentDay) } //выбранная дата
     LazyColumn(
@@ -41,19 +41,19 @@ fun ActivityScreen(viewModel: HealthViewModel) {
     ) {
         item {
             current =  lazyRowProgress1(
-                target = currentDay.targets.activity,
+                target = currentDay.value.targets.activity,
                 color = Color(46, 197, 122, 255),
                 onClick = { current = it },
                 days = days
             )
-            currentDay = viewModel.days.find { it .date==current }?: viewModel.currentDay
+            currentDay.value = viewModel.days.find { it .date==current }?: viewModel.currentDay.value
         }
 
         item {
-            TotalActivityTime(time = currentDay.trainings
-                .sumOf { it.duration }, target = currentDay.targets.activity)
+            TotalActivityTime(time = currentDay.value.trainings
+                .sumOf { it.duration }, target = currentDay.value.targets.activity)
         }
-        items(currentDay.trainings) {
+        items(currentDay.value.trainings) {
             CardActivityList(training = it)
         }
     }

@@ -2,13 +2,17 @@ package com.example.coursework.presentation.ViewM
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.pm.PackageManager
+import android.util.Log
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.coursework.data.local.HealthManager
+import com.example.coursework.domain.model.CustomActivity
 import com.example.coursework.domain.model.Day
 import com.example.coursework.domain.repository.repository
 import com.example.coursework.presentation.screens.getCurrentDay
@@ -35,35 +39,52 @@ class HealthViewModel @Inject constructor(
 
     val user = mutableStateOf(runBlocking { healthManager.readUser() })
     var days: List<Day> = runBlocking { async { repos.Init() }.await() }
-    var currentDay: Day = days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0)
+    var currentDay:MutableState< Day> = mutableStateOf( days.find { it.date == getCurrentDay() } ?: days.last().copy(water = 0))
     val permissionForSteps = ActivityCompat.checkSelfPermission(
         context,
         Manifest.permission.ACTIVITY_RECOGNITION
     ) != PackageManager.PERMISSION_GRANTED
     val _scanEnabled = mutableStateOf(false)
+    val showGraph = mutableStateOf(false)
 
     val stepsCounter = StepsCounter(context)
 
     val heartRateValues = MutableStateFlow(mutableListOf<Float>())
     val liveData: StateFlow<MutableList<Float>> = heartRateValues
 
+    val checkCamera = mutableStateOf(false)
+
     init {
         viewModelScope.launch {
+            delay(100L)
             val steps = stepsCounter.getSteps()
             val lastHourSteps = healthManager.readLastHourSteps() ?: steps
 
-            val s = currentDay.stepsAtTheDay.toMutableList()
+            val s = currentDay.value.stepsAtTheDay.toMutableList()
             if (lastHourSteps < steps) {
                 s[Calendar.getInstance().time.hours] =
                     s[Calendar.getInstance().time.hours] + steps - lastHourSteps
-                currentDay.stepsAtTheDay = s.toList()
+                currentDay.value.stepsAtTheDay = s.toList()
             }
-            handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay))
+            handleViewEvent(viewEvent = HealthViewEvent.Update(currentDay.value))
 
             waterFromNotifications()
             delay(300L)
             healthManager.saveLastHourSteps(steps)
 
+        }
+    }
+
+    fun restartHeartRate() {
+        heartRateValues.value.clear()
+    }
+
+    fun createActivity(activity: CustomActivity?) {
+        if (activity != null) {
+            Log.e(TAG, user.value.userSettings.customActivities.toString() )
+            Log.e(TAG,activity.toString() )
+            user.value.userSettings.customActivities = user.value.userSettings.customActivities.plus(activity)
+            Log.e(TAG, user.value.userSettings.customActivities.toString() )
         }
     }
 
@@ -90,8 +111,8 @@ class HealthViewModel @Inject constructor(
             val water = healthManager.readCountWater().split(" ")
             if (days.isNotEmpty()) {
                 if (water[0] == getCurrentDay()) {
-                    currentDay.water += water[1].toInt() * user.value.userSettings.CupSize
-                    handleViewEvent(HealthViewEvent.Update(currentDay))
+                    currentDay.value.water += water[1].toInt() * user.value.userSettings.CupSize
+                    handleViewEvent(HealthViewEvent.Update(currentDay.value))
                 } else {
                     val day = days.find { it.date == water[0] }
                     if (day != null) {
@@ -124,7 +145,7 @@ class HealthViewModel @Inject constructor(
                             day
                         }
                     }
-                    currentDay = viewEvent.day
+                    currentDay.value = viewEvent.day
                 }
             }
         }

@@ -14,10 +14,10 @@ import androidx.compose.ui.graphics.Color
 import com.example.coursework.domain.model.HeartRate
 import com.example.coursework.presentation.ViewM.HealthViewEvent
 import com.example.coursework.presentation.ViewM.HealthViewModel
-import com.example.coursework.presentation.components.dayForLazyRow
 import com.example.coursework.presentation.components.heartRate.HearRateCardByDay
 import com.example.coursework.presentation.components.heartRate.HeartRateCard
-import com.example.coursework.presentation.components.lazyRowProgress1
+import com.example.coursework.presentation.components.heartRate.dayForLazyRowHeartRate
+import com.example.coursework.presentation.components.heartRate.lazyRowProgressForHeartRate
 import com.example.coursework.util.heartRateMeasure.LineChart
 import com.example.coursework.util.heartRateMeasure.ScannerScreen
 import java.time.format.DateTimeFormatter
@@ -30,14 +30,13 @@ fun MeasureHeartRateScreen(viewModel: HealthViewModel) {
         onMeasured = {
             viewModel.handleViewEvent(
                 HealthViewEvent.Update(
-                    viewModel.currentDay.copy(
-                        heartRateList = viewModel.currentDay.heartRateList + HeartRate(
+                    viewModel.currentDay.value.copy(
+                        heartRateList = viewModel.currentDay.value.heartRateList + HeartRate(
                             it
                         )
                     )
                 )
             )
-//            viewModel.currentDay.heartRateList += HeartRate(it)
             viewModel._scanEnabled.value = false
         },
         viewModel
@@ -46,38 +45,46 @@ fun MeasureHeartRateScreen(viewModel: HealthViewModel) {
     val color = Color(168, 255, 65, 215)
     var current by remember { mutableStateOf(getCurrentDay()) }
     var currentDay by remember { mutableStateOf(viewModel.days.find { it.date == getCurrentDay() }!!) }
-    val target = 100
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
         item {
-            current = lazyRowProgress1(
-                target = target,
+
+            current = lazyRowProgressForHeartRate(
                 color = color,
                 onClick = {},
                 days = viewModel.days.map {
-                    dayForLazyRow(
-                        it.date,
-                        it.heartRateList.sumOf { it.value } / if (it.heartRateList.size != 0) it.heartRateList.size else 1,
-                        target
+                    dayForLazyRowHeartRate(
+                        date = it.date,
+                        max = it.heartRateList.maxByOrNull { it.value }?.value?:1,
+                        min = it.heartRateList.minByOrNull { it.value }?.value?:1,
                     )
                 })
             currentDay = viewModel.days.find { it.date == current }!!
         }
         item {
-            LineChart(viewModel)
+            if (viewModel.showGraph.value)
+                LineChart(viewModel)
         }
         item {
-            HearRateCardByDay(min =  viewModel.currentDay.heartRateList.minByOrNull { it.value }?.value?:0,
-            max = viewModel.currentDay.heartRateList.maxByOrNull { it.value }?.value?:0,)
+            HearRateCardByDay(
+                min = currentDay.heartRateList.minByOrNull { it.value }?.value ?: 0,
+                max = currentDay.heartRateList.maxByOrNull { it.value }?.value ?: 0,
+                last = currentDay.heartRateList.lastOrNull()?.value ?: 0
+            )
             Button(onClick = {
                 viewModel._scanEnabled.value = true
+                viewModel.showGraph.value = true
                 viewModel.heartRateValues.value = mutableListOf()
             }) {
                 Text(text = "Измерить")
             }
-//            Text(text = "${viewModel.currentDay.heartRateList.lastOrNull()?.value ?: "Нет значения"}")
-//            if (viewModel.currentDay.heartRateList.isNotEmpty()) {
-//                Text(text = "${viewModel.currentDay.heartRateList.lastOrNull()?.heartRateMeasureTime.format(DateTimeFormatter.ofPattern("HH:mm")) ?: "Нет данных"}")
-//            }
+            Button(onClick = {
+                viewModel._scanEnabled.value = true
+                viewModel.heartRateValues.value = mutableListOf()
+                viewModel.checkCamera.value = true
+                viewModel.showGraph.value = false
+            }) {
+                Text(text = "Проверить камеру")
+            }
         }
         items(currentDay.heartRateList.reversed()) { heartRateValue ->
             HeartRateCard(

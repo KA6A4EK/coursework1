@@ -37,7 +37,7 @@ import kotlin.math.round
 
 @Composable
 fun StepsScreen(viewModel: HealthViewModel) {
-    val target = viewModel.currentDay.targets.steps
+    val target = viewModel.currentDay.value.targets.steps
     val color = Color(168, 255, 65, 215)
     var current by remember { mutableStateOf(getCurrentDay()) }
     var currentDay by remember { mutableStateOf(viewModel.days.find { it.date == getCurrentDay() }!!) }
@@ -77,7 +77,7 @@ fun StepsScreen(viewModel: HealthViewModel) {
                         width = 290,
                         color
                     )
-                    Text(text = "${stringResource(R.string.target)}  ${viewModel.currentDay.targets.steps}",modifier = Modifier.padding(5.dp),
+                    Text(text = "${stringResource(R.string.target)}  ${viewModel.currentDay.value.targets.steps}",modifier = Modifier.padding(5.dp),
                         Color.Gray)
                 }
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {

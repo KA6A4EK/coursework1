@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.coursework.R
 import com.example.coursework.presentation.ViewM.HealthViewModel
+import com.example.coursework.presentation.cards.ActivityProgressCard
 import com.example.coursework.presentation.cards.CardActivity
 import com.example.coursework.presentation.cards.CardBMI
 import com.example.coursework.presentation.cards.CardEat
@@ -72,9 +73,13 @@ fun StartScreen(modifier: Modifier, navController: NavController, viewModel: Hea
             )
         }
         if (viewModel.user.value.userSettings.healthUiState.activityVisible) {
+            ActivityProgressCard(
+                viewModel,
+                onCardClick = {navController.navigate("activity_list")}
+            )
             CardActivity(
                 viewModel = viewModel,
-                onCardClick = { navController.navigate("activity_list") },
+                onCardClick = { navController.navigate("create_activity") },
             )
         }
         if (viewModel.user.value.userSettings.healthUiState.bodyCompositionVisible) {

@@ -43,4 +43,27 @@
     <string name="measure">measure</string>
     <string name="bpm">bpm</string>
     <string name="heartRateListvalueisNull">----</string>
+    <string name="skiing">Skiing</string>
+    <string name="exercise">Exercise</string>
+    <string name="hiking">Hiking</string>
+    <string name="rowing">Rowing</string>
+    <string name="skateboarding">SkateBoarding</string>
+    <string name="snowboarding">Snowboarding</string>
+    <string name="snowshoeing">Snowshoeing</string>
+    <string name="baseball">Baseball</string>
+    <string name="basketball">Basketball</string>
+    <string name="cricket">Cricket</string>
+    <string name="golf">Golf</string>
+    <string name="gymnastic">Gymnastic</string>
+    <string name="handball">Handball</string>
+    <string name="kabaddi">Kabaddi</string>
+    <string name="martial">Martial</string>
+    <string name="rugby">Rugby</string>
+    <string name="soccer">Soccer</string>
+    <string name="volleyball">Volleyball</string>
+    <string name="sprint">Sprint</string>
+    <string name="surfing">Surfing</string>
+    <string name="mins">mins</string>
+    <string name="enter_title">Enter title</string>
+    <string name="notifications">Notifications</string>
 </resources>

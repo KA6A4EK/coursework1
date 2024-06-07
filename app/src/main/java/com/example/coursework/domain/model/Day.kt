@@ -16,7 +16,6 @@ data class Day(
     val date: String = getCurrentDay(),
     var water: Int = 0,
     val eat: Int = 0,
-    var activity: Int = 0,
     val bmi: Int = 0,
     var weight: Int = 60,
     var height: Int = 170,
@@ -24,6 +23,7 @@ data class Day(
     val sleepPeriod: String = "",
     var targets: Targets = Targets(),
     var trainings: List<Training> = listOf(),
+    var activity: Int = 0,
     @SerialName("heartRateList") var heartRateList: List<HeartRate> = listOf(),
     @SerialName("stepsAtTheDay") var stepsAtTheDay: List<Int> = List(24) { 0 },
 ){

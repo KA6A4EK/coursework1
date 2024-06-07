@@ -76,7 +76,7 @@ class MainActivity : ComponentActivity() {
     override fun onStop() {
         super.onStop()
         vm.saveUser()
-        vm.handleViewEvent(HealthViewEvent.Update(vm.currentDay))
+        vm.handleViewEvent(HealthViewEvent.Update(vm.currentDay.value))
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACTIVITY_RECOGNITION

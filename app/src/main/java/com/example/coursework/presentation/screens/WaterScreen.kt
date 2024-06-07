@@ -40,11 +40,11 @@ fun WaterScreen(viewModel: HealthViewModel) {
 
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         current = lazyRowProgress1(
-            target = selectedDay.targets.water,
+            target = selectedDay.value.targets.water,
             color = color,
             onClick = {},
             days = viewModel.days.map { dayForLazyRow(it.date,it.water,it.targets.water) })
-        selectedDay = viewModel.days.find { it.date == current }!!
+        selectedDay.value = viewModel.days.find { it.date == current }!!
 
         Card(
             Modifier
@@ -60,16 +60,16 @@ fun WaterScreen(viewModel: HealthViewModel) {
             ) {
                 drawWater(
                     width = 120, height = 130,
-                    percent = minOf(selectedDay.water.toFloat() / selectedDay.targets.water, 0.93f),
-                    target = selectedDay.targets.water
+                    percent = minOf(selectedDay.value.water.toFloat() / selectedDay.value.targets.water, 0.93f),
+                    target = selectedDay.value.targets.water
                 )
                 Column {
                     Text(
-                        text = "${selectedDay.water}",
+                        text = "${selectedDay.value.water}",
                         style = MaterialTheme.typography.displayMedium,
                     )
                     Text(
-                        text = "${stringResource(id = R.string.target)} ${selectedDay.targets.water}",
+                        text = "${stringResource(id = R.string.target)} ${selectedDay.value.targets.water}",
                         color = Color.Gray
                     )
                 }

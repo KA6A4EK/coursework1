@@ -100,6 +100,11 @@ fun MainScreen(
             composable(route = "heart_rate_screen") {
                 MeasureHeartRateScreen(viewModel)
             }
+            composable(route = "create_activity") {
+                CreateCustomActivityScreen(
+                    onSave = { viewModel.createActivity(it) }, navController,
+                )
+            }
         }
     }
 }
@@ -122,8 +127,10 @@ fun TopAppbar(
         )
     },
         actions = {
-            IconButton(onClick = { dropDownMenuExpanded = !dropDownMenuExpanded }) {
-                Icon(Icons.Filled.MoreVert, contentDescription = "")
+            if (curent in screens || curent in listOf("start")) {
+                IconButton(onClick = { dropDownMenuExpanded = !dropDownMenuExpanded }) {
+                    Icon(Icons.Filled.MoreVert, contentDescription = "")
+                }
             }
             if (dropDownMenuExpanded) {
                 DropdownMenu(
@@ -140,7 +147,7 @@ fun TopAppbar(
                             },
                             style = MaterialTheme.typography.headlineLarge
                         )
-                        Text(text = "Notifications", modifier = Modifier.clickable {
+                        Text(text = stringResource(R.string.notifications), modifier = Modifier.clickable {
                             navController.navigate("notifications_period")
                             dropDownMenuExpanded = false
                         }, style = MaterialTheme.typography.headlineLarge)
